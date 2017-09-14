@@ -4794,10 +4794,13 @@ class api {
         $DB->delete_records(user_competency_course::TABLE, ['userid' => $userid]);
         $DB->delete_records(user_competency_plan::TABLE, ['userid' => $userid]);
 
+        // Delete any associated files.
+        $fs = get_file_storage();
         $userevidences = $DB->get_records(user_evidence::TABLE, ['userid' => $userid], '', 'id');
         foreach($userevidences as $userevidence) {
             $DB->delete_records(user_evidence_competency::TABLE, ['userevidenceid' => $userevidence->id]);
             $DB->delete_records(user_evidence::TABLE, ['id' => $userevidence->id]);
+            $fs->delete_area_files($userevidence->contextid, 'core_competency', 'userevidence', $userevidence->id);
         }
 
         $userplans = $DB->get_records(plan::TABLE, ['userid' => $userid], '', 'id');
