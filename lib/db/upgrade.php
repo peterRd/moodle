@@ -3798,5 +3798,69 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2019120500.01);
     }
 
+    if ($oldversion < 2019121800.00) {
+        // Upgrade MIME types for existing streaming files.
+        $filetypes = array(
+            '%.fmp4' => 'video/mp4',
+            '%.ts' => 'video/MP2T',
+            '%.mpd' => 'application/dash+xml',
+            '%.m3u8' => 'application/x-mpegURL',
+        );
+
+        $select = $DB->sql_like('filename', '?', false);
+        foreach ($filetypes as $extension => $mimetype) {
+            $DB->set_field_select(
+                'files',
+                'mimetype',
+                $mimetype,
+                $select,
+                array($extension)
+            );
+        }
+
+        upgrade_main_savepoint(true, 2019121800.00);
+    }
+
+    if ($oldversion < 2019122000.01) {
+        global $DB;
+        // Delete any associated files.
+        $fs = get_file_storage();
+        $sql = "SELECT cuc.id, cuc.userid
+                  FROM {competency_usercomp} cuc
+             LEFT JOIN {user} u ON cuc.userid = u.id
+                 WHERE u.deleted = 1";
+        $usercompetencies = $DB->get_records_sql($sql);
+        foreach ($usercompetencies as $usercomp) {
+            $DB->delete_records('competency_evidence', ['usercompetencyid' => $usercomp->id]);
+            $DB->delete_records('competency_usercompcourse', ['userid' => $usercomp->userid]);
+            $DB->delete_records('competency_usercompplan', ['userid' => $usercomp->userid]);
+            $DB->delete_records('competency_usercomp', ['userid' => $usercomp->userid]);
+        }
+
+        $sql = "SELECT cue.id
+                  FROM {competency_userevidence} cue
+             LEFT JOIN {user} u ON cue.userid = u.id
+                 WHERE u.deleted = 1";
+        $userevidences = $DB->get_records_sql($sql);
+        foreach($userevidences as $userevidence) {
+            $DB->delete_records('competency_userevidencecomp', ['userevidenceid' => $userevidence->id]);
+            $DB->delete_records('competency_userevidence', ['id' => $userevidence->id]);
+            $fs->delete_area_files($userevidence->contextid, 'core_competency', 'userevidence', $userevidence->id);
+        }
+
+        $sql = "SELECT cp.id
+                  FROM {competency_plan} cp
+             LEFT JOIN {user} u ON cp.userid = u.id
+                 WHERE u.deleted = 1";
+        $userplans = $DB->get_records_sql($sql);
+        foreach($userplans as $userplan) {
+            $DB->delete_records('competency_plancomp', ['planid' => $userplan->id]);
+            $DB->delete_records('competency_plan', ['id' => $userplan->id]);
+        }
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2019122000.01);
+    }
+
     return true;
 }
