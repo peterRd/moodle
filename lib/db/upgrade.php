@@ -3821,7 +3821,7 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2019121800.00);
     }
 
-    if ($oldversion < 2019121200.01) {
+    if ($oldversion < 2019122000.01) {
         global $DB;
         // Delete any associated files.
         $fs = get_file_storage();
@@ -3859,7 +3859,7 @@ function xmldb_main_upgrade($oldversion) {
         }
 
         // Main savepoint reached.
-        upgrade_main_savepoint(true, 2019121200.01);
+        upgrade_main_savepoint(true, 2019122000.01);
     }
 
     return true;
