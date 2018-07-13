@@ -9240,6 +9240,12 @@ function get_performance_info() {
     // GET/POST (or NULL if $_SERVER['REQUEST_METHOD'] is undefined) is useful for txt logged information.
     $info['txt'] .= 'method: ' . ($_SERVER['REQUEST_METHOD'] ?? "NULL") . ' ';
 
+    if (!empty($PERF->sessionlocktime)) {
+        $info['txt'] .= 'session_lock_wait_time: ' . sprintf("%.5f", $PERF->sessionlocktime) . 's ';
+        $info['html'] .= '<li class="sessionlockwaittime col-sm-4">Session lock wait time: '.
+            sprintf("%.5f", $PERF->sessionlocktime) . 's '.'</li> ';
+    }
+
     if (function_exists('memory_get_usage')) {
         $info['memory_total'] = memory_get_usage();
         $info['memory_growth'] = memory_get_usage() - $PERF->startmemory;

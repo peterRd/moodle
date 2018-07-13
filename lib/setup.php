@@ -787,7 +787,13 @@ if (CLI_SCRIPT) {
 if (empty($CFG->sessiontimeout)) {
     $CFG->sessiontimeout = 7200;
 }
+
+// Evaluate execution time of \core\session\manager::start() in microseconds.
+$timer = -microtime(true);
 \core\session\manager::start();
+$timer += microtime(true);
+global $PERF;
+$PERF->sessionlocktime = $timer;
 
 // Set default content type and encoding, developers are still required to use
 // echo $OUTPUT->header() everywhere, anything that gets set later should override these headers.
