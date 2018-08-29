@@ -124,15 +124,19 @@ Feature: Perform basic calendar functionality
     And I click on "Really awesome event!" "link"
     And ".location-content" "css_element" should exist
     And I should see "Cube office"
+    And I should not see "»"
     And I click on "Edit" "button"
     And I set the following fields to these values:
       | Event title | Mediocre event :( |
       | Description | Wait, this event isn't that great. |
       | Location | |
+      | Duration in minutes | |
+      | Duration in minutes | 30 |
     And I press "Save"
     And I should see "Mediocre event"
     And I click on "Mediocre event :(" "link"
     Then I should see "Mediocre event"
+    And I should see "»"
     And ".location-content" "css_element" should not exist
 
   @javascript
