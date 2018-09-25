@@ -1,0 +1,1 @@
+New plugin creation test
