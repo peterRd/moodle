@@ -29,6 +29,7 @@ Feature: In a book, create chapters and sub chapters
     And I press "Save changes"
     And I should see "1. Dummy first chapter" in the "Table of contents" "block"
     And I click on "Add new chapter" "link" in the "Table of contents" "block"
+    And I should see "Dummy first chapter" in "Previous chapter"
     And I set the following fields to these values:
       | Chapter title | Dummy second chapter |
       | Content | The path is the second part |

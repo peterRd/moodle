@@ -54,6 +54,14 @@ if ($chapterid) {
 }
 $chapter->cmid = $cm->id;
 
+//If current pagenum is provided get the associated record and display the chapter title
+if ($pagenum) {
+    $currentchapter = $DB->get_record('book_chapters', ['pagenum' => $pagenum, 'bookid' => $book->id]);
+    if ($currentchapter) {
+        $chapter->currentchaptertitle = $currentchapter->title;
+    }
+}
+
 $options = array('noclean'=>true, 'subdirs'=>true, 'maxfiles'=>-1, 'maxbytes'=>0, 'context'=>$context);
 $chapter = file_prepare_standard_editor($chapter, 'content', $options, $context, 'mod_book', 'chapter', $chapter->id);
 
