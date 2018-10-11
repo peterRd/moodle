@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use renderer_base;
 use moodle_url;
+use core_completion\progress;
 
 /**
  * Class for exporting a course summary from an stdClass.
@@ -41,9 +42,22 @@ class course_summary_exporter extends \core\external\exporter {
     }
 
     protected function get_other_values(renderer_base $output) {
+        $courseimage = self::get_course_image($this->data);
+        if (!$courseimage) {
+            $courseimage = self::get_course_pattern($this->data);
+        }
+        $progress = self::get_course_progress($this->data);
+        $hasprogress = false;
+        if ($progress === 0 || $progress > 0) {
+            $hasprogress = true;
+        }
+        $progress = floor($progress);
         return array(
             'fullnamedisplay' => get_course_display_name_for_list($this->data),
-            'viewurl' => (new moodle_url('/course/view.php', array('id' => $this->data->id)))->out(false)
+            'viewurl' => (new moodle_url('/course/view.php', array('id' => $this->data->id)))->out(false),
+            'courseimage' => $courseimage,
+            'progress' => $progress,
+            'hasprogress' => $hasprogress
         );
     }
 
@@ -96,7 +110,83 @@ class course_summary_exporter extends \core\external\exporter {
             ),
             'viewurl' => array(
                 'type' => PARAM_URL,
+            ),
+            'courseimage' => array(
+                'type' => PARAM_RAW,
+            ),
+            'progress' => array(
+                'type' => PARAM_INT,
+                'optional' => true
+            ),
+            'hasprogress' => array(
+                'type' => PARAM_BOOL
             )
         );
+    }
+
+    /**
+     * Get the course image if added to course.
+     *
+     * @param object $course
+     * @return string url of course image
+     */
+    public static function get_course_image($course) {
+        global $CFG;
+        $courseinlist = new \core_course_list_element($course);
+        foreach ($courseinlist->get_course_overviewfiles() as $file) {
+            if ($file->is_valid_image()) {
+                return \file_encode_url("$CFG->wwwroot/pluginfile.php",
+                    '/'.
+                    $file->get_contextid().
+                    '/'.
+                    $file->get_component().
+                    '/'.
+                    $file->get_filearea().
+                    $file->get_filepath().
+                    $file->get_filename(),
+                false);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get the course pattern datauri.
+     *
+     * The datauri is an encoded svg that can be passed as a url.
+     * @param object $course
+     * @return string datauri
+     */
+    public static function get_course_pattern($course) {
+        $color = self::coursecolor($course->id);
+        $pattern = new \core_geopattern();
+        $pattern->setColor($color);
+        $pattern->patternbyid($course->id);
+        return $pattern->datauri();
+    }
+
+    /**
+     * Get the course progress percentage.
+     *
+     * @param object $course
+     * @return int progress
+     */
+    public static function get_course_progress($course) {
+        return \core_completion\progress::get_course_progress_percentage($course);
+    }
+
+    /**
+     * Get the course color.
+     *
+     * @param int $courseid
+     * @return string hex color code.
+     */
+    public static function coursecolor($courseid) {
+        // The colour palette is hardcoded for now. It would make sense to combine it with theme settings.
+        $basecolors = ['#81ecec', '#74b9ff', '#a29bfe', '#dfe6e9', '#00b894',
+            '#0984e3', '#b2bec3', '#fdcb6e', '#fd79a8', '#6c5ce7'];
+
+        $color = $basecolors[$courseid % 10];
+        return $color;
     }
 }
