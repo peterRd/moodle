@@ -14,13 +14,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * A javascript module to retrieve enrolled coruses from the server.
+ * A javascript module to handle webservice calls to the server.
+ * Currently does:
+ *  * Gets enrolled course
+ *  * Updates user preferences
  *
  * @package    block_myoverview
  * @copyright  2018 Bas Brands <base@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define(['core/ajax'], function(Ajax) {
+define(['core/ajax', 'core/notification'], function(Ajax, Notification) {
 
     /**
      * Retrieve a list of enrolled courses.
@@ -47,7 +50,32 @@ define(['core/ajax'], function(Ajax) {
         return promise;
     };
 
+    /**
+     * Update the user preferences.
+     *
+     * @param {object} args
+     * Sample args:
+     * {
+     *     preferences: [
+     *         {
+     *             type: 'block_example_user_sort_preference'
+     *             value: 'title'
+     *         }
+     *     ]
+     * }
+     */
+    var updateUserPreferences = function(args) {
+        var request = {
+            methodname: 'core_user_update_user_preferences',
+            args: args
+        };
+
+        Ajax.call([request])[0]
+            .fail(Notification.exception);
+    };
+
     return {
-        getEnrolledCoursesByTimeline: getEnrolledCoursesByTimeline
+        getEnrolledCoursesByTimeline: getEnrolledCoursesByTimeline,
+        updateUserPreferences: updateUserPreferences
     };
 });
