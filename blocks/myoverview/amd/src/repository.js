@@ -14,7 +14,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * A javascript module to retrieve enrolled coruses from the server.
+ * A javascript module to handle webservice calls to the server.
+ * Currently does:
+ *  * Gets enrolled course
+ *  * Updates user preferences
  *
  * @package    block_myoverview
  * @copyright  2018 Bas Brands <base@moodle.com>

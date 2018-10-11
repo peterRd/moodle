@@ -28,6 +28,7 @@ use renderable;
 use renderer_base;
 use templatable;
 
+require_once($CFG->libdir . '/completionlib.php');
 require_once($CFG->dirroot . '/blocks/myoverview/lib.php');
 
 /**

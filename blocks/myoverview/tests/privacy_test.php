@@ -61,9 +61,9 @@ class block_myoverview_privacy_testcase extends \core_privacy\tests\provider_tes
     }
 
     /**
-     * Create an array of valid user preferences for the myoverview block.
+     * DataProvider for test_export_user_preferences
      *
-     * @return array Array of valid user preferences.
+     * @return array Test cases to test
      */
     public function user_preference_provider() {
         return array(
