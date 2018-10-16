@@ -44,8 +44,8 @@ function(
     /**
      * Update the user preference for the block
      *
-     * @param string filter the type of filter: display/sort/grouping
-     * @param string value the current preferred value
+     * @param {string} filter the type of filter: display/sort/grouping
+     * @param {string} value the current preferred value
      */
     var updatePreferences = function(filter, value) {
         var type = null;

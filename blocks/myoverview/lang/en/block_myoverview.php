@@ -47,22 +47,14 @@ $string['aria:removefromfavourites'] = 'Remove star for';
 $string['aria:summary'] = 'Switch to summary view';
 $string['aria:sortingdropdown'] = 'Sorting dropdown';
 $string['card'] = 'Card';
-<<<<<<< HEAD
-=======
 $string['courseprogress'] = 'Course progress:';
 $string['cards'] = 'Card';
->>>>>>> 79c7c798831... MDL-63351 block_myoverview: Save user preferences on myoverview block
 $string['complete'] = 'Complete';
 $string['favourite'] = 'Starred course';
 $string['favourites'] = 'Starred';
 $string['future'] = 'Future';
-<<<<<<< HEAD
-$string['inprogress'] = 'In progress';
 $string['notfavourite'] = 'Not starred';
-=======
-$string['hidden'] = 'Hidden';
 $string['inprogress'] = 'In progress';
->>>>>>> 79c7c798831... MDL-63351 block_myoverview: Save user preferences on myoverview block
 $string['lastaccessed'] = 'Last accessed';
 $string['list'] = 'List';
 $string['myoverview:addinstance'] = 'Add a new course overview block';
@@ -73,12 +65,17 @@ $string['pluginname'] = 'Course overview';
 $string['privacy:metadata:overviewsortpreference'] = 'The myoverview block sort preference.';
 $string['privacy:metadata:overviewviewpreference'] = 'The myoverview block view preference.';
 $string['privacy:metadata:overviewgroupingpreference'] = 'The myoverview block grouping preference.';
-<<<<<<< HEAD
 $string['removefromfavourites'] = 'Unstar this course';
-=======
->>>>>>> 79c7c798831... MDL-63351 block_myoverview: Save user preferences on myoverview block
 $string['summary'] = 'Summary';
 $string['title'] = 'Title';
+$string['aria:hidecourse'] = 'Hide {$a} from view';
+$string['aria:showcourse'] = 'Show {$a} in view';
+$string['aria:hiddencourses'] = 'Show hidden courses';
+$string['hidden'] = 'Hidden courses';
+$string['hidecourse'] = 'Hide from view';
+$string['hiddencourses'] = 'Hidden';
+$string['show'] = 'Show this course';
+$string['privacy:request:preference:set'] = 'The value of the setting \'{$a->name}\' was \'{$a->value}\'';
 
 // Deprecated since Moodle 3.6.
 $string['defaulttab'] = 'Default tab';
@@ -95,9 +92,5 @@ $string['sortbycourses'] = 'Sort by courses';
 $string['sortbydates'] = 'Sort by dates';
 $string['timeline'] = 'Timeline';
 $string['viewcoursename'] = 'View course {$a}';
-<<<<<<< HEAD
 $string['privacy:metadata:overviewlasttab'] = 'This stores the last tab selected by the user on the overview block.';
-
-=======
 $string['viewcourse'] = 'View course';
->>>>>>> 79c7c798831... MDL-63351 block_myoverview: Save user preferences on myoverview block

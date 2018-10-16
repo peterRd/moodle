@@ -35,7 +35,7 @@ Feature: The my overview block allows users to favourite their courses
     And "//div[@class='card course-card' and contains(.,'Course 3')]//span[@data-region='is-favourite' and @aria-hidden='true']" "xpath_element" should exist
     And I log out
 
-    Scenario: Star a course and switch display
+  Scenario: Star a course and switch display
     Given I log in as "student1"
     When I click on ".coursemenubtn" "css_element" in the "//div[@class='card course-card' and contains(.,'Course 5')]" "xpath_element"
     And I click on "Star this course" "link" in the "//div[@class='card course-card' and contains(.,'Course 5')]" "xpath_element"
