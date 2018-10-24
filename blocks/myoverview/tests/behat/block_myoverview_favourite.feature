@@ -1,4 +1,4 @@
-@block @block_myoverview @javascript
+@block @block_myoverview @javascript @blah
 Feature: The my overview block allows users to favourite their courses
   In order to enable the my overview block in a course
   As a student
@@ -25,20 +25,20 @@ Feature: The my overview block allows users to favourite their courses
 
   Scenario: Favourite a course on a course card
     Given I log in as "student1"
-    When I click on ".coursemenubtn" "css_element" in the "//div[@class='card course-card' and contains(.,'Course 2')]" "xpath_element"
-    And I click on "Star this course" "link" in the "//div[@class='card course-card' and contains(.,'Course 2')]" "xpath_element"
+    When I click on ".coursemenubtn" "css_element" in the "//div[@class='card dashboard-card' and contains(.,'Course 2')]" "xpath_element"
+    And I click on "Star this course" "link" in the "//div[@class='card dashboard-card' and contains(.,'Course 2')]" "xpath_element"
     And I reload the page
-    Then "//div[@class='card course-card' and contains(.,'Course 2')]//span[@data-region='is-favourite' and @aria-hidden='false']" "xpath_element" should exist
-    And "//div[@class='card course-card' and contains(.,'Course 2')]//span[@data-region='is-favourite' and @aria-hidden='true']" "xpath_element" should not exist
-    And "//div[@class='card course-card' and contains(.,'Course 2')]//span[@data-region='not-favourite' and @aria-hidden='true']" "xpath_element" should exist
-    And "//div[@class='card course-card' and contains(.,'Course 1')]//span[@data-region='is-favourite' and @aria-hidden='true']" "xpath_element" should exist
-    And "//div[@class='card course-card' and contains(.,'Course 3')]//span[@data-region='is-favourite' and @aria-hidden='true']" "xpath_element" should exist
+    Then "//div[@class='card dashboard-card' and contains(.,'Course 2')]//span[@data-region='is-favourite' and @aria-hidden='false']" "xpath_element" should exist
+    And "//div[@class='card dashboard-card' and contains(.,'Course 2')]//span[@data-region='is-favourite' and @aria-hidden='true']" "xpath_element" should not exist
+    And "//div[@class='card dashboard-card' and contains(.,'Course 2')]//span[@data-region='not-favourite' and @aria-hidden='true']" "xpath_element" should exist
+    And "//div[@class='card dashboard-card' and contains(.,'Course 1')]//span[@data-region='is-favourite' and @aria-hidden='true']" "xpath_element" should exist
+    And "//div[@class='card dashboard-card' and contains(.,'Course 3')]//span[@data-region='is-favourite' and @aria-hidden='true']" "xpath_element" should exist
     And I log out
 
   Scenario: Star a course and switch display
     Given I log in as "student1"
-    When I click on ".coursemenubtn" "css_element" in the "//div[@class='card course-card' and contains(.,'Course 5')]" "xpath_element"
-    And I click on "Star this course" "link" in the "//div[@class='card course-card' and contains(.,'Course 5')]" "xpath_element"
+    When I click on ".coursemenubtn" "css_element" in the "//div[@class='card dashboard-card' and contains(.,'Course 5')]" "xpath_element"
+    And I click on "Star this course" "link" in the "//div[@class='card dashboard-card' and contains(.,'Course 5')]" "xpath_element"
     And I reload the page
     And I click on "Display dropdown" "button" in the "Course overview" "block"
     And I click on "List" "link" in the "Course overview" "block"
