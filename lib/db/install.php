@@ -259,6 +259,8 @@ function xmldb_main_install() {
     $guestrole          = create_role('', 'guest', '', 'guest');
     $userrole           = create_role('', 'user', '', 'user');
     $frontpagerole      = create_role('', 'frontpage', '', 'frontpage');
+    create_role('foo', 'foo', 'foo');
+    create_role('bar', 'bar', 'bar');
 
     // Now is the correct moment to install capabilities - after creation of legacy roles, but before assigning of roles
     update_capabilities('moodle');
