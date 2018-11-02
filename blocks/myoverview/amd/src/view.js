@@ -69,6 +69,8 @@ function(
 
     var lastPage = 0;
 
+    var lastLimit = 0;
+
     /**
      * Get filter values from DOM.
      *
@@ -262,7 +264,19 @@ function(
         // Get the next page's data if loaded and pop the first element from it
         if (loadedPages[jumpto + 1] != undefined) {
             var newElement = loadedPages[jumpto + 1].courses.slice(0, 1);
-            loadedPages[jumpto + 1].courses = loadedPages[jumpto + 1].courses.slice(1);
+
+            // Adjust the dataset for the reset of the pages that are loaded
+            loadedPages.forEach(function(courseList, index) {
+                if (index > jumpto) {
+                    var popElement = [];
+                    if (loadedPages[index + 1] != undefined) {
+                        popElement = loadedPages[index + 1].courses.slice(0, 1);
+                    }
+
+                    loadedPages[index].courses = $.merge(loadedPages[index].courses.slice(1), popElement);
+                }
+            });
+
 
             reducedCourse = $.merge(reducedCourse, newElement);
         }
@@ -375,12 +389,21 @@ function(
                     var currentPage = pageData.pageNumber;
                     var limit = pageData.limit;
 
+                    // Reset local variables if limits have changed
+                    if (lastLimit != limit) {
+                        loadedPages = [];
+                        courseOffset = 0;
+                        lastPage = 0;
+                    }
+
                     if (lastPage == currentPage) {
                         // If we are on the last page and have it's data then load it from cache
                         actions.allItemsLoaded(lastPage);
                         promises.push(renderCourses(root, loadedPages[currentPage]));
                         return true;
                     }
+
+                    lastLimit = limit;
 
                     // Get 2 pages worth of data as we will need it for the hidden functionality.
                     if (loadedPages[currentPage + 1] == undefined) {
@@ -417,9 +440,11 @@ function(
 
                         // Set up the next page
                         var remainingCourses = courses.slice(nextPageStart, courses.length);
-                        loadedPages[currentPage + 1] = {
-                            courses: remainingCourses
-                        };
+                        if (remainingCourses.length) {
+                            loadedPages[currentPage + 1] = {
+                                courses: remainingCourses
+                            };
+                        }
 
                         // Set the last page to either the current or next page
                         if (loadedPages[currentPage].courses.length < pageData.limit) {
