@@ -36,10 +36,37 @@ class mod_folder_edit_form extends moodleform {
 
         $mform->addElement('hidden', 'id', $data->id);
         $mform->setType('id', PARAM_INT);
+        $mform->addElement('hidden', 'timemodified', $data->timemodified);
+        $mform->setType('timemodified', PARAM_NUMBER);
         $mform->addElement('filemanager', 'files_filemanager', get_string('files'), null, $options);
         $submit_string = get_string('savechanges');
         $this->add_action_buttons(true, $submit_string);
 
         $this->set_data($data);
+    }
+
+    /**
+     * Overrides parent::validation. Validate form values
+     *
+     * @param array $data array of ("fieldname"=>value) of submitted data
+     * @param array $files array of uploaded files "element_name"=>tmp_file_path
+     * @return array of "element_name"=>"error_description" if there are errors,
+     *         or an empty array if everything is OK (true allowed for backwards compatibility too).
+     */
+    public function validation($data, $files) {
+        $errors = array();
+        foreach ($data as $key => $value) {
+            switch($key) {
+                // Don't allow updates to the form if the modified time has been updated.
+                case 'timemodified':
+                    $defaultvalue = $this->_form->_defaultValues[$key];
+                    if ($value != $defaultvalue) {
+                        $errors['files_filemanager'] = "Files have been externally updated. Please try again later.";
+                    }
+                    break;
+            }
+        }
+
+        return $errors;
     }
 }

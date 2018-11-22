@@ -45,6 +45,7 @@ $PAGE->set_activity_record($folder);
 
 $data = new stdClass();
 $data->id = $cm->id;
+$data->timemodified = $folder->timemodified;
 $maxbytes = get_user_max_upload_file_size($context, $CFG->maxbytes);
 $options = array('subdirs' => 1, 'maxbytes' => $maxbytes, 'maxfiles' => -1, 'accepted_types' => '*');
 file_prepare_standard_filemanager($data, 'files', $options, $context, 'mod_folder', 'content', 0);
