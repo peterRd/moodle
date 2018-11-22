@@ -665,8 +665,9 @@ class core_filelib_testcase extends advanced_testcase {
             'filename'  => $filename,
             'source'    => $sourcefield,
         );
-        $ref = $fs->pack_reference($filerecord);
         $originalfile = $fs->create_file_from_string($filerecord, 'Test content');
+        $filerecord['lastmodified'] = $originalfile->get_parent_directory()->get_timemodified();
+        $ref = $fs->pack_reference($filerecord);
         $fileid = $originalfile->get_id();
         $this->assertInstanceOf('stored_file', $originalfile);
 
@@ -1477,6 +1478,104 @@ EOF;
     }
 
     /**
+     * Test the response of get_file_area_info while taking into account the race condition check.
+     * NOTE: This will also test file_is_original_modified
+     */
+    public function test_file_get_file_area_info_with_race_condition() {
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        global $USER;
+        $usercontext = context_user::instance($USER->id);
+        $fs = get_file_storage();
+
+        // Test the race condition check with existing files.
+        $filerecord = array(
+            'filename'  => 'one.txt',
+        );
+        $file = self::create_draft_file($filerecord);
+
+        $syscontext = context_system::instance();
+        $component = 'core';
+        $filearea  = 'unittest';
+        $itemid    = $file->get_itemid();
+        $filepath  = '/';
+        $filename  = 'test.txt';
+        $sourcefield = 'Copyright stuff';
+
+        $filerecord = array(
+            'contextid' => $syscontext->id,
+            'component' => $component,
+            'filearea'  => $filearea,
+            'itemid'    => 0,
+            'filepath'  => $filepath,
+            'filename'  => $filename,
+            'source'    => $sourcefield,
+        );
+        $originalfile = $fs->create_file_from_string($filerecord, 'Test content');
+        $draftfilerecord = array(
+            'contextid' => $usercontext->id,
+            'component' => 'user',
+            'filearea' => 'draft',
+            'itemid' => $itemid
+        );
+        $draftfile = $fs->create_file_from_storedfile($draftfilerecord, $originalfile);
+        $sourcefield = $originalfile->get_source();
+        $newsourcefield = new stdClass;
+        $newsourcefield->source = $sourcefield;
+        $original = new stdClass;
+        $original->contextid = $filerecord['contextid'];
+        $original->component = $component;
+        $original->filearea  = $filearea;
+        $original->itemid    = 0;
+        $original->lastmodified = time() - 10; // This will trigger the originalmodified to be set to true in the response.
+        $original->filename  = $originalfile->get_filename();
+        $original->filepath  = $originalfile->get_filepath();
+        $newsourcefield->original = file_storage::pack_reference($original);
+        $draftfile->set_source(serialize($newsourcefield));
+
+        $fileinfo = file_get_file_area_info($usercontext->id, 'user', 'draft', $itemid);
+        $this->assertEquals(2, $fileinfo['filecount']);
+        $this->assertTrue($fileinfo['originalmodified']);
+
+        // Test the race condition check with a draft area with no files in it.
+        $draftitemid = file_get_unused_draft_itemid();
+        $fs->create_directory($usercontext->id, 'user', 'draft', $draftitemid, '/');
+        $draftrootdir = $fs->get_file($usercontext->id, 'user', 'draft', $draftitemid, '/', '.');
+
+        $fs->create_directory($syscontext->id, 'core', 'unittest2', 0, '/');
+        $originalroot = $fs->get_file($syscontext->id, 'core', 'unittest2', 0, '/', '.');
+
+        $sourcefield = $originalroot->get_source();
+        $newsourcefield = new stdClass;
+        $newsourcefield->source = $sourcefield;
+        $original = new stdClass;
+        $original->contextid = $filerecord['contextid'];
+        $original->component = $component;
+        $original->filearea = 'unittest2';
+        $original->itemid = 0;
+        $original->lastmodified = $originalroot->get_timemodified() + 10;
+        $original->filename = $originalroot->get_filename();
+        $original->filepath = $originalroot->get_filepath();
+        $newsourcefield->original = file_storage::pack_reference($original);
+        $draftrootdir->set_source(serialize($newsourcefield));
+
+        // Race condition test if the root folder has been updated.
+        $fileinfo = file_get_file_area_info($usercontext->id, 'user', 'draft', $draftitemid);
+        $this->assertEquals(0, $fileinfo['filecount']);
+        $this->assertTrue($fileinfo['originalmodified']);
+
+        $original->lastmodified = $originalroot->get_timemodified();
+        $newsourcefield->original = file_storage::pack_reference($original);
+        $draftrootdir->set_source(serialize($newsourcefield));
+
+        // Race condition test if the root folder has NOT been updated.
+        $fileinfo = file_get_file_area_info($usercontext->id, 'user', 'draft', $draftitemid);
+        $this->assertEquals(0, $fileinfo['filecount']);
+        $this->assertFalse($fileinfo['originalmodified']);
+    }
+
+    /**
      * Test file_get_file_area_info.
      */
     public function test_file_get_file_area_info() {
@@ -1521,6 +1620,7 @@ EOF;
         $this->assertEquals($size, $fileinfo['filesize']);
         $this->assertEquals(1, $fileinfo['foldercount']);   // Directory created.
         $this->assertEquals($size, $fileinfo['filesize_without_references']);
+        $this->assertFalse($fileinfo['originalmodified']);
 
         // Now get files from just one folder.
         $fileinfo = file_get_file_area_info($usercontext->id, 'user', 'private', 0, '/testsubdir/');
@@ -1528,6 +1628,7 @@ EOF;
         $this->assertEquals($file->get_filesize(), $fileinfo['filesize']);
         $this->assertEquals(0, $fileinfo['foldercount']);   // No subdirectories inside the directory.
         $this->assertEquals($file->get_filesize(), $fileinfo['filesize_without_references']);
+        $this->assertFalse($fileinfo['originalmodified']);
     }
 
     /**

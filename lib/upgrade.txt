@@ -49,6 +49,7 @@ is disabled).
     - make_pluginfile_url
     - file_rewrite_pluginfile_urls
 * New mform element 'float' handles localised floating point numbers.
+* A new toggleable race condition check to handle concurrent updates when using the filemanager. Currently used in mod_folder.
 
 === 3.6 ===
 

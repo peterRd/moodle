@@ -362,8 +362,6 @@ abstract class moodleform_mod extends moodleform {
 
         $mform =& $this->_form;
 
-        $errors = array();
-
         if ($mform->elementExists('name')) {
             $name = trim($data['name']);
             if ($name == '') {
