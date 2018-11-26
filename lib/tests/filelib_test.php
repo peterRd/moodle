@@ -665,8 +665,9 @@ class core_filelib_testcase extends advanced_testcase {
             'filename'  => $filename,
             'source'    => $sourcefield,
         );
-        $ref = $fs->pack_reference($filerecord);
         $originalfile = $fs->create_file_from_string($filerecord, 'Test content');
+        $filerecord['lastmodified'] = $originalfile->get_parent_directory()->get_timemodified();
+        $ref = $fs->pack_reference($filerecord);
         $fileid = $originalfile->get_id();
         $this->assertInstanceOf('stored_file', $originalfile);
 

@@ -229,6 +229,19 @@ abstract class moodleform {
     }
 
     /**
+     * Sets the race condition check with a variable and value
+     * Creates a new form element to store a value which will be used to perform the check after form submit
+     *
+     * @param mixed $raceconditioncheckvalue The contents of the form element which will be used for the racecondition check
+     *                          e.g. the contents could be a last modified timestamp.
+     */
+    public function enable_race_condition_check($raceconditioncheckvalue) {
+        $this->_form->addElement('hidden', 'race-condition-check', null);
+        $this->_form->setType('race-condition-check', PARAM_RAW);
+        $this->_form->setDefault('race-condition-check', $raceconditioncheckvalue);
+    }
+
+    /**
      * It should returns unique identifier for the form.
      * Currently it will return class name, but in case two same forms have to be
      * rendered on same page then override function to get unique form identifier.
@@ -1011,7 +1024,10 @@ abstract class moodleform {
     }
 
     /**
-     * Dummy stub method - override if you needed to perform some extra validation.
+     * Basic validation for race conditions. Message displayed via static.
+     * Non-empty error array returned to trigger validation failure.
+     *
+     * Override if you needed to perform some extra validation.
      * If there are errors return array of errors ("fieldname"=>"error message"),
      * otherwise true if ok.
      *
@@ -1023,7 +1039,22 @@ abstract class moodleform {
      *         or an empty array if everything is OK (true allowed for backwards compatibility too).
      */
     function validation($data, $files) {
-        return array();
+        $errors = array();
+        foreach ($data as $key => $value) {
+            switch($key) {
+                // Don't allow updates to the form if the modified time has been updated.
+                case 'race-condition-check':
+                    $defaultvalue = $this->_form->_defaultValues[$key];
+                    if ($value != $defaultvalue) {
+                        $errors['submitbutton'] = get_string('formexternallyupdated', 'form');
+                        // Add a generic error message.
+                        $this->_form->addElement('static', 'warning', '', $errors['submitbutton']);
+                    }
+                    break;
+            }
+        }
+
+        return $errors;
     }
 
     /**

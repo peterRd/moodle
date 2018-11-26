@@ -574,9 +574,12 @@ function file_get_file_area_info($contextid, $component, $filearea, $itemid = 0,
                 $original['itemid'], $original['filepath'], $original['filename']
             );
 
-            $newtime = (int) $tst->get_parent_directory()->get_timemodified();
-            if ($newtime > $original['lastmodified']) {
-                $results['originalmodified'] = true;
+            $results['originalmodified'] = true;
+            if ($tst) {
+                $newtime = (int) $tst->get_parent_directory()->get_timemodified();
+                if ($newtime == $original['lastmodified']) {
+                    $results['originalmodified'] = false;
+                }
             }
         }
 
