@@ -47,10 +47,11 @@ $data = new stdClass();
 $data->id = $cm->id;
 $data->timemodified = $folder->timemodified;
 $maxbytes = get_user_max_upload_file_size($context, $CFG->maxbytes);
-$options = array('subdirs' => 1, 'maxbytes' => $maxbytes, 'maxfiles' => -1, 'accepted_types' => '*');
+$options = array('subdirs' => 1, 'maxbytes' => $maxbytes, 'maxfiles' => -1, 'accepted_types' => '*', 'raceconditioncheck' => true);
 file_prepare_standard_filemanager($data, 'files', $options, $context, 'mod_folder', 'content', 0);
 
 $mform = new mod_folder_edit_form(null, array('data'=>$data, 'options'=>$options));
+$mform->enable_race_condition_check($data->timemodified);
 if ($folder->display == FOLDER_DISPLAY_INLINE) {
     $redirecturl = course_get_url($cm->course, $cm->sectionnum);
 } else {
