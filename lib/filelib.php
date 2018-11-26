@@ -431,6 +431,7 @@ function file_prepare_draft_area(&$draftitemid, $contextid, $component, $fileare
                 $original->component = $component;
                 $original->filearea  = $filearea;
                 $original->itemid    = $itemid;
+                $original->lastmodified = $file->get_parent_directory()->get_timemodified();
                 $original->filename  = $file->get_filename();
                 $original->filepath  = $file->get_filepath();
                 $newsourcefield->original = file_storage::pack_reference($original);
@@ -558,7 +559,8 @@ function file_get_file_area_info($contextid, $component, $filearea, $itemid = 0,
         'filecount' => 0,
         'foldercount' => 0,
         'filesize' => 0,
-        'filesize_without_references' => 0
+        'filesize_without_references' => 0,
+        'originalmodified' => false
     );
 
     $draftfiles = $fs->get_directory_files($contextid, $component, $filearea, $itemid, $filepath, true, true);
@@ -571,6 +573,20 @@ function file_get_file_area_info($contextid, $component, $filearea, $itemid = 0,
         }
 
         $filesize = $file->get_filesize();
+
+        // Check whether the original has changed and update the last modified date.
+        if (!$results['originalmodified'] && ($source = @unserialize($file->get_source())) && isset($source->original)) {
+            $original = file_storage::unpack_reference($source->original);
+            $tst = $fs->get_file($original['contextid'], $original['component'], $original['filearea'],
+                $original['itemid'], $original['filepath'], $original['filename']
+            );
+
+            $newtime = (int) $tst->get_parent_directory()->get_timemodified();
+            if ($newtime > $original['lastmodified']) {
+                $results['originalmodified'] = true;
+            }
+        }
+
         $results['filesize'] += $filesize;
         if (!$file->is_external_file()) {
             $results['filesize_without_references'] += $filesize;

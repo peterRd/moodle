@@ -63,6 +63,8 @@ switch ($action) {
         $info = file_get_draft_area_info($draftid);
         $data->filecount = $info['filecount'];
         $data->filesize = $info['filesize'];
+        $data->originalmodified = $info['originalmodified'];
+
         $data->tree = new stdClass();
         file_get_drafarea_folders($draftid, '/', $data->tree);
         echo json_encode($data);

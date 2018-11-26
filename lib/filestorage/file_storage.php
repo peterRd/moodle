@@ -1874,6 +1874,7 @@ class file_storage {
         $reference['filearea']  = is_null($params['filearea'])  ? null : clean_param($params['filearea'],  PARAM_AREA);
         $reference['filepath']  = is_null($params['filepath'])  ? null : clean_param($params['filepath'],  PARAM_PATH);
         $reference['filename']  = is_null($params['filename'])  ? null : clean_param($params['filename'],  PARAM_FILE);
+        $reference['lastmodified']  = empty($params['lastmodified']) ? null : clean_param($params['lastmodified'],  PARAM_INT);
         return base64_encode(serialize($reference));
     }
 

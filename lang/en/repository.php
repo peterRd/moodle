@@ -115,6 +115,7 @@ $string['errorpostmaxsize'] = 'The file you tried to upload is too large for the
 $string['errorwhilecommunicatingwith'] = 'Error while communicating with the repository \'{$a}\'.';
 $string['errorwhiledownload'] = 'An error occurred while downloading the file: {$a}';
 $string['existingrepository'] = 'This repository already exists';
+$string['externalchange'] = 'The folder has been changed by another user. Further updates may not persist';
 $string['federatedsearch'] = 'Federated search';
 $string['fileexists'] = 'File name already being used, please use another name';
 $string['fileexistsdialog_editor'] = 'A file with that name has already been attached to the text you are editing.';
