@@ -32,7 +32,7 @@ $id = required_param('id', PARAM_INT);
 $cm = get_coursemodule_from_id('lesson', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 $lesson = new lesson($DB->get_record('lesson', array('id' => $cm->instance), '*', MUST_EXIST), $cm, $course);
-
+$review = optional_param('review', false, PARAM_BOOL);
 require_login($course, false, $cm);
 require_sesskey();
 
@@ -75,7 +75,7 @@ if ($result->nodefaultresponse || $result->inmediatejump) {
 }
 
 // Set Messages.
-$lesson->add_messages_on_page_process($page, $result, $reviewmode);
+$lesson->add_messages_on_page_process($page, $result, $reviewmode || $review);
 
 $PAGE->set_url('/mod/lesson/view.php', array('id' => $cm->id, 'pageid' => $page->id));
 $PAGE->set_subpage($page->id);
@@ -103,6 +103,7 @@ if (isset($USER->modattempts[$lesson->id])) {
     $content .= $OUTPUT->box(get_string("continuetonextpage", "lesson"), 'center');
     $content .= html_writer::empty_tag('input', array('type'=>'hidden', 'name'=>'id', 'value'=>$cm->id));
     $content .= html_writer::empty_tag('input', array('type'=>'hidden', 'name'=>'pageid', 'value'=>LESSON_EOL));
+    $content .= html_writer::empty_tag('input', array('type'=>'hidden', 'name'=>'review', 'value' => $review));
     $content .= html_writer::empty_tag('input', array('type'=>'submit', 'name'=>'submit', 'value'=>get_string('finish', 'lesson')));
     echo html_writer::tag('form', "<div>$content</div>", array('method'=>'post', 'action'=>$url));
 }
@@ -112,11 +113,12 @@ if (!$result->correctanswer && !$result->noanswer && !$result->isessayquestion &
     $url = $CFG->wwwroot.'/mod/lesson/view.php';
     $content = html_writer::empty_tag('input', array('type'=>'hidden', 'name'=>'id', 'value'=>$cm->id));
     $content .= html_writer::empty_tag('input', array('type'=>'hidden', 'name'=>'pageid', 'value'=>$page->id));
+    $content .= html_writer::empty_tag('input', array('type'=>'hidden', 'name'=>'review', 'value' => $review));
     $content .= html_writer::empty_tag('input', array('type'=>'submit', 'name'=>'submit', 'value'=>get_string('reviewquestionback', 'lesson')));
     echo html_writer::tag('form', "<div class=\"singlebutton\">$content</div>", array('method'=>'post', 'action'=>$url));
 }
 
-$url = new moodle_url('/mod/lesson/view.php', array('id'=>$cm->id, 'pageid'=>$result->newpageid));
+$url = new moodle_url('/mod/lesson/view.php', array('id'=>$cm->id, 'pageid'=>$result->newpageid, 'review' => $review));
 if ($lesson->review && !$result->correctanswer && !$result->noanswer && !$result->isessayquestion && !$result->maxattemptsreached) {
     // Button to continue the lesson (the page to go is configured by the teacher).
     echo $OUTPUT->single_button($url, get_string('reviewquestioncontinue', 'lesson'));
