@@ -85,9 +85,11 @@ class lesson_page_type_essay extends lesson_page {
         $data = new stdClass;
         $data->id = $PAGE->cm->id;
         $data->pageid = $this->properties->id;
-        if (isset($USER->modattempts[$this->lesson->id])) {
+        if (!empty($attempt)) {
             $essayinfo = self::extract_useranswer($attempt->useranswer);
-            $data->answer = $essayinfo->answer;
+            $data->answer = [
+                'text' => $essayinfo->answer
+            ];
         }
 
         $data = file_prepare_standard_editor($data, 'answer', $options['editoroptions'],
