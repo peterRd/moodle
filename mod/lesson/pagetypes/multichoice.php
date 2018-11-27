@@ -84,12 +84,14 @@ class lesson_page_type_multichoice extends lesson_page {
         return $answers;
     }
 
-    public function display($renderer, $attempt) {
+    public function display($renderer, $attempt, $reviewmode = false) {
         global $CFG, $PAGE;
         $answers = $this->get_used_answers();
         shuffle($answers);
         $action = $CFG->wwwroot.'/mod/lesson/continue.php';
-        $params = array('answers'=>$answers, 'lessonid'=>$this->lesson->id, 'contents'=>$this->get_contents(), 'attempt'=>$attempt);
+        $params = ['answers' => $answers, 'lessonid' => $this->lesson->id, 'contents' => $this->get_contents(),
+            'attempt' => $attempt, 'review' => $reviewmode];
+
         if ($this->properties->qoption) {
             $mform = new lesson_display_answer_form_multichoice_multianswer($action, $params);
         } else {
@@ -458,11 +460,12 @@ class lesson_add_page_form_multichoice extends lesson_add_page_form_base {
 class lesson_display_answer_form_multichoice_singleanswer extends moodleform {
 
     public function definition() {
-        global $USER, $OUTPUT;
+        global $OUTPUT;
         $mform = $this->_form;
         $answers = $this->_customdata['answers'];
         $lessonid = $this->_customdata['lessonid'];
         $contents = $this->_customdata['contents'];
+        $attempt = null;
         if (array_key_exists('attempt', $this->_customdata)) {
             $attempt = $this->_customdata['attempt'];
         } else {
@@ -477,11 +480,15 @@ class lesson_display_answer_form_multichoice_singleanswer extends moodleform {
 
         $mform->addElement('html', $OUTPUT->container($contents, 'contents'));
 
-        $hasattempt = false;
+        $reviewmode = empty($this->_customdata['review']) ? false : $this->_customdata['review'];
         $disabled = '';
-        if (isset($USER->modattempts[$lessonid]) && !empty($USER->modattempts[$lessonid])) {
-            $hasattempt = true;
+        if ($reviewmode) {
             $disabled = array('disabled' => 'disabled');
+        }
+
+        $hasattempt = false;
+        if (isset($attempt) && !empty($attempt)) {
+            $hasattempt = true;
         }
 
         $options = new stdClass;
@@ -494,20 +501,24 @@ class lesson_display_answer_form_multichoice_singleanswer extends moodleform {
         $mform->addElement('hidden', 'pageid');
         $mform->setType('pageid', PARAM_INT);
 
+        $mform->addElement('hidden', 'review');
+        $mform->setType('review', PARAM_BOOL);
+        $mform->setDefault('review', $reviewmode);
+
         $i = 0;
         foreach ($answers as $answer) {
             $mform->addElement('html', '<div class="answeroption">');
             $answer->answer = preg_replace('#>$#', '> ', $answer->answer);
             $mform->addElement('radio','answerid',null,format_text($answer->answer, $answer->answerformat, $options),$answer->id, $disabled);
             $mform->setType('answer'.$i, PARAM_INT);
-            if ($hasattempt && $answer->id == $USER->modattempts[$lessonid]->answerid) {
-                $mform->setDefault('answerid', $USER->modattempts[$lessonid]->answerid);
+            if ($hasattempt && $answer->id == $attempt->answerid) {
+                $mform->setDefault('answerid', $attempt->answerid);
             }
             $mform->addElement('html', '</div>');
             $i++;
         }
 
-        if ($hasattempt) {
+        if ($reviewmode) {
             $this->add_action_buttons(null, get_string("nextpage", "lesson"));
         } else {
             $this->add_action_buttons(null, get_string("submit", "lesson"));
@@ -519,9 +530,10 @@ class lesson_display_answer_form_multichoice_singleanswer extends moodleform {
 class lesson_display_answer_form_multichoice_multianswer extends moodleform {
 
     public function definition() {
-        global $USER, $OUTPUT;
+        global $OUTPUT;
         $mform = $this->_form;
         $answers = $this->_customdata['answers'];
+        $attempt = array_key_exists('attempt', $this->_customdata) ? $this->_customdata['attempt'] : null;
 
         $lessonid = $this->_customdata['lessonid'];
         $contents = $this->_customdata['contents'];
@@ -533,13 +545,17 @@ class lesson_display_answer_form_multichoice_multianswer extends moodleform {
 
         $mform->addElement('html', $OUTPUT->container($contents, 'contents'));
 
-        $hasattempt = false;
+        $reviewmode = empty($this->_customdata['review']) ? false : $this->_customdata['review'];
         $disabled = '';
-        $useranswers = array();
-        if (isset($USER->modattempts[$lessonid]) && !empty($USER->modattempts[$lessonid])) {
-            $hasattempt = true;
+        if ($reviewmode) {
             $disabled = array('disabled' => 'disabled');
-            $useranswers = explode(',', $USER->modattempts[$lessonid]->useranswer);
+        }
+
+        $hasattempt = false;
+        $useranswers = array();
+        if (isset($attempt) && !empty($attempt)) {
+            $hasattempt = true;
+            $useranswers = explode(',', $attempt->useranswer);
         }
 
         $options = new stdClass;
@@ -570,7 +586,7 @@ class lesson_display_answer_form_multichoice_multianswer extends moodleform {
             $mform->addElement('html', '</div>');
         }
 
-        if ($hasattempt) {
+        if ($reviewmode) {
             $this->add_action_buttons(null, get_string("nextpage", "lesson"));
         } else {
             $this->add_action_buttons(null, get_string("submit", "lesson"));

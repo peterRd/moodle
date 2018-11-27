@@ -47,13 +47,15 @@ class lesson_page_type_shortanswer extends lesson_page {
     public function get_idstring() {
         return $this->typeidstring;
     }
-    public function display($renderer, $attempt) {
-        global $USER, $CFG, $PAGE;
-        $mform = new lesson_display_answer_form_shortanswer($CFG->wwwroot.'/mod/lesson/continue.php', array('contents'=>$this->get_contents(), 'lessonid'=>$this->lesson->id));
+    public function display($renderer, $attempt, $reviewmode = false) {
+        global $CFG, $PAGE;
+        $params = ['contents' => $this->get_contents(), 'lessonid' => $this->lesson->id,
+            'review' => $reviewmode, 'attempt' => $attempt];
+        $mform = new lesson_display_answer_form_shortanswer($CFG->wwwroot.'/mod/lesson/continue.php', $params);
         $data = new stdClass;
         $data->id = $PAGE->cm->id;
         $data->pageid = $this->properties->id;
-        if (isset($USER->modattempts[$this->lesson->id])) {
+        if (isset($attempt) && $attempt) {
             $data->answer = s($attempt->useranswer);
         }
         $mform->set_data($data);
@@ -448,18 +450,16 @@ class lesson_add_page_form_shortanswer extends lesson_add_page_form_base {
 class lesson_display_answer_form_shortanswer extends moodleform {
 
     public function definition() {
-        global $OUTPUT, $USER;
+        global $OUTPUT;
         $mform = $this->_form;
         $contents = $this->_customdata['contents'];
 
-        $hasattempt = false;
         $attrs = array('size'=>'50', 'maxlength'=>'200');
-        if (isset($this->_customdata['lessonid'])) {
-            $lessonid = $this->_customdata['lessonid'];
-            if (isset($USER->modattempts[$lessonid]->useranswer)) {
-                $attrs['readonly'] = 'readonly';
-                $hasattempt = true;
-            }
+        $hasattempt = empty($this->_customdata['attempt']) ? false : true;
+
+        $reviewmode = empty($this->_customdata['review']) ? false : $this->_customdata['review'];
+        if ($reviewmode) {
+            $attrs['readonly'] = 'readonly';
         }
 
         $placeholder = false;
@@ -479,6 +479,10 @@ class lesson_display_answer_form_shortanswer extends moodleform {
         $mform->addElement('hidden', 'pageid');
         $mform->setType('pageid', PARAM_INT);
 
+        $mform->addElement('hidden', 'review');
+        $mform->setType('review', PARAM_BOOL);
+        $mform->setDefault('review', $reviewmode);
+
         if ($placeholder) {
             $contentsgroup = array();
             $contentsgroup[] = $mform->createElement('static', '', '', $contentsparts[0]);
@@ -492,7 +496,7 @@ class lesson_display_answer_form_shortanswer extends moodleform {
         }
         $mform->setType('answer', PARAM_TEXT);
 
-        if ($hasattempt) {
+        if ($reviewmode) {
             $this->add_action_buttons(null, get_string("nextpage", "lesson"));
         } else {
             $this->add_action_buttons(null, get_string("submit", "lesson"));

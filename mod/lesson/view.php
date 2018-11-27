@@ -32,6 +32,7 @@ require_once($CFG->libdir . '/grade/constants.php');
 $id      = required_param('id', PARAM_INT);             // Course Module ID
 $pageid  = optional_param('pageid', null, PARAM_INT);   // Lesson Page ID
 $edit    = optional_param('edit', -1, PARAM_BOOL);
+$review    = optional_param('review', false, PARAM_BOOL);
 $userpassword = optional_param('userpassword','',PARAM_RAW);
 $backtocourse = optional_param('backtocourse', false, PARAM_RAW);
 
@@ -142,7 +143,7 @@ if (empty($pageid)) {
             if ($lesson->timelimit) {
                 if ($lesson->retake) {
                     $continuelink = new single_button(new moodle_url('/mod/lesson/view.php',
-                            array('id' => $cm->id, 'pageid' => $lesson->firstpageid, 'startlastseen' => 'no')),
+                            ['id' => $cm->id, 'pageid' => $lesson->firstpageid, 'startlastseen' => 'no', 'review' => $review]),
                             get_string('continue', 'lesson'), 'get');
 
                     echo html_writer::div($lessonoutput->message(get_string('leftduringtimed', 'lesson'), $continuelink),
@@ -214,7 +215,8 @@ if ($pageid != LESSON_EOL) {
         }
     }
 
-    list($newpageid, $page, $lessoncontent) = $lesson->prepare_page_and_contents($pageid, $lessonoutput, $reviewmode);
+    // If the review has been explicitly specified then atleast one should be used.
+    list($newpageid, $page, $lessoncontent) = $lesson->prepare_page_and_contents($pageid, $lessonoutput, $reviewmode || $review);
 
     if (($edit != -1) && $PAGE->user_allowed_editing()) {
         $USER->editing = $edit;

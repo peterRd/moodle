@@ -102,7 +102,7 @@ class lesson_page_type_branchtable extends lesson_page {
     public function get_idstring() {
         return $this->typeidstring;
     }
-    public function display($renderer, $attempt) {
+    public function display($renderer, $attempt, $reviewmode = false) {
         global $PAGE, $CFG;
 
         $output = '';

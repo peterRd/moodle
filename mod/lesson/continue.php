@@ -32,7 +32,7 @@ $id = required_param('id', PARAM_INT);
 $cm = get_coursemodule_from_id('lesson', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 $lesson = new lesson($DB->get_record('lesson', array('id' => $cm->instance), '*', MUST_EXIST), $cm, $course);
-
+$review = optional_param('review', false, PARAM_BOOL);
 require_login($course, false, $cm);
 require_sesskey();
 
@@ -91,7 +91,7 @@ if ($lesson->displayleft) {
 if ($lesson->ongoing && !$reviewmode) {
     echo $lessonoutput->ongoing_score($lesson);
 }
-if (!$reviewmode) {
+if (!$reviewmode && !$review) {
     echo format_text($result->feedback, FORMAT_MOODLE, array('context' => $context, 'noclean' => true));
 }
 
@@ -106,11 +106,11 @@ if (isset($USER->modattempts[$lesson->id])) {
 
 // Review button back
 if (!$result->correctanswer && !$result->noanswer && !$result->isessayquestion && !$reviewmode && $lesson->review && !$result->maxattemptsreached) {
-    $url = new moodle_url('/mod/lesson/view.php', array('id' => $cm->id, 'pageid' => $page->id));
+    $url = new moodle_url('/mod/lesson/view.php', array('id' => $cm->id, 'pageid' => $page->id, 'review' => $review));
     echo $OUTPUT->single_button($url, get_string('reviewquestionback', 'lesson'));
 }
 
-$url = new moodle_url('/mod/lesson/view.php', array('id'=>$cm->id, 'pageid'=>$result->newpageid));
+$url = new moodle_url('/mod/lesson/view.php', array('id'=>$cm->id, 'pageid'=>$result->newpageid, 'review' => $review));
 
 if ($lesson->review && !$result->correctanswer && !$result->noanswer && !$result->isessayquestion && !$result->maxattemptsreached) {
     // If both the "Yes, I'd like to try again" and "No, I just want to go on  to the next question" point to the same

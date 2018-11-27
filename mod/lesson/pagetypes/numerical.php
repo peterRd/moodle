@@ -47,13 +47,14 @@ class lesson_page_type_numerical extends lesson_page {
     public function get_idstring() {
         return $this->typeidstring;
     }
-    public function display($renderer, $attempt) {
-        global $USER, $CFG, $PAGE;
-        $mform = new lesson_display_answer_form_shortanswer($CFG->wwwroot.'/mod/lesson/continue.php', array('contents'=>$this->get_contents(), 'lessonid'=>$this->lesson->id));
+    public function display($renderer, $attempt, $reviewmode = false) {
+        global $CFG, $PAGE;
+        $params = ['contents' => $this->get_contents(), 'lessonid' => $this->lesson->id, 'review' => $reviewmode];
+        $mform = new lesson_display_answer_form_shortanswer($CFG->wwwroot.'/mod/lesson/continue.php', $params);
         $data = new stdClass;
         $data->id = $PAGE->cm->id;
         $data->pageid = $this->properties->id;
-        if (isset($USER->modattempts[$this->lesson->id])) {
+        if (isset($attempt) && $attempt) {
             $data->answer = s($attempt->useranswer);
         }
         $mform->set_data($data);

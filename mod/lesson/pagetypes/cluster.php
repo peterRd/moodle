@@ -36,7 +36,7 @@ class lesson_page_type_cluster extends lesson_page {
     protected $string = null;
     protected $jumpto = null;
 
-    public function display($renderer, $attempt) {
+    public function display($renderer, $attempt, $reviewmode = false) {
         return '';
     }
 

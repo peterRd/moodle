@@ -47,15 +47,16 @@ class lesson_page_type_truefalse extends lesson_page {
     public function get_idstring() {
         return $this->typeidstring;
     }
-    public function display($renderer, $attempt) {
-        global $USER, $CFG, $PAGE;
+    public function display($renderer, $attempt, $reviewmode = false) {
+        global $CFG, $PAGE;
         $answers = $this->get_answers();
         foreach ($answers as $key => $answer) {
             $answers[$key] = parent::rewrite_answers_urls($answer);
         }
         shuffle($answers);
 
-        $params = array('answers'=>$answers, 'lessonid'=>$this->lesson->id, 'contents'=>$this->get_contents(), 'attempt'=>$attempt);
+        $params = ['answers' => $answers, 'lessonid' => $this->lesson->id, 'contents' => $this->get_contents(),
+            'attempt' => $attempt, 'review' => $reviewmode];
         $mform = new lesson_display_answer_form_truefalse($CFG->wwwroot.'/mod/lesson/continue.php', $params);
         $data = new stdClass;
         $data->id = $PAGE->cm->id;
@@ -372,13 +373,17 @@ class lesson_add_page_form_truefalse extends lesson_add_page_form_base {
 class lesson_display_answer_form_truefalse extends moodleform {
 
     public function definition() {
-        global $USER, $OUTPUT;
+        global $OUTPUT;
         $mform = $this->_form;
         $answers = $this->_customdata['answers'];
         $lessonid = $this->_customdata['lessonid'];
         $contents = $this->_customdata['contents'];
+        $hasattempt = false;
         if (array_key_exists('attempt', $this->_customdata)) {
             $attempt = $this->_customdata['attempt'];
+            if (isset($attempt) && !empty($attempt)) {
+                $hasattempt = true;
+            }
         } else {
             $attempt = new stdClass();
             $attempt->answerid = null;
@@ -391,10 +396,9 @@ class lesson_display_answer_form_truefalse extends moodleform {
 
         $mform->addElement('html', $OUTPUT->container($contents, 'contents'));
 
-        $hasattempt = false;
+        $reviewmode = empty($this->_customdata['review']) ? false : $this->_customdata['review'];
         $disabled = '';
-        if (isset($USER->modattempts[$lessonid]) && !empty($USER->modattempts[$lessonid])) {
-            $hasattempt = true;
+        if ($reviewmode) {
             $disabled = array('disabled' => 'disabled');
         }
 
@@ -408,23 +412,21 @@ class lesson_display_answer_form_truefalse extends moodleform {
         $mform->addElement('hidden', 'pageid');
         $mform->setType('pageid', PARAM_INT);
 
+        $mform->addElement('hidden', 'review');
+        $mform->setType('review', PARAM_BOOL);
+        $mform->setDefault('review', $reviewmode);
+
         $i = 0;
         $radiobuttons = array();
         foreach ($answers as $answer) {
             $ansid = 'answerid';
-            if ($hasattempt) {
-                $ansid = 'answer_id';
-            }
-
             $answer = lesson_page_type_truefalse::rewrite_answers_urls($answer);
             $radiobuttons[] = $mform->createElement('radio', $ansid, null,
                 format_text($answer->answer, $answer->answerformat, $options), $answer->id, $disabled);
 
             $mform->setType($ansid, PARAM_INT);
-            if ($hasattempt && $answer->id == $USER->modattempts[$lessonid]->answerid) {
+            if ($hasattempt && $answer->id == $attempt->answerid) {
                 $mform->setDefault($ansid, $attempt->answerid);
-                $mform->addElement('hidden', 'answerid', $answer->id);
-                $mform->setType('answerid', PARAM_INT);
             }
             $i++;
         }
@@ -432,7 +434,7 @@ class lesson_display_answer_form_truefalse extends moodleform {
         $radiogroup = $mform->addGroup($radiobuttons, $ansid, '', array(''), false);
         $radiogroup->setAttributes(array('class' => 'answeroptiongroup'));
 
-        if ($hasattempt) {
+        if ($reviewmode) {
             $this->add_action_buttons(null, get_string("nextpage", "lesson"));
         } else {
             $this->add_action_buttons(null, get_string("submit", "lesson"));
