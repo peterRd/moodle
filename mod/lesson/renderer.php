@@ -196,10 +196,10 @@ class mod_lesson_renderer extends plugin_renderer_base {
      * @param object $attempt
      * @return string
      */
-    public function display_page(lesson $lesson, lesson_page $page, $attempt) {
+    public function display_page(lesson $lesson, lesson_page $page, $attempt, $reviewmode = false) {
         // We need to buffer here as there is an mforms display call
         ob_start();
-        echo $page->display($this, $attempt);
+        echo $page->display($this, $attempt, $reviewmode);
         $output = ob_get_contents();
         ob_end_clean();
         return $output;

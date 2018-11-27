@@ -3308,7 +3308,7 @@ class lesson extends lesson_base {
                     $attempt = end($attempts);
                 }
             }
-            $lessoncontent = $lessonoutput->display_page($this, $page, $attempt);
+            $lessoncontent = $lessonoutput->display_page($this, $page, $attempt, $reviewmode);
         } else {
             require_once($CFG->dirroot . '/mod/lesson/view_form.php');
             $data = new stdClass;
@@ -3649,7 +3649,7 @@ class lesson extends lesson_base {
                 $lastattempt = end($attempts);
                 $USER->modattempts[$this->properties->id] = $lastattempt->pageid;
 
-                $url = new moodle_url('/mod/lesson/view.php', array('id' => $cm->id, 'pageid' => $pageid));
+                $url = new moodle_url('/mod/lesson/view.php', array('id' => $cm->id, 'pageid' => $pageid, 'review' => 1));
             }
             $data->reviewlesson = $url->out(false);
         } else if ($this->properties->modattempts && $canmanage) {
@@ -3845,9 +3845,10 @@ abstract class lesson_page extends lesson_base {
      * @abstract
      * @param object $renderer
      * @param object $attempt
+     * @param boolean $reviewmode
      * @return string
      */
-    abstract public function display($renderer, $attempt);
+    abstract public function display($renderer, $attempt, $reviewmode = false);
 
     /**
      * Creates a new lesson_page within the database and returns the correct pagetype

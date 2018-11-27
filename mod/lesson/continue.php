@@ -32,7 +32,7 @@ $id = required_param('id', PARAM_INT);
 $cm = get_coursemodule_from_id('lesson', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 $lesson = new lesson($DB->get_record('lesson', array('id' => $cm->instance), '*', MUST_EXIST), $cm, $course);
-
+$review = optional_param('review', false, PARAM_BOOL);
 require_login($course, false, $cm);
 require_sesskey();
 
@@ -75,7 +75,7 @@ if ($result->nodefaultresponse || $result->inmediatejump) {
 }
 
 // Set Messages.
-$lesson->add_messages_on_page_process($page, $result, $reviewmode);
+$lesson->add_messages_on_page_process($page, $result, $reviewmode || $review);
 
 $PAGE->set_url('/mod/lesson/view.php', array('id' => $cm->id, 'pageid' => $page->id));
 $PAGE->set_subpage($page->id);
@@ -106,7 +106,7 @@ if (isset($USER->modattempts[$lesson->id])) {
 
 // Review button back
 if (!$result->correctanswer && !$result->noanswer && !$result->isessayquestion && !$reviewmode && $lesson->review && !$result->maxattemptsreached) {
-    $url = new moodle_url('/mod/lesson/view.php', array('id' => $cm->id, 'pageid' => $page->id));
+    $url = new moodle_url('/mod/lesson/view.php', array('id' => $cm->id, 'pageid' => $page->id, 'review' => $review));
     echo $OUTPUT->single_button($url, get_string('reviewquestionback', 'lesson'));
 }
 
