@@ -3298,7 +3298,15 @@ class lesson extends lesson_base {
                 $attempt = end($attempts);
                 $USER->modattempts[$this->properties->id] = $attempt;
             } else {
-                $attempt = false;
+                $retries = $this->count_user_retries($USER->id);
+                // If there is something submitted then get that to display in the editor.
+                $retries = $retries ? $retries - 1 : $retries;
+                // If no attempts have been grade then just get the last stored attempt.
+                if (!$attempts = $this->get_attempts($retries, false, $page->id)) {
+                    $attempt = false;
+                } else {
+                    $attempt = end($attempts);
+                }
             }
             $lessoncontent = $lessonoutput->display_page($this, $page, $attempt);
         } else {
