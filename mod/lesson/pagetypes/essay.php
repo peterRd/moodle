@@ -64,10 +64,14 @@ class lesson_page_type_essay extends lesson_page {
         return $essayinfo;
     }
 
-    public function display($renderer, $attempt) {
-        global $PAGE, $CFG, $USER;
+    public function display($renderer, $attempt, $reviewmode = false) {
+        global $PAGE, $CFG;
 
-        $mform = new lesson_display_answer_form_essay($CFG->wwwroot.'/mod/lesson/continue.php', array('contents'=>$this->get_contents(), 'lessonid'=>$this->lesson->id));
+        $params = array(
+            'contents'=>$this->get_contents(), 'lessonid'=>$this->lesson->id,
+            'review' => $reviewmode, 'attempt' => $attempt
+        );
+        $mform = new lesson_display_answer_form_essay($CFG->wwwroot.'/mod/lesson/continue.php', $params);
 
         $data = new stdClass;
         $data->id = $PAGE->cm->id;
@@ -303,23 +307,23 @@ class lesson_add_page_form_essay extends lesson_add_page_form_base {
 class lesson_display_answer_form_essay extends moodleform {
 
     public function definition() {
-        global $USER, $OUTPUT;
+        global $OUTPUT;
         $mform = $this->_form;
         $contents = $this->_customdata['contents'];
+        $attempt = array_key_exists('attempt', $this->_customdata) ? $this->_customdata['attempt'] : null;
+        $reviewmode = empty($this->_customdata['review']) ? false : $this->_customdata['review'];
 
         $hasattempt = false;
         $attrs = '';
         $useranswer = '';
         $useranswerraw = '';
-        if (isset($this->_customdata['lessonid'])) {
-            $lessonid = $this->_customdata['lessonid'];
-            if (isset($USER->modattempts[$lessonid]->useranswer) && !empty($USER->modattempts[$lessonid]->useranswer)) {
-                $attrs = array('disabled' => 'disabled');
-                $hasattempt = true;
-                $useranswertemp = lesson_page_type_essay::extract_useranswer($USER->modattempts[$lessonid]->useranswer);
-                $useranswer = htmlspecialchars_decode($useranswertemp->answer, ENT_QUOTES);
-                $useranswerraw = $useranswertemp->answer;
-            }
+
+        if ($attempt && isset($attempt->useranswer) && !empty($attempt->useranswer)) {
+            $attrs = array('disabled' => 'disabled');
+            $hasattempt = true;
+            $useranswertemp = lesson_page_type_essay::extract_useranswer($attempt->useranswer);
+            $useranswer = htmlspecialchars_decode($useranswertemp->answer, ENT_QUOTES);
+            $useranswerraw = $useranswertemp->answer;
         }
 
         // Disable shortforms.
@@ -339,7 +343,11 @@ class lesson_display_answer_form_essay extends moodleform {
         $mform->addElement('hidden', 'pageid');
         $mform->setType('pageid', PARAM_INT);
 
-        if ($hasattempt) {
+        $mform->addElement('hidden', 'review');
+        $mform->setType('review', PARAM_BOOL);
+        $mform->setDefault('review', $reviewmode);
+
+        if ($reviewmode) {
             $mform->addElement('hidden', 'answer', $useranswerraw);
             $mform->setType('answer', PARAM_RAW);
             $mform->addElement('html', $OUTPUT->container(get_string('youranswer', 'lesson'), 'youranswer'));

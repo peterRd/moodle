@@ -47,7 +47,7 @@ class lesson_page_type_matching extends lesson_page {
     public function get_idstring() {
         return $this->typeidstring;
     }
-    public function display($renderer, $attempt) {
+    public function display($renderer, $attempt, $reviewmode = false) {
         global $USER, $CFG, $PAGE;
         $mform = $this->make_answer_form($attempt);
         $data = new stdClass;
@@ -69,8 +69,8 @@ class lesson_page_type_matching extends lesson_page {
         return $mform->display();
     }
 
-    protected function make_answer_form($attempt=null) {
-        global $USER, $CFG;
+    protected function make_answer_form($attempt=null, $reviewmode = false) {
+        global $CFG;
         // don't shuffle answers (could be an option??)
         $getanswers = array_slice($this->get_answers(), 2);
 
@@ -94,7 +94,7 @@ class lesson_page_type_matching extends lesson_page {
                 $responseoptions[htmlspecialchars($response)] = $response;
             }
         }
-        if (isset($USER->modattempts[$this->lesson->id]) && !empty($attempt->useranswer)) {
+        if (isset($attempt) && $attempt && !empty($attempt->useranswer)) {
             $useranswers = explode(',', $attempt->useranswer);
             $t = 0;
         } else {
@@ -102,7 +102,8 @@ class lesson_page_type_matching extends lesson_page {
         }
 
         $action = $CFG->wwwroot.'/mod/lesson/continue.php';
-        $params = array('answers'=>$answers, 'useranswers'=>$useranswers, 'responseoptions'=>$responseoptions, 'lessonid'=>$this->lesson->id, 'contents'=>$this->get_contents());
+        $params = array('answers'=>$answers, 'useranswers'=>$useranswers, 'responseoptions'=>$responseoptions,
+            'lessonid'=>$this->lesson->id, 'contents'=>$this->get_contents(), 'review' => $reviewmode);
         $mform = new lesson_display_answer_form_matching($action, $params);
         return $mform;
     }
@@ -557,11 +558,15 @@ class lesson_display_answer_form_matching extends moodleform {
 
         $mform->addElement('html', $OUTPUT->container($contents, 'contents'));
 
-        $hasattempt = false;
+        $reviewmode = empty($this->_customdata['review']) ? false : $this->_customdata['review'];
         $disabled = '';
+        if ($reviewmode) {
+            $disabled = array('disabled' => 'disabled');
+        }
+
+        $hasattempt = false;
         if (isset($useranswers) && !empty($useranswers)) {
             $hasattempt = true;
-            $disabled = array('disabled' => 'disabled');
         }
 
         $options = new stdClass;
@@ -573,6 +578,10 @@ class lesson_display_answer_form_matching extends moodleform {
 
         $mform->addElement('hidden', 'pageid');
         $mform->setType('pageid', PARAM_INT);
+
+        $mform->addElement('hidden', 'review');
+        $mform->setType('review', PARAM_BOOL);
+        $mform->setDefault('review', $reviewmode);
 
         $i = 0;
 
@@ -598,7 +607,7 @@ class lesson_display_answer_form_matching extends moodleform {
             $mform->addElement('html', '</div>');
             $i++;
         }
-        if ($hasattempt) {
+        if ($reviewmode) {
             $this->add_action_buttons(null, get_string("nextpage", "lesson"));
         } else {
             $this->add_action_buttons(null, get_string("submit", "lesson"));
