@@ -108,6 +108,36 @@ switch ($action) {
             echo json_encode(false);
         }
         die;
+    case 'deleteselected':
+        $selected   = required_param('selected', PARAM_RAW);
+        $return = [];
+        $selectedfiles = json_decode($selected);
+        foreach ($selectedfiles as $selectedfile) {
+            $filename = clean_filename($selectedfile->filename);
+            $filepath = clean_param($selectedfile->filepath, PARAM_PATH);
+
+            $fs = get_file_storage();
+            $filepath = file_correct_filepath($filepath);
+
+            if ($storedfile = $fs->get_file($user_context->id, 'user', 'draft', $draftid, $filepath, $filename)) {
+                $parentpath = $storedfile->get_parent_directory()->get_filepath();
+                if ($storedfile->is_directory()) {
+                    $files = $fs->get_directory_files($user_context->id, 'user', 'draft', $draftid, $filepath, true);
+                    foreach ($files as $file) {
+                        $file->delete();
+                    }
+                    $storedfile->delete();
+                    $return[$parentpath] = "";
+                } else {
+                    if ($result = $storedfile->delete()) {
+                        $return[$parentpath] = "";
+                    }
+                }
+            }
+        }
+
+        echo (json_encode($return ? array_keys($return) : false));
+        die;
 
     case 'setmainfile':
         $filename   = required_param('filename', PARAM_FILE);
