@@ -113,7 +113,8 @@ class core_files_renderer extends plugin_renderer_base {
                 array('invalidjson', 'repository'), array('popupblockeddownload', 'repository'),
                 array('unknownoriginal', 'repository'), array('confirmdeletefolder', 'repository'),
                 array('confirmdeletefilewithhref', 'repository'), array('confirmrenamefolder', 'repository'),
-                array('confirmrenamefile', 'repository'), array('newfolder', 'repository'), array('edit', 'moodle')
+                array('confirmrenamefile', 'repository'), array('newfolder', 'repository'), array('edit', 'moodle'),
+                array('nofilesselected', 'repository'), array('confirmdeleteselectedfile', 'repository')
             )
         );
         if ($this->page->requires->should_create_one_time_item_now('core_file_managertemplate')) {
@@ -182,6 +183,7 @@ class core_files_renderer extends plugin_renderer_base {
         $straddfile  = get_string('addfile', 'repository');
         $strmakedir  = get_string('makeafolder', 'moodle');
         $strdownload = get_string('downloadfolder', 'repository');
+        $strdelete = get_string('deleteselected', 'repository');
         $strloading  = get_string('loading', 'repository');
         $strdroptoupload = get_string('droptoupload', 'moodle');
         $icon_progress = $OUTPUT->pix_icon('i/loading_small', $strloading).'';
@@ -215,6 +217,11 @@ class core_files_renderer extends plugin_renderer_base {
                 <div class="fp-btn-download">
                     <a role="button" title="' . $strdownload . '" href="#">
                         ' . $this->pix_icon('a/download_all', $strdownloadallfiles) . '
+                    </a>
+                </div>
+                <div class="fp-btn-delete">
+                    <a role="button" title="' . $strdelete . '" href="#">
+                        ' . $this->pix_icon('i/trash', $strdelete) . '
                     </a>
                 </div>
                 <span class="fp-img-downloading">
