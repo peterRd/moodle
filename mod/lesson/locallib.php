@@ -99,6 +99,48 @@ function lesson_display_teacher_warning($lesson) {
 }
 
 /**
+ * Helper function to format a given value into locale specific values with n:n signifying ranges
+ *
+ * @param string|number $value The value to be formatted
+ * @return mixed $formattedvalue Formatted value OR $value if not numeric
+ */
+function lesson_format_numeric_value($value) {
+    $formattedvalue = $value;
+    if (strpos($value, ':')) {
+        list($min, $max) = explode(':', $value);
+        $formattedvalue = $min . ':' . $max;
+        if (is_numeric($min) && is_numeric($max)) {
+            $formattedvalue = format_float($min, strlen($min), true, true) . ':'
+                . format_float($max, strlen($max), true, true);
+        }
+    } else {
+        $formattedvalue = is_numeric($value) ?
+            format_float($value, strlen($value), true, true) :
+            $value;
+    }
+
+    return $formattedvalue;
+}
+
+/**
+ * Helper function to unformat a given numeric value from locale specific values with n:n signifying ranges to standards
+ * with decimal point numbers/ranges
+ *
+ * @param string $value The value to be formatted
+ * @return mixed $formattedvalue unformatted value
+ */
+function lesson_unformat_numeric_value($value) {
+    if (strpos($value, ':')) {
+        list($min, $max) = explode(':', $value);
+        $formattedvalue = unformat_float($min) . ':' . unformat_float($max);
+    } else {
+        $formattedvalue = unformat_float($value);
+    }
+
+    return $formattedvalue;
+}
+
+/**
  * Interprets the LESSON_UNSEENBRANCHPAGE jump.
  *
  * will return the pageid of a random unseen page that is within a branch
@@ -1434,7 +1476,7 @@ abstract class lesson_add_page_form_base extends moodleform {
             $this->_form->setDefault('answer_editor['.$count.']', array('text' => '', 'format' => FORMAT_HTML));
         } else {
             $this->_form->addElement('text', 'answer_editor['.$count.']', $label,
-                    array('size' => '50', 'maxlength' => '200'));
+                array('size' => '50', 'maxlength' => '200'));
             $this->_form->setType('answer_editor['.$count.']', PARAM_TEXT);
         }
 
