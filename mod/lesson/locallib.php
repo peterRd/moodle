@@ -3290,23 +3290,23 @@ class lesson extends lesson_base {
         if (is_array($page->answers) && count($page->answers) > 0) {
             // This is for modattempts option.  Find the users previous answer to this page,
             // and then display it below in answer processing.
-            if (isset($USER->modattempts[$this->properties->id])) {
-                $retries = $this->count_user_retries($USER->id);
-                if (!$attempts = $this->get_attempts($retries - 1, false, $page->id)) {
+            $retries = $this->count_user_retries($USER->id);
+            $hasexistingattempts = isset($USER->modattempts[$this->properties->id]);
+            $retries = $hasexistingattempts || $retries ? $retries - 1 : $retries;
+            $attempts = $this->get_attempts($retries, false, $page->id);
+
+            if ($attempts) {
+                $attempt = end($attempts);
+                if ($hasexistingattempts) {
+                    $USER->modattempts[$this->properties->id] = $attempt;
+                }
+            } else {
+                if ($hasexistingattempts) {
                     throw new moodle_exception('cannotfindpreattempt', 'lesson');
                 }
-                $attempt = end($attempts);
-                $USER->modattempts[$this->properties->id] = $attempt;
-            } else {
-                $retries = $this->count_user_retries($USER->id);
                 // If there is something submitted then get that to display in the editor.
-                $retries = $retries ? $retries - 1 : $retries;
                 // If no attempts have been grade then just get the last stored attempt.
-                if (!$attempts = $this->get_attempts($retries, false, $page->id)) {
-                    $attempt = false;
-                } else {
-                    $attempt = end($attempts);
-                }
+                $attempt = false;
             }
             $lessoncontent = $lessonoutput->display_page($this, $page, $attempt, $reviewmode);
         } else {
