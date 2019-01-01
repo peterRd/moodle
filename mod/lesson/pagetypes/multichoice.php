@@ -572,11 +572,11 @@ class lesson_display_answer_form_multichoice_multianswer extends moodleform {
             $mform->addElement('html', '<div class="answeroption">');
             $answerid = 'answer['.$answer->id.']';
             if ($hasattempt && in_array($answer->id, $useranswers)) {
-                $answerid = 'answer_'.$answer->id;
-                $mform->addElement('hidden', 'answer['.$answer->id.']', $answer->answer);
-                $mform->setType('answer['.$answer->id.']', PARAM_NOTAGS);
+                $hiddenanswer = 'answer_'.$answer->id;
+                $mform->addElement('hidden', $hiddenanswer, $answer->answer);
+                $mform->setType($hiddenanswer, PARAM_NOTAGS);
+                $mform->setDefault($hiddenanswer, true);
                 $mform->setDefault($answerid, true);
-                $mform->setDefault('answer['.$answer->id.']', true);
             }
             // NOTE: our silly checkbox supports only value '1' - we can not use it like the radiobox above!!!!!!
             $answer->answer = preg_replace('#>$#', '> ', $answer->answer);

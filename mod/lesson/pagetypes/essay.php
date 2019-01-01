@@ -78,9 +78,13 @@ class lesson_page_type_essay extends lesson_page {
         $data->pageid = $this->properties->id;
         if (!empty($attempt)) {
             $essayinfo = self::extract_useranswer($attempt->useranswer);
-            $data->answer = [
-                'text' => $essayinfo->answer
-            ];
+            $data->answer = $essayinfo->answer;
+            if (!$reviewmode) {
+                $data->answer = [
+                    'text' => $essayinfo->answer,
+                    'format' => $essayinfo->answerformat,
+                ];
+            }
         }
         $mform->set_data($data);
 
