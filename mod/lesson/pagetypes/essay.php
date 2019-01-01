@@ -89,9 +89,7 @@ class lesson_page_type_essay extends lesson_page {
         $data->pageid = $this->properties->id;
         if (!empty($attempt)) {
             $essayinfo = self::extract_useranswer($attempt->useranswer);
-            $data->answer = [
-                'text' => $essayinfo->answer
-            ];
+            $data->answer = $essayinfo->answer;
         }
 
         $data = file_prepare_standard_editor($data, 'answer', $options['editoroptions'],
