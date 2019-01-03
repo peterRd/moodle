@@ -28,7 +28,8 @@
 use Behat\Mink\Session as Session,
     Behat\Mink\Element\NodeElement as NodeElement,
     Behat\Mink\Exception\ElementNotFoundException as ElementNotFoundException,
-    Behat\MinkExtension\Context\RawMinkContext as RawMinkContext;
+    Behat\MinkExtension\Context\RawMinkContext as RawMinkContext,
+    Behat\Mink\Exception\ExpectationException as ExpectationException;
 
 /**
  * Helper to interact with form fields.
@@ -56,6 +57,30 @@ class behat_field_manager {
 
         // The behat field manager.
         return self::get_form_field($fieldnode, $context->getSession());
+    }
+
+    /**
+     * Gets the nth instance of the form field from it's label
+     *
+     * @param int $n Index of element among all fields with this label (0-indexed)
+     * @param string $label
+     * @param RawMinkContext $context
+     * @return behat_form_field
+     */
+    public static function get_nth_form_field_from_label($n, $label, RawMinkContext $context) {
+
+        // There are moodle form elements that are not directly related with
+        // a basic HTML form field, we should also take care of them.
+        // The DOM nodes.
+        $fieldnodes = $context->findall_field($label);
+
+        if (count($fieldnodes) < $n + 1) {
+            throw new ExpectationException('Unable to find '.($n + 1).'th field with label "'.$label.'".'
+                .' Only '.count($fieldnodes).' fields with that label are in the page.', $context->getSession());
+        }
+
+        // The behat field manager.
+        return self::get_form_field($fieldnodes[$n], $context->getSession());
     }
 
     /**

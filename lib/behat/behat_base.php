@@ -237,12 +237,16 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
      */
     public function __call($name, $arguments) {
 
-        if (substr($name, 0, 5) !== 'find_') {
+        if (strpos($name, 'find_') === 0) {
+            $method = 'find';
+        } else if (strpos($name, 'findall_') === 0) {
+            $method = 'find_all';
+        } else {
             throw new coding_exception('The "' . $name . '" method does not exist');
         }
 
         // Only the named selector identifier.
-        $cleanname = substr($name, 5);
+        $cleanname = explode('_', $name, 2)[1];
 
         // All named selectors shares the interface.
         if (count($arguments) !== 1) {
@@ -251,7 +255,7 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
 
         // Redirecting execution to the find method with the specified selector.
         // It will detect if it's pointing to an unexisting named selector.
-        return $this->find('named_partial',
+        return $this->$method('named_partial',
             array(
                 $cleanname,
                 behat_context_helper::escape($arguments[0])

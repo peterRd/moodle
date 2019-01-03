@@ -82,11 +82,18 @@ class behat_forms extends behat_base {
         // Expand all fields in case we have.
         $this->expand_all_fields();
 
-        $datahash = $data->getRowsHash();
+        // Allow setting multiple fields that have the same locator. The nth row with the same locator
+        // sets the value of the nth field with that locator.
+        $counter = [];
 
         // The action depends on the field type.
-        foreach ($datahash as $locator => $value) {
-            $this->set_field_value($locator, $value);
+        foreach ($data->getRows() as $row) {
+            $locator = array_shift($row);
+            $value = (1 == count($row)) ? $row[0] : $row;
+            if (!array_key_exists($locator, $counter)) {
+                $counter[$locator] = 0;
+            }
+            $this->set_nth_field_value($counter[$locator]++, $locator, $value);
         }
     }
 
@@ -494,6 +501,25 @@ class behat_forms extends behat_base {
         // We delegate to behat_form_field class, it will
         // guess the type properly as it is a select tag.
         $field = behat_field_manager::get_form_field_from_label($fieldlocator, $this);
+        $field->set_value($value);
+    }
+
+    /**
+     * Setter for nth field.
+     *
+     * Internal API method, a generic *I set "VALUE" to "N"th "FIELD" field*
+     * could be created based on it.
+     *
+     * @param int $n Index of the field among fields with the same name
+     * @param string $fieldlocator The pointer to the field, it will depend on the field type.
+     * @param string $value
+     * @return void
+     */
+    protected function set_nth_field_value($n, $fieldlocator, $value) {
+
+        // We delegate to behat_form_field class, it will
+        // guess the type properly as it is a select tag.
+        $field = behat_field_manager::get_nth_form_field_from_label($n, $fieldlocator, $this);
         $field->set_value($value);
     }
 
