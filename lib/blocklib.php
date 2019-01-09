@@ -242,24 +242,41 @@ class block_manager {
      * @return boolean - is there one of these blocks in the current page?
      */
     public function is_block_present($blockname) {
-        if (empty($this->blockinstances)) {
+        if (empty($this->blockinstances) && empty($this->birecordsbyregion)) {
             return false;
         }
 
-        $requiredbythemeblocks = $this->get_required_by_theme_block_types();
-        foreach ($this->blockinstances as $region) {
-            foreach ($region as $instance) {
-                if (empty($instance->instance->blockname)) {
-                    continue;
-                }
-                if ($instance->instance->blockname == $blockname) {
-                    if ($instance->instance->requiredbytheme) {
-                        if (!in_array($blockname, $requiredbythemeblocks)) {
-                            continue;
-                        }
+        if (!empty($this->blockinstances)) {
+            $requiredbythemeblocks = $this->get_required_by_theme_block_types();
+            foreach ($this->blockinstances as $region) {
+                foreach ($region as $instance) {
+                    if (empty($instance->instance->blockname)) {
+                        continue;
                     }
-                    return true;
+                    if ($instance->instance->blockname == $blockname) {
+                        if ($instance->instance->requiredbytheme) {
+                            if (!in_array($blockname, $requiredbythemeblocks)) {
+                                continue;
+                            }
+                        }
+                        return true;
+                    }
                 }
+            }
+        }
+
+        // Secondary check for cases where blockinstances is not loaded.
+        if (!empty($this->birecordsbyregion)) {
+            foreach ($this->birecordsbyregion as $region) {
+                foreach ($region as $block) {
+                    if (empty($block->blockname)) {
+                        continue;
+                    }
+                    if ($block->blockname == $blockname) {
+                        return true;
+                    }
+                }
+
             }
         }
         return false;
@@ -829,6 +846,11 @@ class block_manager {
      */
     public function add_block($blockname, $region, $weight, $showinsubcontexts, $pagetypepattern = NULL, $subpagepattern = NULL) {
         global $DB;
+
+        if ($this->is_block_present($blockname)) {
+            return false;
+        }
+
         // Allow invisible blocks because this is used when adding default page blocks, which
         // might include invisible ones if the user makes some default blocks invisible
         $this->check_known_block_type($blockname, true);
