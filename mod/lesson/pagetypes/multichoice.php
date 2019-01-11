@@ -185,28 +185,12 @@ class lesson_page_type_multichoice extends lesson_page {
                 } else {
                     $iscorrectanswer = $this->lesson->jumpto_is_correct($this->properties->id, $answer->jumpto);
                 }
-
-                // Iterate over all the student answers to check if he selected the current possible answer.
-                foreach ($studentanswers as $answerid) {
-                    if ($answerid == $answer->id) {
-                        if ($iscorrectanswer) {
-                            $nhits++;
-                        } else {
-                            // Always jump to the page related to the student's first wrong answer.
-                            if (!isset($wrongpageid)) {
-                                // Leave in its "raw" state - will be converted into a proper page id later.
-                                $wrongpageid = $answer->jumpto;
-                            }
-                            // Save the answer id for scoring.
-                            if ($wronganswerid == 0) {
-                                $wronganswerid = $answer->id;
-                            }
-                        }
-                    }
-                }
-
+                $isselected = in_array($answer->id, $studentanswers);
                 if ($iscorrectanswer) {
                     $ncorrect++;
+
+                    // Iterate over all the student answers to check if he selected the current possible answer.
+                    $nhits += ($isselected ? 1 : 0);
 
                     // Save the first jumpto page id, may be needed!
                     if (!isset($correctpageid)) {
@@ -216,6 +200,16 @@ class lesson_page_type_multichoice extends lesson_page {
                     // Save the answer id for scoring.
                     if ($correctanswerid == 0) {
                         $correctanswerid = $answer->id;
+                    }
+                } else {
+                    // Jump to the page related to either the first available wrong answer OR student's wrong answer.
+                    if (!isset($wrongpageid) || $isselected) {
+                        // Leave in its "raw" state - will be converted into a proper page id later.
+                        $wrongpageid = $answer->jumpto;
+                    }
+                    // Save the answer id for scoring.
+                    if ($wronganswerid == 0 && $isselected) {
+                        $wronganswerid = $answer->id;
                     }
                 }
             }
