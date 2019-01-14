@@ -215,7 +215,7 @@ if ($pageid != LESSON_EOL) {
         }
     }
 
-    // if the review has been explicitly specified then atleast one should be used
+    // If the review has been explicitly specified then atleast one should be used.
     list($newpageid, $page, $lessoncontent) = $lesson->prepare_page_and_contents($pageid, $lessonoutput, $reviewmode || $review);
 
     if (($edit != -1) && $PAGE->user_allowed_editing()) {

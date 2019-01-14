@@ -305,6 +305,11 @@ class mod_lesson_mod_form extends moodleform_mod {
         $mform->setDefault('maxpages', $lessonconfig->numberofpagestoshow);
         $mform->setAdvanced('maxpages', $lessonconfig->numberofpagestoshow_adv);
 
+        $mform->addElement('selectyesno', 'preloadpreviousattempt', get_string('preloadpreviousattempt', 'lesson'), $numbers);
+        $mform->addHelpButton('preloadpreviousattempt', 'preloadpreviousattempt', 'lesson');
+        $mform->setDefault('preloadpreviousattempt', 0);
+        $mform->setAdvanced('preloadpreviousattempt');
+
         // Grade.
         $this->standard_grading_coursemodule_elements();
 

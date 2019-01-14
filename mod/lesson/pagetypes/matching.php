@@ -49,7 +49,7 @@ class lesson_page_type_matching extends lesson_page {
     }
     public function display($renderer, $attempt, $reviewmode = false) {
         global $USER, $CFG, $PAGE;
-        $mform = $this->make_answer_form($attempt);
+        $mform = $this->make_answer_form($attempt, $reviewmode);
         $data = new stdClass;
         $data->id = $PAGE->cm->id;
         $data->pageid = $this->properties->id;
