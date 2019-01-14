@@ -568,6 +568,10 @@ class lesson_display_answer_form_multichoice_multianswer extends moodleform {
         $mform->addElement('hidden', 'pageid');
         $mform->setType('pageid', PARAM_INT);
 
+        $mform->addElement('hidden', 'review');
+        $mform->setType('review', PARAM_BOOL);
+        $mform->setDefault('review', $reviewmode);
+
         foreach ($answers as $answer) {
             $mform->addElement('html', '<div class="answeroption">');
             $answerid = 'answer['.$answer->id.']';
