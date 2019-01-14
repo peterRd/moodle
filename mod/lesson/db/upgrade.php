@@ -64,5 +64,19 @@ function xmldb_lesson_upgrade($oldversion) {
     // Automatically generated Moodle v3.8.0 release upgrade line.
     // Put any upgrade step following this.
 
+    if ($oldversion < 2019111801) {
+        global $DB;
+        $dbman = $DB->get_manager();
+
+        // Define new fields to be added to lesson.
+        $table = new xmldb_table('lesson');
+        $field = new xmldb_field('preloadpreviousattempt', XMLDB_TYPE_INTEGER, '1', null, null, null, 0, 'allowofflineattempts');
+        // Conditionally launch add field preloadpreviousattempt.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Lesson savepoint reached.
+        upgrade_mod_savepoint(true, 2019111801, 'lesson');
+    }
     return true;
 }

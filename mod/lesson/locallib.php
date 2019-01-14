@@ -1572,6 +1572,7 @@ abstract class lesson_add_page_form_base extends moodleform {
  * @property int $deadline Timestamp of when this lesson is no longer available
  * @property int $timemodified Timestamp when lesson was last modified
  * @property int $allowofflineattempts Whether to allow the lesson to be attempted offline in the mobile app
+ * @property int $preloadpreviousattempt Whether to allow the lesson to be reload the previous attempt for a question
  *
  * These properties are calculated
  * @property int $firstpageid Id of the first page of this lesson (prevpageid=0)
@@ -3292,13 +3293,26 @@ class lesson extends lesson_base {
             // and then display it below in answer processing.
             $retries = $this->count_user_retries($USER->id);
             $hasexistingattempts = isset($USER->modattempts[$this->properties->id]);
+
+            // Get attempts from the current try.
+            $currentattempts = $this->get_attempts($retries, false, $page->id);
+
+            // Get attempts from the previously successful try.
             $retries = $hasexistingattempts || $retries ? $retries - 1 : $retries;
-            $attempts = $this->get_attempts($retries, false, $page->id);
+            $previouscompletedattempts = $this->get_attempts($retries, false, $page->id);
+
+            // We prioritize any attempts from the current try over the previously submitted.
+            $attempts = $currentattempts ? $currentattempts : $previouscompletedattempts;
+            $preloadexistingattempt = $this->preloadpreviousattempt;
 
             if ($attempts) {
                 $attempt = end($attempts);
                 if ($hasexistingattempts) {
+                    // This is the default behaviour.
                     $USER->modattempts[$this->properties->id] = $attempt;
+                } else if (!$preloadexistingattempt) {
+                    // Reset the $attempt if preload is disabled.
+                    $attempt = false;
                 }
             } else {
                 if ($hasexistingattempts) {
