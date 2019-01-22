@@ -151,9 +151,10 @@ function glossary_update_instance($glossary) {
  *
  * @global object
  * @param int $id glossary id
+ * @param boolean $contentsonly Flag to empty contents only
  * @return bool success
  */
-function glossary_delete_instance($id) {
+function glossary_delete_instance($id, $contentsonly = false) {
     global $DB, $CFG;
 
     if (!$glossary = $DB->get_record('glossary', array('id'=>$id))) {
@@ -222,7 +223,9 @@ function glossary_delete_instance($id) {
 
     \core_completion\api::update_completion_date_event($cm->id, 'glossary', $glossary->id, null);
 
-    $DB->delete_records('glossary', array('id'=>$id));
+    if (!$contentsonly) {
+        $DB->delete_records('glossary', array('id' => $id));
+    }
 
     // Reset caches.
     \mod_glossary\local\concept_cache::reset_glossary($glossary);

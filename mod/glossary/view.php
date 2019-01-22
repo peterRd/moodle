@@ -415,10 +415,21 @@ if (has_capability('mod/glossary:write', $context) && $showcommonelements ) {
     echo "</div>\n";
 }
 
+require("sql.php");
+
+// Show the clear entries button if allowed.
+if ($count && has_capability('moodle/course:manageactivities', $context) ) {
+    echo '<div class="singlebutton clearglossary">';
+    echo "<form class=\"form form-inline m-b-1\" id=\"newentryform\" method=\"get\" action=\"$CFG->wwwroot/mod/glossary/emptyglossary.php\">";
+    echo '<div>';
+    echo "<input type=\"hidden\" name=\"id\" value=\"$cm->id\" />";
+    echo '<input type="submit" value="'.get_string('emptyglossary', 'glossary').'" class="btn btn-secondary" />';
+    echo '</div>';
+    echo '</form>';
+    echo "</div>\n";
+}
 
 require("tabs.php");
-
-require("sql.php");
 
 /// printing the entries
 $entriesshown = 0;
