@@ -99,6 +99,26 @@ function xmldb_glossary_upgrade($oldversion) {
 
     // Automatically generated Moodle v3.8.0 release upgrade line.
     // Put any upgrade step following this.
+    if ($oldversion < 2019111801) {
+        $dbman = $DB->get_manager();
+
+        // Define field deleted to be added to forum_posts.
+        $table = new xmldb_table('glossary_entries');
+        $field = new xmldb_field('groupid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'userid');
+
+        // Conditionally launch add field deleted.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Drop the old index.
+        $index = new xmldb_index('groupid', XMLDB_INDEX_NOTUNIQUE, array('groupid'));
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        upgrade_mod_savepoint(true, 2019111801, 'glossary');
+    }
 
     return true;
 }

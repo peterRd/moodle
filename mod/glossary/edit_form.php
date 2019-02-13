@@ -15,6 +15,7 @@ class mod_glossary_entry_form extends moodleform {
         $currententry      = $this->_customdata['current'];
         $glossary          = $this->_customdata['glossary'];
         $cm                = $this->_customdata['cm'];
+        $course            = $this->_customdata['course'];
         $definitionoptions = $this->_customdata['definitionoptions'];
         $attachmentoptions = $this->_customdata['attachmentoptions'];
 
@@ -50,6 +51,45 @@ class mod_glossary_entry_form extends moodleform {
 
         $mform->addElement('filemanager', 'attachment_filemanager', get_string('attachment', 'glossary'), null, $attachmentoptions);
         $mform->addHelpButton('attachment_filemanager', 'attachment', 'glossary');
+
+        // Basic group implementation for glossary.
+        if ($groupmode = groups_get_activity_groupmode($cm, $course)) {
+            $groupdata = groups_get_activity_allowed_groups($cm);
+
+            // If the user is not assigned to any group then do nothing. Entry will be global by default.
+            if (!empty($groupdata)) {
+                $groupinfo = array_reduce($groupdata, function($carry, $group) use ($glossary) {
+                    // Check whether the user can access this group.
+                    if (glossary_user_can_add_entry($glossary, $group->id)) {
+                        $carry[$group->id] = $group->name;
+                    }
+                    return $carry;
+                }, []);
+
+                // Check if a user has the ability to add globally.
+                if (glossary_user_can_add_entry($glossary, -1)) {
+                    // Note: We must reverse in this manner because array_unshift renumbers the array.
+                    $groupinfo = array_reverse($groupinfo, true );
+                    $groupinfo[null] = get_string('allparticipants');
+                    $groupinfo = array_reverse($groupinfo, true );
+                }
+
+                $canselectgroup = count($groupinfo) > 1;
+
+                // If this is a new element and the user belongs to multiple groups.
+                if (empty($currententry->id) && $canselectgroup) {
+                    $mform->addElement('select', 'groupid', get_string('group'), $groupinfo);
+                    $mform->setType('groupid', PARAM_INT);
+                } else {
+                    if (empty($currententry->groupid) || $currententry->groupid < 0) {
+                        $groupname = get_string('allparticipants');
+                    } else {
+                        $groupname = format_string($groupdata[$currententry->groupid]->name);
+                    }
+                    $mform->addElement('static', 'groupinfo', get_string('group'), $groupname);
+                }
+            }
+        }
 
         if (!$glossary->usedynalink) {
             $mform->addElement('hidden', 'usedynalink',   $CFG->glossary_linkentries);

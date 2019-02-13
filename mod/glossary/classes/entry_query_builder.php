@@ -233,6 +233,19 @@ class mod_glossary_entry_query_builder {
     }
 
     /**
+     * Add the group filter.
+     *
+     * @param string $sql The group access filter
+     * @param array $params The params used in the $sql
+     */
+    public function filter_by_group_filter(string $sql, array $params) {
+        if ($sql) {
+            $this->where[] = $sql;
+            $this->params = array_merge($this->params, $params);
+        }
+    }
+
+    /**
      * Filter non approved entries.
      *
      * @param string $constant One of the NON_APPROVED_* constants.

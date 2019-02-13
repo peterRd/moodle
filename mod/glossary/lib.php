@@ -3076,8 +3076,8 @@ function glossary_get_extra_capabilities() {
  */
 function glossary_supports($feature) {
     switch($feature) {
-        case FEATURE_GROUPS:                  return false;
-        case FEATURE_GROUPINGS:               return false;
+        case FEATURE_GROUPS:                  return true;
+        case FEATURE_GROUPINGS:               return true;
         case FEATURE_MOD_INTRO:               return true;
         case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
         case FEATURE_COMPLETION_HAS_RULES:    return true;
@@ -3440,6 +3440,9 @@ function glossary_get_entries_by_letter($glossary, $context, $letter, $from, $li
         $qb->filter_by_concept_non_letter();
     }
 
+    list($filter, $params) = glossary_get_group_filter($context);
+    $qb->filter_by_group_filter($filter, $params);
+
     if (!empty($options['includenotapproved']) && has_capability('mod/glossary:approve', $context)) {
         $qb->filter_by_non_approved(mod_glossary_entry_query_builder::NON_APPROVED_ALL);
     } else {
@@ -3488,6 +3491,9 @@ function glossary_get_entries_by_date($glossary, $context, $order, $sort, $from,
     $qb->join_user();
     $qb->add_user_fields();
     $qb->limit($from, $limit);
+
+    list($filter, $params) = glossary_get_group_filter($context);
+    $qb->filter_by_group_filter($filter, $params);
 
     if ($order == 'CREATION') {
         $qb->order_by('timecreated', 'entries', $sort);
@@ -3551,6 +3557,10 @@ function glossary_get_entries_by_category($glossary, $context, $categoryid, $fro
     $qb->order_by('id', 'entries', 'ASC');
     $qb->limit($from, $limit);
 
+    // Add the grouping restriction.
+    list($filter, $params) = glossary_get_group_filter($context);
+    $qb->filter_by_group_filter($filter, $params);
+
     // Fetching the entries.
     $count = $qb->count_records();
     $entries = $qb->get_records();
@@ -3598,6 +3608,10 @@ function glossary_get_entries_by_author($glossary, $context, $letter, $field, $s
     $qb->order_by('concept', 'entries');
     $qb->order_by('id', 'entries', 'ASC'); // Sort on ID to avoid random ordering when entries share an ordering value.
     $qb->limit($from, $limit);
+
+    // Add the grouping restriction.
+    list($filter, $params) = glossary_get_group_filter($context);
+    $qb->filter_by_group_filter($filter, $params);
 
     // Fetching the entries.
     $count = $qb->count_records();
@@ -3679,6 +3693,9 @@ function glossary_get_authors($glossary, $context, $limit, $from, $options = arr
         $approvedsql = '1 = 1';
     }
 
+    // Add the grouping restriction.
+    list($groupfilter, $grouparams) = glossary_get_group_filter($context);
+
     $sqlselectcount = "SELECT COUNT(DISTINCT(u.id))";
     $sqlselect = "SELECT DISTINCT(u.id) AS userId, $userfields";
     $sql = "  FROM {user} u
@@ -3687,6 +3704,11 @@ function glossary_get_authors($glossary, $context, $limit, $from, $options = arr
                AND (ge.glossaryid = :gid1 OR ge.sourceglossaryid = :gid2)
                AND $approvedsql";
     $ordersql = " ORDER BY u.lastname, u.firstname";
+
+    if ($groupfilter) {
+        $sql .= " AND $groupfilter";
+        $params = array_merge($params, $grouparams);
+    }
 
     $params['gid1'] = $glossary->id;
     $params['gid2'] = $glossary->id;
@@ -3814,6 +3836,8 @@ function glossary_get_entries_by_search($glossary, $context, $query, $fullsearch
                                         $options = array()) {
     global $DB, $USER;
 
+    list($groupfilter, $groupparams) = glossary_get_group_filter($context);
+
     // Clean terms.
     $terms = explode(' ', $query);
     foreach ($terms as $key => $term) {
@@ -3854,6 +3878,11 @@ function glossary_get_entries_by_search($glossary, $context, $query, $fullsearch
 
     $sqlwhere = "WHERE ($searchcond) $approvedsql";
 
+    if ($groupfilter) {
+        $sqlwhere .= " AND $groupfilter";
+        $params = array_merge($params, $groupparams);
+    }
+
     // Fetching the entries.
     $count = $DB->count_records_sql("SELECT COUNT(DISTINCT(ge.id)) $sqlfrom $sqlwhere", $params);
 
@@ -3892,6 +3921,9 @@ function glossary_get_entries_by_term($glossary, $context, $term, $from, $limit,
     $qb->join_user();
     $qb->add_user_fields();
     $qb->filter_by_term($term);
+
+    list($filter, $params) = glossary_get_group_filter($context);
+    $qb->filter_by_group_filter($filter, $params);
 
     $qb->order_by('concept', 'entries');
     $qb->order_by('id', 'entries');     // Sort on ID to avoid random ordering when entries share an ordering value.
@@ -3973,6 +4005,51 @@ function glossary_get_entry_by_id($id) {
 }
 
 /**
+ * Checks whether a user can add an entry to the glossary
+ *
+ * @param object $glossary The glossary object
+ * @param int|null $groupid
+ * @param int|null $userid
+ * @return bool
+ * @throws coding_exception
+ * @throws moodle_exception
+ */
+function glossary_user_can_add_entry(object $glossary, ?int $groupid = null, ?int $userid = null) : bool {
+    if (empty($userid)) {
+        global $USER;
+        $userid = $USER->id;
+    }
+
+    // Shortcut - guest and not-logged-in users can not post.
+    if (isguestuser() or !isloggedin()) {
+        return false;
+    }
+
+    if (!$cm = get_coursemodule_from_instance('glossary', $glossary->id, $glossary->course)) {
+        print_error('invalidcoursemodule');
+    }
+
+    $context = context_module::instance($cm->id);
+
+    if ($groupid === null) {
+        $groupid = groups_get_activity_group($cm);
+    }
+
+    $groupmode = groups_get_activity_groupmode($cm);
+
+    if (!$groupmode or has_capability('moodle/site:accessallgroups', $context)) {
+        return true;
+    }
+
+    if ($groupid) {
+        return groups_is_member($groupid, $userid);
+    } else {
+        // No group membership and no accessallgroups means no new glossary entries.
+        return false;
+    }
+}
+
+/**
  * Checks if the current user can see the glossary entry.
  *
  * @since Moodle 3.1
@@ -3988,6 +4065,18 @@ function glossary_can_view_entry($entry, $cminfo) {
 
     // Recheck uservisible although it should have already been checked in core_search.
     if ($cminfo->uservisible === false) {
+        return false;
+    }
+
+    // Check group acccess.
+    if (groups_get_activity_groupmode($cm)) {
+        $groups = groups_get_activity_allowed_groups($cm);
+    } else {
+        $groups = array();
+    }
+
+    // If groups are enabled check whether the user can access it.
+    if ($groups && !in_array($entry->groupid, $groups)) {
         return false;
     }
 
@@ -4198,6 +4287,79 @@ function glossary_check_updates_since(cm_info $cm, $from, $filter = array()) {
     }
 
     return $updates;
+}
+
+/**
+ * Get the grouping filter to be applied to the glossary sql
+ *
+ * @param object $modcontext
+ * @param int $groupid
+ * @param string $alias The alias corresponding to the glossary_entries table
+ * @return array [groupselect, param]
+ * @throws coding_exception
+ * @throws dml_exception
+ */
+function glossary_get_group_filter(object $modcontext, ?int $groupid = -1,
+        string $alias = mod_glossary_entry_query_builder::ALIAS_ENTRIES) : array {
+    global $DB, $USER;
+
+    $cm = get_coursemodule_from_id('glossary', $modcontext->instanceid);
+    $groupmode = groups_get_activity_groupmode($cm);
+    $groupselect = "";
+    $params = [];
+    $alias = $alias ? "$alias." : "";
+
+    if ($groupmode) {
+        $modcontext = context_module::instance($cm->id);
+
+        // Special case, we received a groupid to override currentgroup.
+        if ($groupid > 0) {
+            $course = get_course($cm->course);
+            if (!groups_group_visible($groupid, $course, $cm)) {
+                // User doesn't belong to this group, return nothing.
+                return [$groupselect, $params];
+            }
+            $currentgroup = $groupid;
+        } else if ($groupid === -1) {
+            $currentgroup = groups_get_activity_group($cm);
+        } else {
+            // Get discussions for all groups current user can see.
+            $currentgroup = null;
+        }
+
+        if ($groupmode == VISIBLEGROUPS or has_capability('moodle/site:accessallgroups', $modcontext)) {
+            if ($currentgroup) {
+                $groupselect = "(" . $alias . "groupid = :groupid OR ". $alias . "groupid IS NULL)";
+                $params['groupid'] = $currentgroup;
+            } else {
+                $groupselect = "";
+            }
+
+        } else {
+            // Separate groups.
+
+            // Get discussions for all groups current user can see.
+            if ($currentgroup === null) {
+                $mygroups = array_keys(groups_get_all_groups($cm->course, $USER->id, $cm->groupingid, 'g.id'));
+                if (empty($mygroups)) {
+                    $groupselect = $alias . "groupid IS NULL";
+                } else {
+                    list($insqlgroups, $inparamsgroups) = $DB->get_in_or_equal($mygroups, SQL_PARAMS_NAMED);
+                    $groupselect = "(" . $alias . "groupid IS NULL OR " . $alias . "groupid $insqlgroups)";
+                    $params = array_merge($params, $inparamsgroups);
+                }
+            } else if ($currentgroup) {
+                $groupselect = "(" . $alias . "groupid = :groupid OR " . $alias . "groupid IS NULL)";
+                $params['groupid'] = $currentgroup;
+            } else {
+                $groupselect = $alias . "groupid IS NULL";
+            }
+        }
+    } else {
+        $groupselect = "";
+    }
+
+    return [$groupselect, $params];
 }
 
 /**
