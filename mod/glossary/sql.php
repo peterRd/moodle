@@ -87,7 +87,7 @@ switch ($tab) {
 
             case 'entry':
                 $printpivot = false;
-                $entry = glossary_get_entry_by_id($hook);
+                $entry = glossary_get_entry_by_id($hook, $context);
                 $canapprove = has_capability('mod/glossary:approve', $context);
                 if ($entry && ($entry->glossaryid == $glossary->id || $entry->sourceglossaryid != $glossary->id)
                         && (!empty($entry->approved) || $entry->userid == $USER->id || $canapprove)) {

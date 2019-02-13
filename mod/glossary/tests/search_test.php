@@ -193,12 +193,17 @@ class mod_glossary_search_testcase extends advanced_testcase {
 
         $user1 = self::getDataGenerator()->create_user();
         $user2 = self::getDataGenerator()->create_user();
+        $user3 = self::getDataGenerator()->create_user();
 
         $course1 = self::getDataGenerator()->create_course();
         $course2 = self::getDataGenerator()->create_course();
+        $group1 = $this->getDataGenerator()->create_group(array('courseid' => $course1->id));
 
+        // Add a user to the group.
+        groups_add_member($group1->id, $user2->id);
         $this->getDataGenerator()->enrol_user($user1->id, $course1->id, 'teacher');
         $this->getDataGenerator()->enrol_user($user2->id, $course1->id, 'student');
+        $this->getDataGenerator()->enrol_user($user3->id, $course1->id, 'student');
 
         $record = new stdClass();
         $record->course = $course1->id;
@@ -215,11 +220,19 @@ class mod_glossary_search_testcase extends advanced_testcase {
         $studentapproved = self::getDataGenerator()->get_plugin_generator('mod_glossary')->create_content($glossary2);
         $studentnotapproved = self::getDataGenerator()->get_plugin_generator('mod_glossary')->create_content($glossary2, array('approved' => false));
 
+        // Entries can be grouped.
+        $glossary3 = self::getDataGenerator()->create_module('glossary', $record, ['groupmode' => SEPARATEGROUPS]);
+        $grouprestricted = self::getDataGenerator()->get_plugin_generator('mod_glossary')->create_content($glossary3,
+            array('approved' => 1, 'userid' => $user2->id, 'groupid' => $group1->id)
+        );
+
         // Activity hidden to students.
         $this->setUser($user1);
         $glossary3 = self::getDataGenerator()->create_module('glossary', $record);
         $hidden = self::getDataGenerator()->get_plugin_generator('mod_glossary')->create_content($glossary3);
         set_coursemodule_visible($glossary3->cmid, 0);
+
+        $this->assertEquals(\core_search\manager::ACCESS_DENIED, $searcharea->check_access($grouprestricted->id));
 
         $this->setUser($user2);
         $this->assertEquals(\core_search\manager::ACCESS_GRANTED, $searcharea->check_access($teacherapproved->id));

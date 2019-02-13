@@ -503,4 +503,55 @@ class mod_glossary_lib_testcase extends advanced_testcase {
         $search = glossary_get_entries_search($concept, $course->id);
         $this->assertCount(0, $search);
     }
+
+    /**
+     * Test the glossary_user_can_add_entry function
+     */
+    public function test_glossary_user_can_add_entry() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        // Setup test data.
+        $glossarygenerator = $this->getDataGenerator()->get_plugin_generator('mod_glossary');
+        $course1 = $this->getDataGenerator()->create_course(['groupmode' => SEPARATEGROUPS, 'groupmodeforce' => 0]);
+
+        // Create and enrol a student.
+        $student1 = self::getDataGenerator()->create_user();
+        $student2 = self::getDataGenerator()->create_user();
+
+        $this->getDataGenerator()->enrol_user($student1->id, $course1->id, 'student', 'manual');
+        $this->getDataGenerator()->enrol_user($student2->id, $course1->id, 'student', 'manual');
+
+        $group1 = $this->getDataGenerator()->create_group(array('courseid' => $course1->id));
+        groups_add_member($group1->id, $student1->id);
+
+        // Create glossaries and entries.
+        $glossary1 = $this->getDataGenerator()->create_module('glossary',
+            array('course' => $course1->id), ["groupmode" => SEPARATEGROUPS]);
+        $glossary2 = $this->getDataGenerator()->create_module('glossary',
+            array('course' => $course1->id), ["groupmode" => VISIBLEGROUPS]);
+        $glossary3 = $this->getDataGenerator()->create_module('glossary',
+            array('course' => $course1->id));
+
+        // When logged in as an admin.
+        $this->assertTrue(glossary_user_can_add_entry($glossary1));
+        $this->assertTrue(glossary_user_can_add_entry($glossary1, $group1->id));
+        $this->assertTrue(glossary_user_can_add_entry($glossary1, $group1->id, $student1->id));
+        $this->assertTrue(glossary_user_can_add_entry($glossary2, $group1->id, $student1->id));
+        $this->assertTrue(glossary_user_can_add_entry($glossary3, $group1->id, $student1->id));
+
+        // When logged in as a student in a group.
+        $this->setUser($student1);
+        $this->assertTrue(glossary_user_can_add_entry($glossary1));
+        $this->assertTrue(glossary_user_can_add_entry($glossary2));
+        $this->assertTrue(glossary_user_can_add_entry($glossary3));
+
+        // When logged in as a student NOT in a group.
+        $this->setUser($student2);
+        $this->assertFalse(glossary_user_can_add_entry($glossary1));
+        $this->assertFalse(glossary_user_can_add_entry($glossary1, $group1->id));
+        $this->assertFalse(glossary_user_can_add_entry($glossary2));
+        $this->assertTrue(glossary_user_can_add_entry($glossary3));
+
+    }
 }

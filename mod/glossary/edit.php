@@ -71,8 +71,13 @@ $entry = file_prepare_standard_filemanager($entry, 'attachment', $attachmentopti
 $entry->cmid = $cm->id;
 
 // create form and set initial data
-$mform = new mod_glossary_entry_form(null, array('current'=>$entry, 'cm'=>$cm, 'glossary'=>$glossary, 'course' => $course,
-                                                 'definitionoptions'=>$definitionoptions, 'attachmentoptions'=>$attachmentoptions));
+$mform = new mod_glossary_entry_form(null, array('current' => $entry,
+    'cm' => $cm,
+    'glossary' => $glossary,
+    'course' => $course,
+    'definitionoptions' => $definitionoptions,
+    'attachmentoptions' => $attachmentoptions
+));
 
 if ($mform->is_cancelled()){
     if ($id){

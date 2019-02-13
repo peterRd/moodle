@@ -146,21 +146,58 @@ class mod_glossary_external_testcase extends externallib_advanced_testcase {
 
         // Generate all the things.
         $gg = $this->getDataGenerator()->get_plugin_generator('mod_glossary');
-        $c1 = $this->getDataGenerator()->create_course();
+        $c1 = $this->getDataGenerator()->create_course(array('enablecompletion' => 1,
+            'groupmode' => SEPARATEGROUPS,
+            'groupmodeforce' => 0));
+        $u1 = $this->getDataGenerator()->create_user();
+        $u2 = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($u1->id, $c1->id);
+        $this->getDataGenerator()->enrol_user($u2->id, $c1->id);
+        $group1 = $this->getDataGenerator()->create_group(array('courseid' => $c1->id));
+
+        // Add a user to the group.
+        groups_add_member($group1->id, $u2->id);
+
         $g1 = $this->getDataGenerator()->create_module('glossary', array('course' => $c1->id));
         $g2 = $this->getDataGenerator()->create_module('glossary', array('course' => $c1->id, 'visible' => false));
-        $u1 = $this->getDataGenerator()->create_user();
         $e1 = $gg->create_content($g1, array('approved' => 1));
         $e2 = $gg->create_content($g1, array('approved' => 0, 'userid' => $u1->id));
         $e3 = $gg->create_content($g1, array('approved' => 0, 'userid' => -1));
         $e4 = $gg->create_content($g2, array('approved' => 1));
         $ctx = context_module::instance($g1->cmid);
-        $this->getDataGenerator()->enrol_user($u1->id, $c1->id);
         $this->setUser($u1);
 
         // Test readable entry.
         $sink = $this->redirectEvents();
         $return = mod_glossary_external::view_entry($e1->id);
+        $return = external_api::clean_returnvalue(mod_glossary_external::view_entry_returns(), $return);
+        $events = $sink->get_events();
+        $this->assertTrue($return['status']);
+        $this->assertEmpty($return['warnings']);
+        $this->assertCount(1, $events);
+        $this->assertEquals('\mod_glossary\event\entry_viewed', $events[0]->eventname);
+        $sink->close();
+
+        // Test grouped entry - SEPARATEGROUPS.
+        $g3 = $this->getDataGenerator()->create_module('glossary',
+            array('course' => $c1->id),
+            ['groupmode' => SEPARATEGROUPS]
+        );
+        $e5 = $gg->create_content($g3, array('approved' => 1, 'userid' => $u2->id, 'groupid' => $group1->id));
+        try {
+            $return = mod_glossary_external::view_entry($e5->id);
+            $this->fail('Cannot view external group entries.');
+        } catch (invalid_parameter_exception $e) {
+            // All good.
+        }
+        // Test grouped entry - VISIBLEGROUPS.
+        $g4 = $this->getDataGenerator()->create_module('glossary',
+            array('course' => $c1->id),
+            ['groupmode' => VISIBLEGROUPS]
+        );
+        $e6 = $gg->create_content($g4, array('approved' => 1, 'userid' => $u2->id, 'groupid' => $group1->id));
+        $sink = $this->redirectEvents();
+        $return = mod_glossary_external::view_entry($e6->id);
         $return = external_api::clean_returnvalue(mod_glossary_external::view_entry_returns(), $return);
         $events = $sink->get_events();
         $this->assertTrue($return['status']);

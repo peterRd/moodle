@@ -104,6 +104,7 @@ class mod_glossary_external extends external_api {
             'tags' => new external_multiple_structure(
                 \core_tag\external\tag_item_exporter::get_read_structure(), 'Tags', VALUE_OPTIONAL
             ),
+            'groupid' => new external_value(PARAM_INT, 'Whether the entry has a group associated or not'),
         );
 
         if ($includecat) {
@@ -1403,7 +1404,7 @@ class mod_glossary_external extends external_api {
             throw new invalid_parameter_exception('invalidentry');
         }
 
-        $entry = glossary_get_entry_by_id($id);
+        $entry = glossary_get_entry_by_id($id, $context);
         self::fill_entry_details($entry, $context);
 
         return array(
@@ -1450,6 +1451,7 @@ class mod_glossary_external extends external_api {
                             categories (comma separated int); comma separated category ids
                             aliases (comma separated str); comma separated aliases
                             usedynalink (bool); whether the entry should be automatically linked.
+                            groupid (int); the group to assign this entry to.
                             casesensitive (bool); whether the entry is case sensitive.
                             fullmatch (bool); whether to match whole words only.'),
                         'value' => new external_value(PARAM_RAW, 'the value of the option (validated inside the function)')
@@ -1533,6 +1535,9 @@ class mod_glossary_external extends external_api {
                     if ($glossary->usedynalink) {
                         $entry->{$name} = clean_param($option['value'], PARAM_BOOL);
                     }
+                    break;
+                case 'groupid':
+                    $entry->groupid = clean_param($option['groupid'], PARAM_INT);
                     break;
                 default:
                     throw new moodle_exception('errorinvalidparam', 'webservice', '', $name);

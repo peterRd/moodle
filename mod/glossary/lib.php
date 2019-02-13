@@ -3661,6 +3661,10 @@ function glossary_get_entries_by_author_id($glossary, $context, $authorid, $orde
 
     $qb->limit($from, $limit);
 
+    // Add the grouping restriction.
+    list($filter, $params) = glossary_get_group_filter($context);
+    $qb->filter_by_group_filter($filter, $params);
+
     // Fetching the entries.
     $count = $qb->count_records();
     $entries = $qb->get_records();
@@ -3984,10 +3988,11 @@ function glossary_get_entries_to_approve($glossary, $context, $letter, $order, $
  * Fetch an entry.
  *
  * @param  int $id The entry ID.
+ * @param object $context
  * @return object|false The entry, or false when not found.
  * @since Moodle 3.1
  */
-function glossary_get_entry_by_id($id) {
+function glossary_get_entry_by_id($id, $context) {
 
     // Build the query.
     $qb = new mod_glossary_entry_query_builder();
@@ -3995,6 +4000,9 @@ function glossary_get_entry_by_id($id) {
     $qb->join_user();
     $qb->add_user_fields();
     $qb->where('id', 'entries', $id);
+
+    list($filter, $params) = glossary_get_group_filter($context);
+    $qb->filter_by_group_filter($filter, $params);
 
     // Fetching the entries.
     $entries = $qb->get_records();
@@ -4068,16 +4076,19 @@ function glossary_can_view_entry($entry, $cminfo) {
         return false;
     }
 
-    // Check group acccess.
-    if (groups_get_activity_groupmode($cm)) {
-        $groups = groups_get_activity_allowed_groups($cm);
-    } else {
-        $groups = array();
-    }
+    // If entries is group restricted check the access.
+    if ($entry->groupid) {
+        // Check group acccess.
+        if ($groupmode = groups_get_activity_groupmode($cm)) {
+            $groups = array_keys(groups_get_activity_allowed_groups($cm));
+        } else {
+            $groups = array();
+        }
 
-    // If groups are enabled check whether the user can access it.
-    if ($groups && !in_array($entry->groupid, $groups)) {
-        return false;
+        // If groups are enabled check whether the user can access it.
+        if ($groupmode == SEPARATEGROUPS && !in_array($entry->groupid, $groups)) {
+            return false;
+        }
     }
 
     // Check approval.
@@ -4170,6 +4181,13 @@ function glossary_edit_entry($entry, $course, $cm, $glossary, $context) {
     $entry->usedynalink      = isset($entry->usedynalink) ? $entry->usedynalink : 0;
     $entry->casesensitive    = isset($entry->casesensitive) ? $entry->casesensitive : 0;
     $entry->fullmatch        = isset($entry->fullmatch) ? $entry->fullmatch : 0;
+
+    if (isset($entry->groupid) && $entry->groupid) {
+        // If the groupid provided cannot be used then unset the groupid.
+        if (!glossary_user_can_add_entry($glossary, $entry->groupid, $USER->id)) {
+            unset($entry->groupid);
+        }
+    }
 
     if ($glossary->defaultapproval or has_capability('mod/glossary:approve', $context)) {
         $entry->approved = 1;

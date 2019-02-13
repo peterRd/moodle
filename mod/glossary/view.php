@@ -20,7 +20,7 @@ $sortorder  = optional_param('sortorder', 'ASC', PARAM_ALPHA);   // it defines t
 $offset     = optional_param('offset', 0,PARAM_INT);             // entries to bypass (for paging purposes)
 $page       = optional_param('page', 0,PARAM_INT);               // Page to show (for paging purposes)
 $show       = optional_param('show', '', PARAM_ALPHA);           // [ concept | alias ] => mode=term hook=$show
-$group      = optional_param('group', '', PARAM_INT);            // Group selection
+$group      = optional_param('group', '', PARAM_INT);            // Group selection.
 
 if (!empty($id)) {
     if (! $cm = get_coursemodule_from_id('glossary', $id)) {
