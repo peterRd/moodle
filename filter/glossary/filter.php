@@ -100,7 +100,8 @@ class filter_glossary extends moodle_text_filter {
         // We sort longest first, so that when we replace the terms,
         // the longest ones are replaced first. This does the right thing
         // when you have two terms like 'Moodle' and 'Moodle 3.5'. You want the longest match.
-        usort($conceptlist, [$this, 'sort_entries_by_length']);
+        // If you have 2 terms with the same lengths then get a group specific one else the first one.
+        usort($conceptlist, [$this, 'sort_entries_by_length_groupid']);
 
         $conceptlist = filter_prepare_phrases_for_filtering($conceptlist);
 
@@ -191,6 +192,22 @@ class filter_glossary extends moodle_text_filter {
      * @return int -1, 0 or 1.
      */
     private function sort_entries_by_length($filterobject0, $filterobject1) {
+        return strlen($filterobject1->phrase) <=> strlen($filterobject0->phrase);
+    }
+
+    /**
+     * usort helper to sort by multiple keys. Sorts the entry by length and groupid
+     * @param filterobject $filterobject0 first item to compare.
+     * @param filterobject $filterobject1 second item to compare.
+     * @return int -1, 0 or 1.
+     */
+    private function sort_entries_by_length_groupid($filterobject0, $filterobject1) {
+        if (strlen($filterobject1->phrase) == strlen($filterobject0->phrase)) {
+            $data1 = $filterobject1->replacementcallbackdata[0];
+            $data0 = $filterobject0->replacementcallbackdata[0];
+            return $data1->groupref <=> $data0->groupref;
+        }
+
         return strlen($filterobject1->phrase) <=> strlen($filterobject0->phrase);
     }
 }

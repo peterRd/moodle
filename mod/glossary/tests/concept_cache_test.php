@@ -84,7 +84,7 @@ class mod_glossary_concept_cache_testcase extends advanced_testcase {
         $this->arrayHasKey($concepts1[0], $glossary3->id);
         $this->assertCount(5, $concepts1[1][$glossary1a->id]);
         foreach($concepts1[1][$glossary1a->id] as $concept) {
-            $this->assertSame(array('id', 'glossaryid', 'concept', 'casesensitive', 'category', 'fullmatch'), array_keys((array)$concept));
+            $this->assertSame(array('id', 'glossaryid', 'concept', 'casesensitive', 'category', 'fullmatch', 'groupref'), array_keys((array)$concept));
             if ($concept->concept === 'first') {
                 $this->assertEquals($entry1a1->id, $concept->id);
                 $this->assertEquals($glossary1a->id, $concept->glossaryid);
@@ -111,7 +111,7 @@ class mod_glossary_concept_cache_testcase extends advanced_testcase {
         }
         $this->assertCount(1, $concepts1[1][$glossary1b->id]);
         foreach($concepts1[1][$glossary1b->id] as $concept) {
-            $this->assertSame(array('id', 'glossaryid', 'concept', 'casesensitive', 'category', 'fullmatch'), array_keys((array)$concept));
+            $this->assertSame(array('id', 'glossaryid', 'concept', 'casesensitive', 'category', 'fullmatch', 'groupref'), array_keys((array)$concept));
             if ($concept->concept === 'second') {
                 $this->assertEquals($entry1b1->id, $concept->id);
                 $this->assertEquals($glossary1b->id, $concept->glossaryid);
@@ -122,7 +122,7 @@ class mod_glossary_concept_cache_testcase extends advanced_testcase {
         }
         $this->assertCount(2, $concepts1[1][$glossary3->id]);
         foreach($concepts1[1][$glossary3->id] as $concept) {
-            $this->assertSame(array('id', 'glossaryid', 'concept', 'casesensitive', 'category', 'fullmatch'), array_keys((array)$concept));
+            $this->assertSame(array('id', 'glossaryid', 'concept', 'casesensitive', 'category', 'fullmatch', 'groupref'), array_keys((array)$concept));
             if ($concept->concept === 'global') {
                 $this->assertEquals($entry31->id, $concept->id);
                 $this->assertEquals($glossary3->id, $concept->glossaryid);
@@ -142,7 +142,7 @@ class mod_glossary_concept_cache_testcase extends advanced_testcase {
         $this->assertCount(1, $concepts3[1]);
         $this->arrayHasKey($concepts3[0], $glossary3->id);
         foreach($concepts3[1][$glossary3->id] as $concept) {
-            $this->assertSame(array('id', 'glossaryid', 'concept', 'casesensitive', 'category', 'fullmatch'), array_keys((array)$concept));
+            $this->assertSame(array('id', 'glossaryid', 'concept', 'casesensitive', 'category', 'fullmatch', 'groupref'), array_keys((array)$concept));
             if ($concept->concept === 'global') {
                 $this->assertEquals($entry31->id, $concept->id);
                 $this->assertEquals($glossary3->id, $concept->glossaryid);

@@ -93,31 +93,39 @@ class concept_cache {
     }
 
     /**
-     * Fetch concepts for given glossaries.
+     * Fetch concepts for given glossaries while taking into consideration any groupids passed through.
      * @param int[] $glossaries
+     * @param int[]|null $groupids
      * @return array
      */
-    protected static function fetch_concepts(array $glossaries) {
+    protected static function fetch_concepts(array $glossaries, ?array $groupids = null) {
         global $DB;
 
         $glossarylist = implode(',', $glossaries);
 
-        $sql = "SELECT id, glossaryid, concept, casesensitive, 0 AS category, fullmatch
+        $groupsql = " AND (groupid IS NULL ";
+        if ($groupids) {
+            $groupsql .= " OR groupid IN (".implode(',', $groupids). ")";
+        };
+        $groupsql .= " )";
+
+        $sql = "SELECT id, glossaryid, concept, casesensitive, 0 AS category, fullmatch, groupid AS groupref
                   FROM {glossary_entries}
-                 WHERE glossaryid IN ($glossarylist) AND usedynalink = 1 AND approved = 1
+                 WHERE glossaryid IN ($glossarylist) AND usedynalink = 1 AND approved = 1 $groupsql
 
                  UNION
 
-                SELECT id, glossaryid, name AS concept, 1 AS casesensitive, 1 AS category, 1 AS fullmatch
-                  FROM {glossary_categories}
+                SELECT id, glossaryid, name AS concept, 1 AS casesensitive, 1 AS category, 1 AS fullmatch, 0 AS groupref
+                  FROM {glossary_categories} gc
                  WHERE glossaryid IN ($glossarylist) AND usedynalink = 1
 
                 UNION
 
-                SELECT ge.id, ge.glossaryid, ga.alias AS concept, ge.casesensitive, 0 AS category, ge.fullmatch
+                SELECT ge.id, ge.glossaryid, ga.alias AS concept, ge.casesensitive, 0 AS category,
+                        ge.fullmatch, ge.groupid AS groupref
                   FROM {glossary_alias} ga
                   JOIN {glossary_entries} ge ON (ga.entryid = ge.id)
-                 WHERE ge.glossaryid IN ($glossarylist) AND ge.usedynalink = 1 AND ge.approved = 1";
+                 WHERE ge.glossaryid IN ($glossarylist) AND ge.usedynalink = 1 AND ge.approved = 1 $groupsql";
 
         $concepts = array();
         $rs = $DB->get_recordset_sql($sql);
@@ -151,7 +159,7 @@ class concept_cache {
      * @return array
      */
     protected static function get_course_concepts($courseid) {
-        global $DB;
+        global $DB, $USER;
 
         if (empty($courseid)) {
             return array(array(), array());
@@ -167,11 +175,15 @@ class concept_cache {
             return array(array(), array());
         }
 
-        $cache = \cache::make('mod_glossary', 'concepts');
-        $data = $cache->get($courseid);
-        if (is_array($data)) {
-            list($glossaries, $allconcepts) = $data;
+        $userid = $USER->id ?? null;
+        $groups = [];
 
+        $cache = \cache::make('mod_glossary', 'concepts');
+        // Get the cache key corresponding to the user because glossary is now group specific.
+        $cachekey = $userid ? $courseid . "_" . $userid : $courseid;
+        $data = $cache->get($courseid);
+        if (is_array($data) && isset($data[$cachekey])) {
+            list($glossaries, $allconcepts) = $data[$cachekey];
         } else {
             // Find all course glossaries.
             $sql = "SELECT g.id, g.name
@@ -182,16 +194,20 @@ class concept_cache {
                   ORDER BY g.globalglossary, g.id";
             $glossaries = $DB->get_records_sql_menu($sql, array('course' => $courseid));
             if (!$glossaries) {
-                $data = array(array(), array());
+                $data[$cachekey] = array(array(), array());
                 $cache->set($courseid, $data);
-                return $data;
+                return $data[$cachekey];
             }
             foreach ($glossaries as $id => $name) {
                 $name = str_replace(':', '-', $name);
                 $glossaries[$id] = replace_ampersands_not_followed_by_entity(strip_tags($name));
             }
 
-            $allconcepts = self::fetch_concepts(array_keys($glossaries));
+            if ($userid) {
+                $groups = groups_get_all_groups($courseid, $userid);
+            }
+
+            $allconcepts = self::fetch_concepts(array_keys($glossaries), array_keys($groups));
             foreach ($glossaries as $gid => $unused) {
                 if (!isset($allconcepts[$gid])) {
                     unset($glossaries[$gid]);
@@ -199,11 +215,12 @@ class concept_cache {
             }
             if (!$glossaries) {
                 // This means there are no interesting concepts in the existing glossaries.
-                $data = array(array(), array());
+                $data[$cachekey] = array(array(), array());
                 $cache->set($courseid, $data);
-                return $data;
+                return $data[$cachekey];
             }
-            $cache->set($courseid, array($glossaries, $allconcepts));
+            $data[$cachekey] = [$glossaries, $allconcepts];
+            $cache->set($courseid, $data);
         }
 
         $concepts = $allconcepts;
