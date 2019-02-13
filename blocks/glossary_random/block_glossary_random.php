@@ -43,6 +43,7 @@ class block_glossary_random extends block_base {
         global $CFG, $DB;
 
         require_once($CFG->libdir . '/filelib.php');
+        require_once($CFG->dirroot. "/mod/glossary/lib.php");
 
         $this->course = $this->page->course;
 
@@ -68,15 +69,30 @@ class block_glossary_random extends block_base {
                 // Skip generating of the cache if we can't display anything to the current user.
                 return false;
             }
+            $glossaryctx = context_module::instance($cm->id);
+
+            $sql = "SELECT id, concept, definition, definitionformat, definitiontrust
+                      FROM {glossary_entries}";
+            $wheresql = "glossaryid = :glossaryid AND approved = :approved";
+            $params = [
+                'glossaryid' => $this->config->glossary,
+                'approved' => 1
+            ];
+
+            // Add group/grouping restrictions.
+            list($filter, $groupparams) = glossary_get_group_filter($glossaryctx, null, "");
+
+            if ($filter) {
+                $wheresql .= " AND " . $filter;
+                $params = array_merge($params, $groupparams);
+            }
+            $sql .= " WHERE $wheresql ";
 
             // place glossary concept and definition in $pref->cache
-            if (!$numberofentries = $DB->count_records('glossary_entries',
-                                                       array('glossaryid'=>$this->config->glossary, 'approved'=>1))) {
+            if (!$numberofentries = $DB->count_records_select('glossary_entries', $wheresql, $params)) {
                 $this->config->cache = get_string('noentriesyet','block_glossary_random');
                 $this->instance_config_commit();
             }
-
-            $glossaryctx = context_module::instance($cm->id);
 
             $limitfrom = 0;
             $limitnum = 1;
@@ -122,10 +138,7 @@ class block_glossary_random extends block_base {
                     break;
             }
 
-            if ($entry = $DB->get_records_sql("SELECT id, concept, definition, definitionformat, definitiontrust
-                                                 FROM {glossary_entries}
-                                                WHERE glossaryid = ? AND approved = 1
-                                             ORDER BY $orderby", array($this->config->glossary), $limitfrom, $limitnum)) {
+            if ($entry = $DB->get_records_sql("$sql ORDER BY $orderby", $params, $limitfrom, $limitnum)) {
 
                 $entry = reset($entry);
 
