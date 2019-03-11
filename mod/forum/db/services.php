@@ -83,6 +83,7 @@ $functions = array(
         'classpath' => 'mod/forum/externallib.php',
         'description' => 'Create new posts into an existing discussion.',
         'type' => 'write',
+        'ajax' => true,
         'capabilities' => 'mod/forum:replypost',
         'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
     ),
@@ -124,5 +125,5 @@ $functions = array(
         'type' => 'write',
         'ajax' => true,
         'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
-    ),
+    )
 );

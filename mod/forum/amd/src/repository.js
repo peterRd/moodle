@@ -59,8 +59,22 @@ define([
         return Ajax.call([request])[0];
     };
 
+    var addDiscussionPost = function(postid, subject, message) {
+        var request = {
+            methodname: 'mod_forum_add_discussion_post',
+            args: {
+                postid: postid,
+                message: message,
+                subject: subject
+            }
+        };
+
+        return Ajax.call([request])[0];
+    };
+
     return {
         toggleSubscription: toggleSubscription,
         togglePin: togglePin,
+        addDiscussionPost: addDiscussionPost
     };
 });

@@ -30,6 +30,7 @@
     }
 }}
 
+<div data-content="forum-discussion">
 {{#html}}
     {{{subscribe}}}
     {{{neighbourlinks}}}
@@ -49,3 +50,11 @@
 {{{html.posts}}}
 
 {{#html.neighbourlinks}}{{{.}}}{{/html.neighbourlinks}}
+</div>
+
+{{#js}}
+require(['mod_forum/posts_list'], function(View) {
+    var root = $("[data-content='forum-discussion']");
+    View.init(root);
+});
+{{/js}}

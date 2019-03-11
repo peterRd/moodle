@@ -33,5 +33,15 @@ define([], function() {
         pin: {
             toggle: ".pindiscussion [data-action='toggle']",
         },
+        post: {
+            forum_core_content: "[data-region-content='forum-post-core']",
+            forum_content: "[data-content='forum-post']",
+            inpage_reply_link: "[data-action='collapsible-link']",
+            inpage_reply_content: "[data-content='inpage-reply-content']",
+            inpage_reply_form: "form[data-content='inpage-reply-form']",
+            inpage_submit_btn: "[data-action='forum-inpage-submit']",
+            replies_container: "[data-region='replies-container']",
+            mode_select: "select[name='mode']"
+        }
     };
 });

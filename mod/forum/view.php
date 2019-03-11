@@ -118,8 +118,10 @@
     }
 
     // Mark viewed and trigger the course_module_viewed event.
-    forum_view($forum, $course, $cm, $context);
-
+    \mod_forum\event\course_module_viewed::create([
+        'context' => $context,
+        'objectid' => $forum->id
+    ]);
     echo $OUTPUT->header();
 
     echo $OUTPUT->heading(format_string($forum->name), 2);
