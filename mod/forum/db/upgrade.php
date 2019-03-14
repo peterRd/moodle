@@ -114,7 +114,6 @@ function xmldb_forum_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        // Forum savepoint reached.
         upgrade_mod_savepoint(true, 2019031200, 'forum');
     }
 
@@ -134,6 +133,15 @@ function xmldb_forum_upgrade($oldversion) {
         $field = new xmldb_field('cutoffdate', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'duedate');
 
         // Conditionally launch add field cutoffdate.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field deleted to be added to forum_posts.
+        $table = new xmldb_table('forum_discussions');
+        $field = new xmldb_field('locked', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'pinned');
+
+        // Conditionally launch add field deleted.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
