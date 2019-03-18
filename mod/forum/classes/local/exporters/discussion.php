@@ -93,6 +93,7 @@ class discussion extends exporter {
             'userstate' => [
                 'type' => [
                     'subscribed' => ['type' => PARAM_BOOL],
+                    'favourited' => ['type' => PARAM_BOOL],
                 ],
             ],
             'capabilities' => [
@@ -100,7 +101,8 @@ class discussion extends exporter {
                     'subscribe' => ['type' => PARAM_BOOL],
                     'move' => ['type' => PARAM_BOOL],
                     'pin' => ['type' => PARAM_BOOL],
-                    'post' => ['type' => PARAM_BOOL]
+                    'post' => ['type' => PARAM_BOOL],
+                    'favourite' => ['type' => PARAM_BOOL]
                 ]
             ],
             'urls' => [
@@ -189,12 +191,14 @@ class discussion extends exporter {
             ],
             'userstate' => [
                 'subscribed' => \mod_forum\subscriptions::is_subscribed($user->id, $forumrecord, $discussion->get_id()),
+                'favourited' => discussion_entity::is_favourited($discussion, $forum->get_context(), $user),
             ],
             'capabilities' => [
                 'subscribe' => $capabilitymanager->can_subscribe_to_discussion($user, $discussion),
                 'move' => $capabilitymanager->can_move_discussion($user, $discussion),
                 'pin' => $capabilitymanager->can_pin_discussion($user, $discussion),
-                'post' => $capabilitymanager->can_post_in_discussion($user, $discussion)
+                'post' => $capabilitymanager->can_post_in_discussion($user, $discussion),
+                'favourite' => $capabilitymanager->can_favourite_discussion($user, $discussion) // Defaulting to true until we get capabilities sorted
             ],
             'urls' => [
                 'view' => $urlfactory->get_discussion_view_url_from_discussion($discussion)->out(false),

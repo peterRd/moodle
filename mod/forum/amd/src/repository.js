@@ -52,12 +52,32 @@ define(['core/ajax'], function(Ajax) {
                 subject: subject
             }
         };
+        return Ajax.call([request])[0];
+    };
 
+    /**
+     * Set the favourite state for a discussion in a forum.
+     *
+     * @param {number} forumId ID of the forum the discussion belongs to
+     * @param {number} discussionId ID of the discussion with the subscription state
+     * @param {boolean} targetState Set the favourite state. True == favourited; false == unfavourited.
+     * @return {object} jQuery promise
+     */
+    var toggleFavouriteDiscussionState = function(forumId, discussionId, targetState) {
+        var request = {
+            methodname: 'mod_forum_toggle_favourite_state',
+            args: {
+                forumid: forumId,
+                discussionid: discussionId,
+                targetstate: targetState
+            }
+        };
         return Ajax.call([request])[0];
     };
 
     return {
         setDiscussionSubscriptionState: setDiscussionSubscriptionState,
-        addDiscussionPost: addDiscussionPost
+        addDiscussionPost: addDiscussionPost,
+        toggleFavouriteDiscussionState: toggleFavouriteDiscussionState
     };
 });
