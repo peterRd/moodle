@@ -1573,4 +1573,64 @@ class mod_forum_external extends external_api {
     public static function set_subscription_state_returns() {
         return \mod_forum\local\exporters\discussion::get_read_structure();
     }
+
+    /**
+     * Set the pin state.
+     *
+     * @param   int     $forumid
+     * @param   int     $discussionid
+     * @param   bool    $targetstate
+     * @return  \stdClass
+     */
+    public static function set_pin_state($forumid, $discussionid, $targetstate) {
+        global $PAGE, $USER;
+        $params = self::validate_parameters(self::set_pin_state_parameters(), [
+            'forumid' => $forumid,
+            'discussionid' => $discussionid,
+            'targetstate' => $targetstate,
+        ]);
+        $vaultfactory = mod_forum\local\container::get_vault_factory();
+        $forumvault = $vaultfactory->get_forum_vault();
+        $discussionvault = $vaultfactory->get_discussion_vault();
+        $forum = $forumvault->get_from_id($params['forumid']);
+
+        self::validate_context($forum->get_context());
+        if (!$forum->can_subscribe()) {
+            // Nothing to do. We won't actually output any content here though.
+            throw new \moodle_exception('cannotsubscribe', 'mod_forum');
+        }
+
+        $discussion = $discussionvault->get_from_id($params['discussionid']);
+        $discussion->set_pinned($targetstate);
+
+        $legacydatamapperfactory = mod_forum\local\container::get_legacy_data_mapper_factory();
+        $discussionrecord = $legacydatamapperfactory->get_discussion_data_mapper()->to_legacy_object($discussion);
+        $discussionvault->update_discussion($discussion);
+
+        $exporterfactory = mod_forum\local\container::get_exporter_factory();
+        $exporter = $exporterfactory->get_discussion_exporter($USER, $forum, $discussion);
+        return $exporter->export($PAGE->get_renderer('mod_forum'));
+    }
+    /**
+     * Returns description of method parameters.
+     *
+     * @return external_function_parameters
+     */
+    public static function set_pin_state_parameters() {
+        return new external_function_parameters(
+            [
+                'forumid' => new external_value(PARAM_INT, 'Forum that the discussion is in', VALUE_REQUIRED, null, NULL_NOT_ALLOWED),
+                'discussionid' => new external_value(PARAM_INT, 'The discussion to pin or unpin', VALUE_REQUIRED, null, NULL_NOT_ALLOWED),
+                'targetstate' => new external_value(PARAM_INT, 'The target state', VALUE_REQUIRED, null, NULL_NOT_ALLOWED),
+            ]
+        );
+    }
+    /**
+     * Returns description of method result value.
+     *
+     * @return external_description
+     */
+    public static function set_pin_state_returns() {
+        return \mod_forum\local\exporters\discussion::get_read_structure();
+    }
 }
