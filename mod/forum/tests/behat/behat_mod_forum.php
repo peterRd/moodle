@@ -102,6 +102,19 @@ class behat_mod_forum extends behat_base {
     }
 
     /**
+     * Opens up the action menu for the discussion
+     *
+     * @Given /^I click on "(?P<post_subject_string>(?:[^"]|\\")*)" action menu$/
+     * @param string $discussion The subject of the discussion
+     */
+    public function i_click_on_action_menu($discussion) {
+        $this->execute('behat_general::i_click_on_in_the', [
+            "[data-container='discussion-tools'] [data-toggle='dropdown']", "css_element",
+            "//tr[@class='discussion-row' and contains(.,'$discussion')]", "xpath_element"
+        ]);
+    }
+
+    /**
      * Returns the steps list to add a new discussion to a forum.
      *
      * Abstracts add a new topic and add a new discussion, as depending
