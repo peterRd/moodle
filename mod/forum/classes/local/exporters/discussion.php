@@ -202,7 +202,7 @@ class discussion extends exporter {
                 'move' => $capabilitymanager->can_move_discussion($user, $discussion),
                 'pin' => $capabilitymanager->can_pin_discussion($user, $discussion),
                 'post' => $capabilitymanager->can_post_in_discussion($user, $discussion),
-                'favourite' => $capabilitymanager->can_favourite_discussion($user, $discussion) // Defaulting to true until we get capabilities sorted
+                'favourite' => $capabilitymanager->can_favourite_discussion($user, $discussion)
             ],
             'urls' => [
                 'view' => $urlfactory->get_discussion_view_url_from_discussion($discussion)->out(false),
