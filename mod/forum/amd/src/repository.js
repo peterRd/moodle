@@ -75,9 +75,23 @@ define(['core/ajax'], function(Ajax) {
         return Ajax.call([request])[0];
     };
 
+    var togglePin = function(forumid, discussionid, targetstate, includetext) {
+        var request = {
+            methodname: 'mod_forum_set_pin_state',
+            args: {
+                forumid: forumid,
+                discussionid: discussionid,
+                targetstate: targetstate,
+                includetext: includetext,
+            }
+        };
+        return Ajax.call([request])[0];
+    };
+
     return {
         setDiscussionSubscriptionState: setDiscussionSubscriptionState,
         addDiscussionPost: addDiscussionPost,
-        toggleFavouriteDiscussionState: toggleFavouriteDiscussionState
+        toggleFavouriteDiscussionState: toggleFavouriteDiscussionState,
+        togglePin: togglePin
     };
 });
