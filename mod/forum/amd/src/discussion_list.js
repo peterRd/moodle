@@ -38,7 +38,20 @@ define([
             var forumId = toggleElement.data('forumid');
             var discussionId = toggleElement.data('discussionid');
             var subscriptionState = toggleElement.data('targetstate');
-            Repository.toggleFavouriteDiscussionState(forumId, discussionId, subscriptionState)
+            Repository.setFavouriteDiscussionState(forumId, discussionId, subscriptionState)
+                .then(function() {
+                    location.reload();
+                })
+                .catch(Notification.exception);
+        });
+
+        root.on('click', Selectors.pin.toggle, function(e) {
+            e.preventDefault();
+            var toggleElement = $(this);
+            var forumId = toggleElement.data('forumid');
+            var discussionId = toggleElement.data('discussionid');
+            var state = toggleElement.data('targetstate');
+            Repository.setPinDiscussionState(forumId, discussionId, state)
                 .then(function() {
                     location.reload();
                 })
