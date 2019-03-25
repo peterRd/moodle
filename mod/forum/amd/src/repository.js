@@ -80,7 +80,6 @@ define(['core/ajax'], function(Ajax) {
      * @param {number} forumid
      * @param {number} discussionid
      * @param {boolean} targetstate
-     * @param includetext
      * @return {*|Promise}
      */
     var setPinDiscussionState = function(forumid, discussionid, targetstate) {
