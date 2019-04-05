@@ -321,7 +321,7 @@ YUI.add('moodle-core_filepicker', function(Y) {
             var el = Y.Node.create('<div/>');
             var checkbox = Y.Node.create('<input/>');
             checkbox.setAttribute('type', 'checkbox')
-                .setAttribute('class', 'mark-for-deletion')
+                .setAttribute('class', 'mark-for-selection')
                 .setAttribute('data-fullname', o.data.fullname);
 
             el.appendChild(checkbox);
@@ -373,9 +373,9 @@ YUI.add('moodle-core_filepicker', function(Y) {
             scope.tableview.delegate('change', function(e) {
                 e.preventDefault();
                 if (e.target.get('checked')) {
-                    e.container.all('.mark-for-deletion').setAttribute('checked', true);
+                    e.container.all('.mark-for-selection').setAttribute('checked', true);
                 } else {
-                    e.container.all('.mark-for-deletion').removeAttribute('checked');
+                    e.container.all('.mark-for-selection').removeAttribute('checked');
                 }
             }, '#select-all', options.callbackcontext, scope.tableview);
             if (options.rightclickcallback) {

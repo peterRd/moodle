@@ -3249,3 +3249,50 @@ function repository_delete_selected_files($context, string $component, string $f
 
     return $return;
 }
+
+function repository_download_selected_files($context, string $component, string $filearea, $itemid, array $files) {
+    global $USER;
+    $return = false;
+
+    $zipper = get_file_packer('application/zip');
+    $fs = get_file_storage();
+    // archive compressed file to an unused draft area
+    $newdraftitemid = file_get_unused_draft_itemid();
+    $filestoarchive = [];
+
+    foreach ($files as $selectedfile) {
+        $filename = clean_filename($selectedfile->filename); // Default to '.' for root.
+        $filepath = clean_param($selectedfile->filepath, PARAM_PATH); // Default to '/' for downloadall.
+        $filepath = file_correct_filepath($filepath);
+        $area = file_get_draft_area_info($itemid, $filepath);
+        if ($area['filecount'] == 0 && $area['foldercount'] == 0) {
+            continue;
+        }
+
+        $stored_file = $fs->get_file($context->id, $component, $filearea, $itemid, $filepath, $filename);
+        // If it is empty we are downloading a directory
+        $archivefile = $stored_file->get_filename();
+        if (!$filename || $filename == '.' ) {
+            $archivefile = $filepath;
+        }
+
+        $filestoarchive[$archivefile] = $stored_file;
+    }
+    $zippedfile = get_string('files') . '.zip';
+    if ($newfile =
+        $zipper->archive_to_storage(
+            $filestoarchive,
+            $context->id,
+            $component,
+            $filearea,
+            $newdraftitemid,
+            "/",
+            $zippedfile, $USER->id)
+    ) {
+        $return = new stdClass();
+        $return->fileurl = moodle_url::make_draftfile_url($newdraftitemid, '/', $zippedfile)->out();
+        $return->filepath = $filepath;
+    }
+
+    return $return;
+}
