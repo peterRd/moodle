@@ -5448,7 +5448,18 @@ class core_course_courselib_testcase extends advanced_testcase {
         $context = context_course::instance($guestcourse->id);
         course_view($context);
 
-        // Every course accessed, even the not enrolled one.
+        // Every course accessed, even the not enrolled one with enrollment enabled.
+        $result = course_get_recent_courses($student->id);
+        $this->assertCount(4, $result);
+
+        $guestcourse = $generator->create_course(
+            (object)array('shortname' => 'guestcourse2',
+                'enrol_guest_status_0' => ENROL_INSTANCE_DISABLED,
+                'enrol_guest_password_0' => ''));
+        $context = context_course::instance($guestcourse->id);
+        course_view($context);
+
+        // Every course accessed, excluding the not enrolled one with enrollment disabled.
         $result = course_get_recent_courses($student->id);
         $this->assertCount(4, $result);
 
