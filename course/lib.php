@@ -4571,7 +4571,7 @@ function course_get_recent_courses(int $userid = null, int $limit = 0, int $offs
     }
 
     $basefields = array('id', 'idnumber', 'summary', 'summaryformat', 'startdate', 'enddate', 'category',
-            'shortname', 'fullname', 'timeaccess', 'component');
+            'shortname', 'fullname', 'timeaccess', 'component', 'visible');
 
     $sort = trim($sort);
     if (empty($sort)) {
@@ -4608,19 +4608,6 @@ function course_get_recent_courses(int $userid = null, int $limit = 0, int $offs
             $favsql
              WHERE ul.userid = :userid
                AND c.visible = :visible
-               AND EXISTS (SELECT e.id
-                             FROM {enrol} e
-                        LEFT JOIN {user_enrolments} ue ON ue.enrolid = e.id
-                            WHERE e.courseid = c.id
-                              AND e.status = :statusenrol
-                              AND ((ue.status = :status
-                                    AND ue.userid = ul.userid
-                                    AND ue.timestart < :now1
-                                    AND (ue.timeend = 0 OR ue.timeend > :now2)
-                                   )
-                                   OR e.enrol = :guestenrol
-                                  )
-                          )
             $orderby";
 
     $now = round(time(), -2); // Improves db caching.
@@ -4628,6 +4615,10 @@ function course_get_recent_courses(int $userid = null, int $limit = 0, int $offs
                'statusenrol' => ENROL_INSTANCE_ENABLED, 'guestenrol' => 'guest', 'now1' => $now, 'now2' => $now] + $favparams;
 
     $recentcourses = $DB->get_records_sql($sql, $params, $offset, $limit);
+
+    $recentcourses = array_filter($recentcourses, function($course) {
+        return can_access_course($course, null, '', true);
+    });
 
     // Filter courses if last access field is hidden.
     $hiddenfields = array_flip(explode(',', $CFG->hiddenuserfields));
