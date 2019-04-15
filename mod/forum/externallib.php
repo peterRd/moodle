@@ -588,6 +588,7 @@ class mod_forum_external extends external_api {
             }
             // The forum function returns the replies for all the discussions in a given forum.
             $canseeprivatereplies = has_capability('mod/forum:readprivatereplies', $modcontext);
+            $canlock = has_capability('moodle/course:manageactivities', $modcontext, $USER);
             $replies = forum_count_discussion_replies($forumid, $sort, -1, $page, $perpage, $canseeprivatereplies);
 
             foreach ($alldiscussions as $discussion) {
@@ -637,6 +638,7 @@ class mod_forum_external extends external_api {
                 }
 
                 $discussion->locked = forum_discussion_is_locked($forum, $discussion);
+                $discussion->canlock = $canlock;
                 $discussion->canreply = forum_user_can_post($forum, $discussion, $USER, $cm, $course, $modcontext);
 
                 if (forum_is_author_hidden($discussion, $forum)) {
@@ -728,6 +730,7 @@ class mod_forum_external extends external_api {
                                 'pinned' => new external_value(PARAM_BOOL, 'Is the discussion pinned'),
                                 'locked' => new external_value(PARAM_BOOL, 'Is the discussion locked'),
                                 'canreply' => new external_value(PARAM_BOOL, 'Can the user reply to the discussion'),
+                                'canlock' => new external_value(PARAM_BOOL, 'Can the user lock the discussion'),
                             ), 'post'
                         )
                     ),
