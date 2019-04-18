@@ -49,6 +49,12 @@ define('GLOSSARY_CONTINUOUS', 'continuous');
 define('GLOSSARY_DICTIONARY', 'dictionary');
 define('GLOSSARY_FULLWITHOUTAUTHOR', 'fullwithoutauthor');
 
+// Glossary display modes
+define('GLOSSARY_DISPLAY_MODE_LETTER', 'letter');
+define('GLOSSARY_DISPLAY_MODE_CATEGORY', 'cat');
+define('GLOSSARY_DISPLAY_MODE_AUTHOR', 'author');
+define('GLOSSARY_DISPLAY_MODE_DATE', 'date');
+
 /// STANDARD FUNCTIONS ///////////////////////////////////////////////////////////
 /**
  * @global object
