@@ -205,8 +205,7 @@ class discussion_list {
     private function get_discussion_form(stdClass $user, \cm_info $cm, ?int $groupid) {
         $forum = $this->forum;
         $forumrecord = $this->legacydatamapperfactory->get_forum_data_mapper()->to_legacy_object($forum);
-        $modcontext = \context_module::instance($cm->id);
-        $coursecontext = \context_course::instance($forum->get_course_id());
+        $modcontext = $forum->get_context();
         $post = (object) [
             'course' => $forum->get_course_id(),
             'forum' => $forum->get_id(),
@@ -221,21 +220,21 @@ class discussion_list {
         ];
         $thresholdwarning = forum_check_throttling($forumrecord, $cm);
 
+        // Send through some default args.
         $formparams = array(
             'course' => $forum->get_course_record(),
             'cm' => $cm,
-            'coursecontext' => $coursecontext,
+            'coursecontext' => false,
             'modcontext' => $modcontext,
             'forum' => $forumrecord,
             'post' => $post,
-            'subscribe' => \mod_forum\subscriptions::is_subscribed($user->id, $forumrecord,
-                null, $cm),
+            'subscribe' => false,
             'thresholdwarning' => $thresholdwarning,
             'inpagereply' => true,
             'edit' => 0
         );
         $mformpost = new \mod_forum_post_form('post.php', $formparams, 'post', '', array('id' => 'mformforum'));
-        $discussionsubscribe = \mod_forum\subscriptions::get_user_default_subscription($forumrecord, $coursecontext, $cm, null);
+        $discussionsubscribe = \mod_forum\subscriptions::get_user_default_subscription($forumrecord, $modcontext, $cm, null);
 
         $params = array('reply' => 0, 'forum' => $forumrecord->id, 'edit' => 0) +
             (isset($post->groupid) ? array('groupid' => $post->groupid) : array()) +
