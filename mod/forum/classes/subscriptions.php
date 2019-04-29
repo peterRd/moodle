@@ -515,6 +515,9 @@ class subscriptions {
                     foreach ($subscriptions as $id => $data) {
                         self::add_to_discussion_cache($forumid, $userid, $data->discussion, $data->preference);
                     }
+
+                    // Confirm this forum has been loaded.
+                    self::$discussionfetchedforums[$forumid] = true;
                     $subscriptions->close();
                 }
             } else {
