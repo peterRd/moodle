@@ -53,12 +53,13 @@ define([
             var message = form.elements.post.value.trim();
             var postid = form.elements.reply.value;
             var subject = form.elements.subject.value;
+            var isprivatereply = form.elements.privatereply != undefined ? form.elements.privatereply.checked : false;
             var currentRoot = $(e.currentTarget).parents(Selectors.post.forumContent);
             var mode = parseInt(root.find(Selectors.post.modeSelect).get(0).value);
             var newid;
 
             if (message.length) {
-                Repository.addDiscussionPost(postid, subject, message)
+                Repository.addDiscussionPost(postid, subject, message, isprivatereply)
                     .then(function(context) {
                         var message = context.messages.reduce(function(carry, message) {
                             if (message.type == 'success') {
