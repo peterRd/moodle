@@ -408,10 +408,18 @@ function file_prepare_draft_area(&$draftitemid, $contextid, $component, $fileare
         $draftitemid = file_get_unused_draft_itemid();
         $file_record = array('contextid'=>$usercontext->id, 'component'=>'user', 'filearea'=>'draft', 'itemid'=>$draftitemid);
         if (!is_null($itemid) and $files = $fs->get_area_files($contextid, $component, $filearea, $itemid)) {
+            // This means there are no files in the filearea, only the root directory.
+            // So manually create the draftfile. Otherwise it will automatically be handled.
+            if (count($files) == 1) {
+                $fs->create_directory($usercontext->id, 'user', 'draft', $draftitemid, '/');
+            }
+
             foreach ($files as $file) {
                 if ($file->is_directory() and $file->get_filepath() === '/') {
                     // we need a way to mark the age of each draft area,
-                    // by not copying the root dir we force it to be created automatically with current timestamp
+                    // by not copying the root dir we force it to be created automatically with current timestamp,
+                    // Store the original so we can do a racecondition check.
+                    $originalroot = $file;
                     continue;
                 }
                 if (!$options['subdirs'] and ($file->is_directory() or $file->get_filepath() !== '/')) {
@@ -437,6 +445,23 @@ function file_prepare_draft_area(&$draftitemid, $contextid, $component, $fileare
                 $newsourcefield->original = file_storage::pack_reference($original);
                 $draftfile->set_source(serialize($newsourcefield));
                 // End of file manager hack
+            }
+
+            // Get the automatically created root directory and set it's source fields.
+            if ($originalroot && $draftrootdir = $fs->get_file($usercontext->id, 'user', 'draft', $draftitemid, '/', '.')) {
+                $sourcefield = $originalroot->get_source();
+                $newsourcefield = new stdClass;
+                $newsourcefield->source = $sourcefield;
+                $original = new stdClass;
+                $original->contextid = $contextid;
+                $original->component = $component;
+                $original->filearea  = $filearea;
+                $original->itemid    = $itemid;
+                $original->lastmodified = $originalroot->get_timemodified();
+                $original->filename  = $originalroot->get_filename();
+                $original->filepath  = $originalroot->get_filepath();
+                $newsourcefield->original = file_storage::pack_reference($original);
+                $draftrootdir->set_source(serialize($newsourcefield));
             }
         }
         if (!is_null($text)) {
@@ -562,6 +587,23 @@ function file_get_file_area_info($contextid, $component, $filearea, $itemid = 0,
         'filesize_without_references' => 0,
         'originalmodified' => false
     );
+
+    // Get the root directory file.
+    $file = $fs->get_file($contextid, $component, $filearea, $itemid, '/', '.');
+    if ($file && ($source = @unserialize($file->get_source())) && isset($source->original)) {
+        $original = file_storage::unpack_reference($source->original);
+        $originalroot = $fs->get_file($original['contextid'], $original['component'], $original['filearea'],
+            $original['itemid'] , $original['filepath'], $original['filename']
+        );
+
+        $results['originalmodified'] = true;
+        if ($originalroot) {
+            $newtime = (int) $originalroot->get_timemodified();
+            if ($newtime == $original['lastmodified']) {
+                $results['originalmodified'] = false;
+            }
+        }
+    }
 
     $draftfiles = $fs->get_directory_files($contextid, $component, $filearea, $itemid, $filepath, true, true);
 
