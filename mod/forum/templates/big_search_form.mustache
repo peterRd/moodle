@@ -144,6 +144,16 @@
                     <input type="text" size="35" name="user" id="user" value="{{user}}">
                 </td>
             </tr>
+            {{^guestuser}}
+            <tr>
+                <td class="c0 text-xs-right">
+                    <label for="includeonlyfavourites">{{#str}}includeonlyfavouritesearch, forum{{/str}}</label>
+                </td>
+                <td class="c1 align-middle form-inline">
+                    <input type="checkbox" class="form-control" name="includeonlyfavourites" id="includeonlyfavourites" value="1" {{#includeonlyfavourites}}checked{{/includeonlyfavourites}} />
+                </td>
+            </tr>
+            {{/guestuser}}
             {{#tagsenabled}}
             <tr>
                 <td class="c0">

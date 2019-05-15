@@ -67,6 +67,7 @@ if ($timetorestrict) {
 } else {
     $dateto = optional_param('dateto', 0, PARAM_INT);      // Ending date
 }
+$includeonlyfavourites = optional_param('includeonlyfavourites', false, PARAM_BOOL); // Include only favourites.
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url($FULLME); //TODO: this is very sloppy --skodak
@@ -104,6 +105,9 @@ if (empty($search)) {   // Check the other parameters instead
     }
     if (!empty($tags)) {
         $search .= ' tags:' . implode(',', $tags);
+    }
+    if (!empty($includeonlyfavourites)) {
+        $search .= ' includeonlyfavourites:on';
     }
     $individualparams = true;
 } else {
@@ -330,7 +334,7 @@ echo $OUTPUT->footer();
   * @return void The function prints the form.
   */
 function forum_print_big_search_form($course) {
-    global $PAGE, $words, $subject, $phrase, $user, $fullwords, $notwords, $datefrom, $dateto, $forumid, $tags;
+    global $PAGE, $words, $subject, $phrase, $user, $fullwords, $notwords, $datefrom, $dateto, $forumid, $tags, $includeonlyfavourites;
 
     $renderable = new \mod_forum\output\big_search_form($course, $user);
     $renderable->set_words($words);
@@ -343,6 +347,7 @@ function forum_print_big_search_form($course) {
     $renderable->set_user($user);
     $renderable->set_forumid($forumid);
     $renderable->set_tags($tags);
+    $renderable->set_includeonlyfavourites($includeonlyfavourites);
 
     $output = $PAGE->get_renderer('mod_forum');
     echo $output->render($renderable);

@@ -2093,6 +2093,18 @@ function forum_search_posts($searchterms, $courseid=0, $limitfrom=0, $limitnum=5
         $where[] = "(d.forum $fullid_sql)";
     }
 
+    $favjoin = "";
+    if (in_array('includeonlyfavourites:on', $searchterms)) {
+        $usercontext = context_user::instance($USER->id);
+        $ufservice = \core_favourites\service_factory::get_service_for_user_context($usercontext);
+        list($favjoin, $favparams) = $ufservice->get_join_sql_by_type('mod_forum', 'discussions',
+            "favourited", "d.id");
+
+        $searchterms = array_values(array_diff($searchterms, array('includeonlyfavourites:on')));
+        $params = array_merge($params, $favparams);
+        $extrasql .= " AND favourited.itemid IS NOT NULL AND favourited.itemid != 0";
+    }
+
     $selectdiscussion = "(".implode(" OR ", $where).")";
 
     $messagesearch = '';
@@ -2139,12 +2151,13 @@ function forum_search_posts($searchterms, $courseid=0, $limitfrom=0, $limitnum=5
                                                               'p.userid', 'u.id', 'u.firstname',
                                                               'u.lastname', 'p.modified', 'd.forum',
                                                               $tagfields);
+
         $params = array_merge($params, $msparams);
     }
 
     $fromsql = "{forum_posts} p
                   INNER JOIN {forum_discussions} d ON d.id = p.discussion
-                  INNER JOIN {user} u ON u.id = p.userid $tagjoins";
+                  INNER JOIN {user} u ON u.id = p.userid $tagjoins $favjoin";
 
     $selectsql = " $messagesearch
                AND p.discussion = d.id
