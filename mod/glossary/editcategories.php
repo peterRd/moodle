@@ -4,6 +4,7 @@
 
 require_once("../../config.php");
 require_once("lib.php");
+require_once("editcategories_form.php");
 
 $id = required_param('id', PARAM_INT);                       // Course Module ID, or
 $usedynalink = optional_param('usedynalink', 0, PARAM_INT);  // category ID
@@ -90,17 +91,22 @@ if (right_to_left()) { // RTL table alignment support
     $leftalignment = 'left';
 
 }
-
-if ( $hook >0 ) {
-
-    if ( $action == "edit" ) {
-        if ( $confirm ) {
+$current = [
+    'mode' => $mode,
+    'confirm' => $confirm,
+    'action' => $action,
+    'id' => $cm->id
+];
+$mform = new mod_glossary_editcategories_form(null, ['current' => $current]);
+if ($hook > 0) {
+    if ($action == "edit") {
+        if ($mform->is_submitted() and $data = $mform->get_data() and confirm_sesskey()) {
             require_sesskey();
             $action = "";
             $cat = new stdClass();
-            $cat->id = $hook;
-            $cat->name = $name;
-            $cat->usedynalink = $usedynalink;
+            $cat->id = $data->hook;
+            $cat->name = $data->name;
+            $cat->usedynalink = $data->usedynalink;
 
             $DB->update_record("glossary_categories", $cat);
             $event = \mod_glossary\event\category_updated::create(array(
@@ -118,16 +124,18 @@ if ( $hook >0 ) {
         } else {
             echo $OUTPUT->header();
             echo $OUTPUT->heading(format_string($glossary->name), 2);
-            echo $OUTPUT->heading(format_string(get_string("editcategory", "glossary")), 3);
 
-            $name = $category->name;
-            $usedynalink = $category->usedynalink;
-            require "editcategories.html";
+            $mform->set_data([
+                'hook' => $category->id,
+                'name' => $category->name,
+                'usedynalink' => $category->usedynalink
+            ]);
+            echo $mform->display();
             echo $OUTPUT->footer();
             die;
         }
 
-    } elseif ( $action == "delete" ) {
+    } else if ( $action == "delete" ) {
         if ( $confirm ) {
             require_sesskey();
             $DB->delete_records("glossary_entries_categories", array("categoryid"=>$hook));
@@ -189,18 +197,19 @@ if ( $hook >0 ) {
         }
     }
 
-} elseif ( $action == "add" ) {
-    if ( $confirm ) {
+} else if ($action == "add") {
+    if ($mform->is_submitted() and confirm_sesskey() and $data = $mform->get_data()) {
         require_sesskey();
-        $dupcategory = $DB->get_records_sql("SELECT * FROM {glossary_categories} WHERE ".$DB->sql_like('name','?', false)." AND glossaryid=?", array($name, $glossary->id));
+        $dupcategory = $DB->get_records_sql("SELECT * FROM {glossary_categories} WHERE "
+            . $DB->sql_like('name', '?', false) . " AND glossaryid=?", array($data->name, $glossary->id));
         if ( $dupcategory ) {
-            redirect("editcategories.php?id=$cm->id&amp;action=add&amp;name=$name", get_string("duplicatecategory", "glossary"), 2);
-
+            redirect("editcategories.php?id=$cm->id&amp;action=add&amp;name={$data->name}",
+                get_string("duplicatecategory", "glossary"), 2);
         } else {
             $action = "";
             $cat = new stdClass();
-            $cat->name = $name;
-            $cat->usedynalink = $usedynalink;
+            $cat->name = $data->name;
+            $cat->usedynalink = $data->usedynalink;
             $cat->glossaryid = $glossary->id;
 
             $cat->id = $DB->insert_record("glossary_categories", $cat);
@@ -217,10 +226,7 @@ if ( $hook >0 ) {
         }
     } else {
         echo $OUTPUT->header();
-        echo $OUTPUT->heading(format_string($glossary->name), 2);
-        echo "<h3 class=\"main\">" . get_string("addcategory", "glossary"). "</h3>";
-        $name="";
-        require "editcategories.html";
+        echo $mform->display();
     }
 }
 
