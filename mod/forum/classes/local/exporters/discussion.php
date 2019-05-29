@@ -98,6 +98,7 @@ class discussion extends exporter {
                 'type' => [
                     'subscribed' => ['type' => PARAM_BOOL],
                     'favourited' => ['type' => PARAM_BOOL],
+                    'tracked' => ['type' => PARAM_BOOL],
                 ],
             ],
             'capabilities' => [
@@ -201,6 +202,7 @@ class discussion extends exporter {
             'pinned' => $discussion->is_pinned(),
             'locked' => $forum->is_discussion_locked($discussion),
             'istimelocked' => $forum->is_discussion_time_locked($discussion),
+            'unread' => boolval($this->related['unread']),
             'name' => format_string($discussion->get_name(), true, [
                 'context' => $this->related['context']
             ]),
@@ -214,6 +216,7 @@ class discussion extends exporter {
             'userstate' => [
                 'subscribed' => \mod_forum\subscriptions::is_subscribed($user->id, $forumrecord, $discussion->get_id()),
                 'favourited' => in_array($discussion->get_id(), $favouriteids) ? true : false,
+                'tracked' => forum_tp_is_tracked($this->get_forum_record(), $user)
             ],
             'capabilities' => [
                 'subscribe' => $capabilitymanager->can_subscribe_to_discussion($user, $discussion),
@@ -279,7 +282,8 @@ class discussion extends exporter {
             'user' => 'stdClass',
             'groupsbyid' => 'stdClass[]',
             'latestpostid' => 'int?',
-            'favouriteids' => 'int[]?'
+            'favouriteids' => 'int[]?',
+            'unread' => 'int?',
         ];
     }
 }

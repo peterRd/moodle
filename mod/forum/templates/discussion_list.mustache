@@ -217,7 +217,6 @@
                                             {{! TODO Rewrite as AJAX}}
                                             <span class="p-1 w-100 h-100 d-block unread">
                                                 <a href="{{{discussion.urls.viewfirstunread}}}">{{unread}}</a>
-                                                <a href="{{{discussion.urls.markasread}}}">{{#pix}}t/markasread, core, {{#str}}markalldread, mod_forum{{/str}}{{/pix}}</a>
                                             </span>
                                         {{/unread}}
                                         {{^unread}}
@@ -294,6 +293,15 @@
                                         <div class="mt-3" data-container='discussion-tools'>
                                             {{> mod_forum/forum_action_menu}}
                                         </div>
+                                        {{/hasanyactions}}
+                                        {{^hasanyactions}}
+                                            {{#userstate.tracked}}
+                                            {{#unread}}
+                                            <div class="mt-3" data-container='discussion-tools'>
+                                                {{> mod_forum/forum_action_menu}}
+                                            </div>
+                                            {{/unread}}
+                                            {{/userstate.tracked}}
                                         {{/hasanyactions}}
                                     </div>
                                 {{/discussion}}

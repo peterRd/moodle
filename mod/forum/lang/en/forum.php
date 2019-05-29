@@ -337,6 +337,7 @@ $string['mailnow'] = 'Send forum post notifications with no editing-time delay';
 $string['manydiscussions'] = 'Discussions per page';
 $string['managesubscriptionsoff'] = 'Finish managing subscriptions';
 $string['managesubscriptionson'] = 'Manage subscribers';
+$string['markallasread'] = 'Mark all as read';
 $string['markalldread'] = 'Mark all posts in this discussion read.';
 $string['markallread'] = 'Mark all posts in this forum read.';
 $string['markasreadonnotification'] = 'When sending forum post notifications';

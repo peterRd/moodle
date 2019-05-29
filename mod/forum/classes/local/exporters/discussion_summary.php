@@ -135,6 +135,7 @@ class discussion_summary extends exporter {
         $related = (array) (object) $this->related;
         $related['latestpostid'] = $this->latestpostid;
         $related['groupsbyid'] = $this->groupsbyid;
+        $related['unread'] = $this->unreadcount;
         $discussionexporter = new discussion($discussion, $related);
 
         $related = [

@@ -60,5 +60,15 @@
             {{> forum/discussion_lock_toggle }}
         {{/istimelocked}}
         {{/capabilities.manage}}
+        {{#userstate.tracked}}
+        {{#unread}}
+        <a class="{{$classes}}dropdown-item menu-action{{/classes}}"
+           role="{{$role}}menuitem{{/role}}"
+           href="{{{urls.markasread}}}"
+           title="{{#str}}markalldread, mod_forum{{/str}}">
+            {{#str}}markallasread, mod_forum{{/str}}
+        </a>
+        {{/unread}}
+        {{/userstate.tracked}}
     </div>
 </div>
