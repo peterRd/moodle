@@ -271,8 +271,19 @@ function xmldb_forum_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019100109, 'forum');
 
     }
+
     // Automatically generated Moodle v3.8.0 release upgrade line.
     // Put any upgrade step following this.
+
+    if ($oldversion < 2019111801) {
+        $sql = "UPDATE {forum_discussions} d, {forum_posts} p
+                SET d.userid = p.userid
+                WHERE d.firstpost = p.id AND d.userid <> p.userid";
+        $DB->execute($sql, []);
+
+        // Forum savepoint reached.
+        upgrade_mod_savepoint(true, 2019111801, 'forum');
+    }
 
     return true;
 }
