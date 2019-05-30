@@ -119,5 +119,22 @@ function xmldb_forum_upgrade($oldversion) {
     // Automatically generated Moodle v3.5.0 release upgrade line.
     // Put any upgrade step following this.
 
+    if ($oldversion < 2018051401) {
+        $sql = "SELECT d.id AS discussionid, d.userid AS existinguser, p.userid AS correctuser
+                FROM {forum_discussions} d
+                INNER JOIN {forum_posts} p ON p.id=d.firstpost
+                WHERE d.userid!=p.userid";
+        $recordset = $DB->get_records_sql($sql);
+        foreach ($recordset as $record) {
+            $object = new stdClass();
+            $object->id = $record->discussionid;
+            $object->userid = $record->correctuser;
+            $DB->update_record('forum_discussions', $object);
+        }
+
+        // Forum savepoint reached.
+        upgrade_mod_savepoint(true, 2018051401, 'forum');
+    }
+
     return true;
 }
