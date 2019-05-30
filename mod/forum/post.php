@@ -462,7 +462,7 @@ if (!empty($forum)) {      // User is starting a new discussion in a forum.
         $newdiscussion->forum        = $discussion->forum;
         $newdiscussion->name         = $name;
         $newdiscussion->firstpost    = $post->id;
-        $newdiscussion->userid       = $discussion->userid;
+        $newdiscussion->userid       = $post->userid;
         $newdiscussion->groupid      = $discussion->groupid;
         $newdiscussion->assessed     = $discussion->assessed;
         $newdiscussion->usermodified = $post->userid;
