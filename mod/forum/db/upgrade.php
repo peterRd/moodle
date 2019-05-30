@@ -157,5 +157,15 @@ function xmldb_forum_upgrade($oldversion) {
     // Automatically generated Moodle v3.7.0 release upgrade line.
     // Put any upgrade step following this.
 
+    if ($oldversion < 2019052001) {
+        $sql = "UPDATE {forum_discussions} d, {forum_posts} p
+                SET d.userid = p.userid
+                WHERE d.firstpost = p.id AND d.userid <> p.userid";
+        $DB->execute($sql, []);
+
+        // Forum savepoint reached.
+        upgrade_mod_savepoint(true, 2019052001, 'forum');
+    }
+
     return true;
 }
