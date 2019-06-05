@@ -48,7 +48,8 @@ class mod_folder_mod_form extends moodleform_mod {
 
         //-------------------------------------------------------
         $mform->addElement('header', 'content', get_string('contentheader', 'folder'));
-        $mform->addElement('filemanager', 'files', get_string('files'), null, array('subdirs'=>1, 'accepted_types'=>'*'));
+        $options = array('subdirs' => 1, 'accepted_types' => '*', 'raceconditioncheck' => true);
+        $mform->addElement('filemanager', 'files', get_string('files'), null, $options);
         $mform->addElement('select', 'display', get_string('display', 'mod_folder'),
                 array(FOLDER_DISPLAY_PAGE => get_string('displaypage', 'mod_folder'),
                     FOLDER_DISPLAY_INLINE => get_string('displayinline', 'mod_folder')));
@@ -78,6 +79,9 @@ class mod_folder_mod_form extends moodleform_mod {
         $mform->addElement('hidden', 'revision');
         $mform->setType('revision', PARAM_INT);
         $mform->setDefault('revision', 1);
+        if ($this->current->instance) {
+            $this->enable_race_condition_check($this->current->timemodified);
+        }
     }
 
     function data_preprocessing(&$default_values) {
