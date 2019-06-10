@@ -869,6 +869,8 @@ class core_course_category implements renderable, cacheable_object, IteratorAggr
     public static function user_enrolment_changed($courseid, $userid,
             $status, $timestart = null, $timeend = null) {
         $cache = cache::make('core', 'coursecontacts');
+        $accesscache = cache::make('core', 'can_access_course');
+        $accesscache->delete("{$userid}_{$courseid}"); // Reset the cache if the enrollment has been updated.
         $contacts = $cache->get($courseid);
         if ($contacts === false) {
             // The contacts for the affected course were not cached anyway.
