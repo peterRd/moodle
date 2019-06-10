@@ -400,4 +400,12 @@ $definitions = array(
         'simplekeys' => true,
         'staticacceleration' => true
     ],
+
+    // Cache course accessibility.
+    'can_access_course' => [
+        'mode' => cache_store::MODE_SESSION,
+        'simplekeys' => true,
+        'staticacceleration' => true,
+        'ttl' => 1800
+    ],
 );

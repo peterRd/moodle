@@ -4634,8 +4634,8 @@ function course_get_recent_courses(int $userid = null, int $limit = 0, int $offs
 
     $recentcourses = $DB->get_records_sql($sql, $params, $offset, $limit);
 
-    $recentcourses = array_filter($recentcourses, function($course) {
-        return can_access_course($course, null, '', true);
+    $recentcourses = array_filter($recentcourses, function($course) use ($USER) {
+        return can_access_course($course, $USER, '', true);
     });
 
     // Filter courses if last access field is hidden.
