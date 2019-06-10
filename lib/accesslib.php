@@ -1876,6 +1876,24 @@ function is_viewing(context $context, $user = null, $withcapability = '') {
 }
 
 /**
+ * Store's the access permission for particular courses.
+ *
+ * @param int $userid The id of the user we are storing the access for
+ * @param int $key The course id we are storing the information for
+ * @param bool $value Whether the current user has access to the course.
+ * @param cache_application|cache_store|cache_session $cache A cache object generated from a similar cache::make in another function
+ *                                                              to help with performance.
+ * @return bool $value The original parameter.
+ */
+function update_access_cache($userid, $key, $value, $cache = null) {
+    if (!$cache) {
+        $cache = cache::make('core', 'can_access_course');
+    }
+    $cache->set("{$userid}_{$key}", intval($value));
+    return $value;
+}
+
+/**
  * Returns true if the user is able to access the course.
  *
  * This function is in no way, shape, or form a substitute for require_login.
@@ -1927,28 +1945,34 @@ function can_access_course(stdClass $course, $user = null, $withcapability = '',
     }
     unset($user);
 
+    $cache = cache::make('core', 'can_access_course');
+    if ($cache->get("{$userid}_{$course->id}") !== false) {
+        return boolval($cache->get("{$userid}_{$course->id}"));
+    }
+
     if ($withcapability and !has_capability($withcapability, $coursecontext, $userid)) {
-        return false;
+        return update_access_cache($userid, $course->id, false, $cache);
     }
 
     if ($userid == $USER->id) {
         if (!empty($USER->access['rsw'][$coursecontext->path])) {
             // the fact that somebody switched role means they can access the course no matter to what role they switched
-            return true;
+            return update_access_cache($userid, $course->id, true, $cache);
         }
     }
 
     if (!$course->visible and !has_capability('moodle/course:viewhiddencourses', $coursecontext, $userid)) {
-        return false;
+        return update_access_cache($userid, $course->id, false, $cache);
     }
 
     if (is_viewing($coursecontext, $userid)) {
-        return true;
+        return update_access_cache($userid, $course->id, true, $cache);
     }
 
     if ($userid != $USER->id) {
         // for performance reasons we do not verify temporary guest access for other users, sorry...
-        return is_enrolled($coursecontext, $userid, '', $onlyactive);
+        $isenrolled = is_enrolled($coursecontext, $userid, '', $onlyactive);
+        return update_access_cache($userid, $course->id, $isenrolled, $cache);
     }
 
     // === from here we deal only with $USER ===
@@ -1957,22 +1981,22 @@ function can_access_course(stdClass $course, $user = null, $withcapability = '',
 
     if (isset($USER->enrol['enrolled'][$course->id])) {
         if ($USER->enrol['enrolled'][$course->id] > time()) {
-            return true;
+            return update_access_cache($userid, $course->id, true, $cache);
         }
     }
     if (isset($USER->enrol['tempguest'][$course->id])) {
         if ($USER->enrol['tempguest'][$course->id] > time()) {
-            return true;
+            return update_access_cache($userid, $course->id, true, $cache);
         }
     }
 
     if (is_enrolled($coursecontext, $USER, '', $onlyactive)) {
-        return true;
+        return update_access_cache($userid, $course->id, true, $cache);
     }
 
     if (!core_course_category::can_view_course_info($course)) {
         // No guest access if user does not have capability to browse courses.
-        return false;
+        return update_access_cache($userid, $course->id, false, $cache);
     }
 
     // if not enrolled try to gain temporary guest access
@@ -1986,7 +2010,7 @@ function can_access_course(stdClass $course, $user = null, $withcapability = '',
         $until = $enrols[$instance->enrol]->try_guestaccess($instance);
         if ($until !== false and $until > time()) {
             $USER->enrol['tempguest'][$course->id] = $until;
-            return true;
+            return update_access_cache($userid, $course->id, true, $cache);
         }
     }
     if (isset($USER->enrol['tempguest'][$course->id])) {
@@ -1994,7 +2018,7 @@ function can_access_course(stdClass $course, $user = null, $withcapability = '',
         remove_temp_course_roles($coursecontext);
     }
 
-    return false;
+    return update_access_cache($userid, $course->id, false, $cache);
 }
 
 /**
