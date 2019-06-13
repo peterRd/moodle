@@ -109,7 +109,7 @@
     <location>pear/PEAR.php</location>
     <name>Pear.php</name>
     <license>PHP</license>
-    <version>1.4.5</version>
+    <version>1.10.9</version>
     <licenseversion>3.0</licenseversion>
   </library>
   <library>
