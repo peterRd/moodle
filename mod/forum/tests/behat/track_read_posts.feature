@@ -170,3 +170,24 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
     Then I should not see "1 unread post"
     And I follow "Test forum name"
     And I should not see "Track unread posts"
+
+  @javascript
+  Scenario: Marking all posts as read
+    Given I add a "Forum" to section "1" and I fill the form with:
+      | Forum name | Test forum name |
+      | Forum type | Standard forum for general use |
+      | Description | Test forum description |
+      | Read tracking | Optional |
+    And I add a new discussion to "Test forum name" forum with:
+      | Subject | Test post subject |
+      | Message | Test post message |
+    And I log out
+    When I log in as "student1"
+    And I am on "Course 1" course homepage
+    Then I should see "1 unread post"
+    And I follow "Test forum name"
+    And I click on "Test post subject" action menu
+    And I click on "[title='Mark all posts in this discussion read']" "css_element"
+    And I wait to be redirected
+    And I am on "Course 1" course homepage
+    Then I should not see "1 unread post"

@@ -1,5 +1,7 @@
 This files describes API changes in /mod/forum/*,
 information provided here is intended especially for developers.
+=== 3.8 ===
+  * Moved the "Mark all read" link to the action menu for each discussion.
 
 === 3.7 ===
   * Changed the forum discussion rendering to use templates rather than print functions.
