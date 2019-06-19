@@ -16,6 +16,7 @@ Installation
 ------------
 1) Download the latest version of fpdi from the url above.
 2) Unzip the src directory files into this directory.
+3) Update mod/assign/feedback/editpdf/fpdi/fpdi_bridge.php (or the replacement file) to extend 'pdf' instead of 'TCPDF'.
 3) Make a note below of any changes made.
 
 2018/06/18
