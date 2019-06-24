@@ -62,6 +62,9 @@ class restore_controller extends base_controller {
 
     protected $checksum; // Cache @checksumable results for lighter @is_checksum_correct() uses
 
+    /** @var bool Force use the loaded plan's settings instead of the defaults */
+    protected $useplandefaults = false;
+
     /** @var int Number of restore_controllers that are currently executing */
     protected static $executing = 0;
 
@@ -99,6 +102,11 @@ class restore_controller extends base_controller {
         $this->samesite = false;
         $this->checksum = '';
         $this->precheck = null;
+
+        // If this is an import then use the default settings when restoring.
+        if ($mode == backup::MODE_IMPORT) {
+            $this->useplandefaults = true;
+        }
 
         // Apply current backup version and release if necessary
         backup_controller_dbops::apply_version_and_release();
@@ -269,6 +277,15 @@ class restore_controller extends base_controller {
 
     public function is_checksum_correct($checksum) {
         return $this->checksum === $checksum;
+    }
+
+    /**
+     * Return the useplandefaults config
+     *
+     * @return bool
+     */
+    public function get_useplandefaults() {
+        return $this->useplandefaults;
     }
 
     public function get_tempdir() {
