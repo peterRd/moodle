@@ -152,7 +152,8 @@ if ($backup->get_stage() == backup_ui::STAGE_FINAL) {
 
     // Prepare the restore controller. We don't need a UI here as we will just use what
     // ever the restore has (the user has just chosen).
-    $rc = new restore_controller($backupid, $course->id, backup::INTERACTIVE_YES, backup::MODE_IMPORT, $USER->id, $restoretarget);
+    $rc = new restore_controller($backupid, $course->id, backup::INTERACTIVE_YES, backup::MODE_IMPORT,
+        $USER->id, $restoretarget, null, backup::RELEASESESSION_NO, ['useplandefaults' => true]);
 
     // Start a progress section for the restore, which will consist of 2 steps
     // (the precheck and then the actual restore).
