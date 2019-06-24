@@ -62,6 +62,9 @@ class restore_controller extends base_controller {
 
     protected $checksum; // Cache @checksumable results for lighter @is_checksum_correct() uses
 
+    /** @var bool Force use the loaded plan's settings instead of the defaults */
+    protected $useplandefaults = false;
+
     /** @var int Number of restore_controllers that are currently executing */
     protected static $executing = 0;
 
@@ -79,9 +82,11 @@ class restore_controller extends base_controller {
      * @param int $userid
      * @param int $target backup::TARGET_[ NEW_COURSE | CURRENT_ADDING | CURRENT_DELETING | EXISTING_ADDING | EXISTING_DELETING ]
      * @param \core\progress\base $progress Optional progress monitor
+     * @param array $options A generic array to pass additional configurations into the restore controller.
+     *                      'useplandefaults' -> Uses the loaded plan's settings instead of the admin defaults
      */
     public function __construct($tempdir, $courseid, $interactive, $mode, $userid, $target,
-            \core\progress\base $progress = null) {
+            \core\progress\base $progress = null, $options = []) {
         $this->tempdir = $tempdir;
         $this->courseid = $courseid;
         $this->interactive = $interactive;
@@ -97,6 +102,13 @@ class restore_controller extends base_controller {
         $this->samesite = false;
         $this->checksum = '';
         $this->precheck = null;
+
+        // Apply additional custom defaults.
+        if (is_array($options)) {
+            if (isset($options['useplandefaults']) && $options['useplandefaults']) {
+                $this->useplandefaults = true;
+            }
+        }
 
         // Apply current backup version and release if necessary
         backup_controller_dbops::apply_version_and_release();
@@ -267,6 +279,15 @@ class restore_controller extends base_controller {
 
     public function is_checksum_correct($checksum) {
         return $this->checksum === $checksum;
+    }
+
+    /**
+     * Return the useplandefaults config
+     *
+     * @return bool
+     */
+    public function get_useplandefaults() {
+        return $this->useplandefaults;
     }
 
     public function get_tempdir() {
