@@ -278,10 +278,16 @@ abstract class restore_controller_dbops extends restore_dbops {
      */
     private static function apply_admin_config_defaults(restore_controller $controller, array $settings, $uselocks) {
         $plan = $controller->get_plan();
+        $useplandefaults = $controller->get_useplandefaults();
         foreach ($settings as $config => $settingname) {
             if ($plan->setting_exists($settingname)) {
                 $setting = $plan->get_setting($settingname);
-                $value = self::get_setting_default($config, $setting);
+
+                // Get the current value of the setting as this may have been userdefined.
+                $currentvalue = $setting->get_value();
+
+                // If we are using the plan's setting then use it instead of overriding it with the admin default.
+                $value = $useplandefaults ? $currentvalue : self::get_setting_default($config, $setting);
                 $locked = (get_config('restore', $config . '_locked') == true);
 
                 // We can only update the setting if it isn't already locked by config or permission.
