@@ -25,8 +25,21 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      2.9
  */
-define(['core/yui', 'jquery', 'core/activity_chooser_dialogue'],
-function(Y, $, chooserDialogue) {
+define(
+    [
+        'core/yui',
+        'jquery',
+        'core/activity_chooser_dialogue',
+        'core/pubsub',
+        'core/activity_chooser_events',
+    ],
+    function(
+        Y,
+        $,
+        chooserDialogue,
+        PubSub,
+        ActivityChooserEvents
+    ) {
 
     var CSS = {
         PAGECONTENT: 'body',
@@ -65,7 +78,7 @@ function(Y, $, chooserDialogue) {
             sectionid = 0;
         }
 
-        chooserDialogue.displayChooser(e, sectionid);
+        chooserDialogue.displayChooser(e);
     };
 
     /**
@@ -124,6 +137,19 @@ function(Y, $, chooserDialogue) {
     };
 
     /**
+     * Helper function to set the value of a hidden radio button when a
+     * selection is made.
+     *
+     * @method option_selected
+     * @param {String} thisoption The selected option value
+     * @private
+     */
+    var optionSelected = function(thisoption) {
+        // Add the sectionid to the URL.
+        chooserDialogue.updateHiddenRadioValue('jump', thisoption.value + '&section=' + sectionid);
+    };
+
+    /**
      * Set up the activity chooser.
      *
      * @method initializer
@@ -142,24 +168,9 @@ function(Y, $, chooserDialogue) {
 
             // Initialize existing sections and register for dynamically created sections
             setupForSection();
-           // M.course.coursebase.register_module(this);
         });
-    };
 
-    /**
-     * Helper function to set the value of a hidden radio button when a
-     * selection is made.
-     *
-     * @method option_selected
-     * @param {String} thisoption The selected option value
-     * @private
-     */
-    var optionSelected = function(thisoption) {
-        // Add the sectionid to the URL.
-        // chooserDialogue.hiddenRadioValue.setAttrs({
-        //     name: 'jump',
-        //     value: thisoption.get('value') + '&section=' + sectionid
-        // });
+        PubSub.subscribe(ActivityChooserEvents.OPTION_SELECTED, optionSelected);
     };
 
     return /** @alias module:core/notification */{
