@@ -18,21 +18,3 @@
     Course module chooser.
 }}
 {{> core/chooser }}
-{{#js}}
-require([
-    'core/yui',
-    'core/str'
-], function(Y, Str) {
-    Str.get_strings([
-        { key: 'addresourceoractivity', component: 'moodle' },
-        { key: 'close', component: 'editor' },
-    ]).then(function(add, close) {
-        Y.use('moodle-course-modchooser', function() {
-            M.course.init_chooser({
-                courseid: {{courseid}},
-                closeButtonTitle: close
-            });
-        });
-    });
-});
-{{/js}}
