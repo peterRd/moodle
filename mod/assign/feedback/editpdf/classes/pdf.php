@@ -785,7 +785,7 @@ class pdf extends TcpdfFpdi {
             if ($size['width'] < $size['height']) {
                 $temp = $size['width'];
                 $size['width'] = $size['height'];
-                $size['h'] = $temp;
+                $size['height'] = $temp;
             }
         } else if ($imageinfo["width"] < $imageinfo["height"]) {
             if ($size['width'] > $size['height']) {
