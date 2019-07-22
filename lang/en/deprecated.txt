@@ -47,3 +47,6 @@ error:nogroups,core_badges
 purgedefinitionsuccess,core_cache
 purgestoresuccess,core_cache
 eventrolecapabilitiesupdated,core_role
+backup:backuptargethub, core_role
+course:publish, core_role
+restore:restoretargethub, core_role
