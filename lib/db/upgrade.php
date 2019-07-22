@@ -3390,5 +3390,19 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2019052001.04);
     }
 
+    if ($oldversion < 2019052001.11) {
+        $capabilitiestoberemoved = ['moodle/restore:restoretargethub', 'moodle/course:publish', 'moodle/backup:backuptargethub'];
+
+        // Delete any role_capabilities for the old roles.
+        $DB->delete_records_list('role_capabilities', 'capability', $capabilitiestoberemoved);
+
+        // Delete the capability itself.
+        $DB->delete_records_list('capabilities', 'name', $capabilitiestoberemoved);
+
+        // Remove unused config.
+        unset_config('enablecoursepublishing');
+        upgrade_main_savepoint(true, 2019052001.11);
+    }
+
     return true;
 }
