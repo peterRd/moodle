@@ -15,15 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the version information for the comments submission plugin
+ * Add event handlers for the assign
  *
- * @package    assignsubmission_comments
- * @copyright 2012 NetSpot {@link http://www.netspot.com.au}
+ * @package    mod_assign
+ * @category   event
+ * @copyright  2019 Peter Dias
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2019052001;
-$plugin->requires  = 2019051100;
-$plugin->component = 'assignsubmission_comments';
+$observers = array(
+
+    array(
+        'eventname' => 'assignsubmission_comments\event\comment_created',
+        'callback' => '\assignsubmission_comments\event_observers::comment_created',
+    ),
+);

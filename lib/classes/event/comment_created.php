@@ -89,6 +89,16 @@ abstract class comment_created extends base {
     }
 
     /**
+     * Get the email message for the event.
+     *
+     * @return string
+     */
+    public function get_email_message() {
+        $url = $this->get_url();
+        return $this->get_description() . ($url ? " Access the comment via {$url}" : "");
+    }
+
+    /**
      * Custom validation.
      *
      * @throws \coding_exception
