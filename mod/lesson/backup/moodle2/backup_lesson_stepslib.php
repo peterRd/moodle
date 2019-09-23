@@ -77,7 +77,7 @@ class backup_lesson_activity_structure_step extends backup_activity_structure_st
             'mediafile', 'mediaheight', 'mediawidth', 'mediaclose', 'slideshow',
             'width', 'height', 'bgcolor', 'displayleft', 'displayleftif', 'progressbar',
             'available', 'deadline', 'timemodified',
-            'completionendreached', 'completiontimespent', 'allowofflineattempts'
+            'completionendreached', 'completiontimespent', 'allowofflineattempts', 'preloadpreviousattempt'
         ));
 
         // The lesson_pages table
