@@ -53,11 +53,6 @@ class external_backpack extends \moodleform {
         $mform->addElement('hidden', 'action', 'edit');
         $mform->setType('action', PARAM_ALPHA);
 
-        if ($backpack) {
-            $mform->addElement('hidden', 'id', $backpack->id);
-            $mform->setType('id', PARAM_INTEGER);
-        }
-
         $mform->addElement('text', 'backpackapiurl',  get_string('backpackapiurl', 'core_badges'));
         $mform->setType('backpackapiurl', PARAM_URL);
         $mform->addRule('backpackapiurl', null, 'required', null, 'client');
@@ -74,11 +69,21 @@ class external_backpack extends \moodleform {
         $mform->setDefault('apiversion', OPEN_BADGES_V2P1);
         $mform->addRule('apiversion', null, 'required', null, 'client');
 
-        $issuername = $CFG->badges_defaultissuername;
-        $mform->addElement('static', 'issuerinfo', get_string('defaultissuername', 'core_badges'), $issuername);
+        $mform->addElement('hidden', 'id', ($backpack->id ?? null));
+        $mform->setType('id', PARAM_INT);
+        $mform->addElement('hidden', 'badgebackpack', 0);
+        $mform->setType('badgebackpack', PARAM_INTEGER);
+        $mform->addElement('hidden', 'userid', 0);
+        $mform->setType('userid', PARAM_INTEGER);
+        $mform->addElement('hidden', 'backpackuid', 0);
+        $mform->setType('backpackuid', PARAM_INTEGER);
+
+        $mform->addElement('checkbox', 'includeauthdetails', null, get_string('includeauthdetails', 'core_badges'));
 
         $issuercontact = $CFG->badges_defaultissuercontact;
-        $mform->addElement('static', 'issuerinfo', get_string('defaultissuercontact', 'core_badges'), $issuercontact);
+        $mform->addElement('text', 'backpackemail', get_string('defaultissuercontact', 'core_badges'));
+        $mform->setType('backpackemail', PARAM_EMAIL);
+        $mform->setDefault('backpackemail', $issuercontact);
 
         $mform->addElement('passwordunmask', 'password', get_string('defaultissuerpassword', 'core_badges'));
         $mform->setType('password', PARAM_RAW);
