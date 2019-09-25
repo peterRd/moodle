@@ -28,6 +28,7 @@ $string['actions'] = 'Actions';
 $string['activate'] = 'Enable access';
 $string['activatesuccess'] = 'Access to the badges was successfully enabled.';
 $string['addalignment'] = 'Add external skill or standard';
+$string['addbackpack'] = 'Add backpack';
 $string['addbadge'] = 'Add badges';
 $string['addbadge_help'] = 'Select all badges that should be added to this badge requirement. Hold CTRL key to select multiple items.';
 $string['addcompetency'] = 'Add competency';

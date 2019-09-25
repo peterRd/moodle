@@ -45,12 +45,13 @@ if (empty($CFG->badges_allowexternalbackpack)) {
 $PAGE->set_url($url);
 $PAGE->set_title(get_string('managebackpacks', 'badges'));
 $PAGE->set_heading($SITE->fullname);
-if ($action == 'edit') {
+if ($action == 'edit' || $action == 'add') {
     $backpack = null;
     if (!empty($id)) {
         $backpack = badges_get_site_backpack($id);
     }
-    $form = new \core_badges\form\external_backpack(null, ['externalbackpack' => $backpack]);
+    $form = new \core_badges\form\external_backpack();
+    $form->set_data($backpack);
     if ($form->is_cancelled()) {
         redirect($url);
     } else if ($data = $form->get_data()) {
@@ -70,7 +71,6 @@ if ($action == 'edit') {
 } else {
     echo $OUTPUT->header();
     echo $output->heading(get_string('managebackpacks', 'badges'));
-
     $page = new \core_badges\output\external_backpacks_page($url);
     echo $output->render($page);
 }

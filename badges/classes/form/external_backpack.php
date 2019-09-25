@@ -44,50 +44,35 @@ class external_backpack extends \moodleform {
         global $CFG;
 
         $mform = $this->_form;
-        $backpack = false;
+        //$backpack = false;
 
-        if (isset($this->_customdata['externalbackpack'])) {
-            $backpack = $this->_customdata['externalbackpack'];
-        } else {
-            throw new \coding_exception('backpack is required.');
-        }
-
-        $url = $backpack->backpackapiurl;
-
-        $mform->addElement('static', 'backpackapiurlinfo', get_string('backpackapiurl', 'core_badges'), $url);
-
-        $mform->addElement('hidden', 'backpackapiurl', $url);
+        $mform->addElement('text', 'backpackapiurl', get_string('backpackapiurl', 'core_badges'));
         $mform->setType('backpackapiurl', PARAM_URL);
 
-        $url = $backpack->backpackweburl;
-        $mform->addElement('static', 'backpackweburlinfo', get_string('backpackweburl', 'core_badges'), $url);
-        $mform->addElement('hidden', 'backpackweburl', $url);
+        $mform->addElement('text', 'backpackweburl', get_string('backpackweburl', 'core_badges'));
         $mform->setType('backpackweburl', PARAM_URL);
 
         $options = badges_get_badge_api_versions();
-        $label = $options[$backpack->apiversion];
-        $mform->addElement('static', 'apiversioninfo', get_string('apiversion', 'core_badges'), $label);
-        $mform->addElement('hidden', 'apiversion', $backpack->apiversion);
+        $mform->addElement('select', 'apiversion', get_string('apiversion', 'core_badges'), $options);
         $mform->setType('apiversion', PARAM_INTEGER);
 
-        $mform->addElement('hidden', 'id', $backpack->id);
+        $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INTEGER);
 
         $mform->addElement('hidden', 'action', 'edit');
         $mform->setType('action', PARAM_ALPHA);
 
-        $issuername = $CFG->badges_defaultissuername;
-        $mform->addElement('static', 'issuerinfo', get_string('defaultissuername', 'core_badges'), $issuername);
-
         $issuercontact = $CFG->badges_defaultissuercontact;
-        $mform->addElement('static', 'issuerinfo', get_string('defaultissuercontact', 'core_badges'), $issuercontact);
+        $mform->addElement('text', 'backpackemail', get_string('defaultissuercontact', 'core_badges'));
+        $mform->setType('backpackemail', PARAM_EMAIL);
+        $mform->setDefault('backpackemail', $issuercontact);
 
         $mform->addElement('passwordunmask', 'password', get_string('defaultissuerpassword', 'core_badges'));
         $mform->setType('password', PARAM_RAW);
         $mform->addHelpButton('password', 'defaultissuerpassword', 'badges');
         $mform->hideIf('password', 'apiversion', 'eq', 1);
 
-        $this->set_data($backpack);
+        //$this->set_data($backpack);
 
         // Disable short forms.
         $mform->setDisableShortforms();
