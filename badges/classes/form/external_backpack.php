@@ -44,7 +44,6 @@ class external_backpack extends \moodleform {
         global $CFG;
 
         $mform = $this->_form;
-        $backpack = false;
 
         if (isset($this->_customdata['externalbackpack'])) {
             $backpack = $this->_customdata['externalbackpack'];
@@ -74,11 +73,13 @@ class external_backpack extends \moodleform {
         $mform->setDefault('apiversion', OPEN_BADGES_V2P1);
         $mform->addRule('apiversion', null, 'required', null, 'client');
 
-        $issuername = $CFG->badges_defaultissuername;
-        $mform->addElement('static', 'issuerinfo', get_string('defaultissuername', 'core_badges'), $issuername);
+        $mform->addElement('hidden', 'id');
+        $mform->setType('id', PARAM_INTEGER);
 
         $issuercontact = $CFG->badges_defaultissuercontact;
-        $mform->addElement('static', 'issuerinfo', get_string('defaultissuercontact', 'core_badges'), $issuercontact);
+        $mform->addElement('text', 'backpackemail', get_string('defaultissuercontact', 'core_badges'));
+        $mform->setType('backpackemail', PARAM_EMAIL);
+        $mform->setDefault('backpackemail', $issuercontact);
 
         if ($backpack && $backpack->apiversion != OPEN_BADGES_V2P1) {
             $mform->addElement('passwordunmask', 'password', get_string('defaultissuerpassword', 'core_badges'));

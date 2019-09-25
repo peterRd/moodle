@@ -2441,5 +2441,18 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2020060500.01);
     }
 
+    if ($oldversion < 2020061200.01) {
+        $table = new xmldb_table('badge_external_backpack');
+        $field = new xmldb_field('backpackemail', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $table->deleteKey('backpackapiurlkey');
+        $table->deleteKey('backpackweburlkey');
+        $table->add_key('backpackapiurlkey', XMLDB_KEY_UNIQUE, ['backpackapiurl', 'backpackemail']);
+
+        upgrade_main_savepoint(true, 2020061200.01);
+    }
+
     return true;
 }
