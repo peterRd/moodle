@@ -778,8 +778,7 @@ function badges_create_site_backpack($data) {
     $backpack->backpackapiurl = $data->backpackapiurl;
     $backpack->backpackweburl = $data->backpackweburl;
     $backpack->sortorder = $count;
-    $DB->insert_record('badge_external_backpack', $backpack);
-    return true;
+    return $DB->insert_record('badge_external_backpack', $backpack);
 }
 
 /**
@@ -842,7 +841,11 @@ function badges_get_site_backpack($id) {
 function badges_get_site_backpacks() {
     global $DB, $CFG;
 
-    $all = $DB->get_records('badge_external_backpack');
+    $sql = "SELECT beb.* 
+            FROM {badge_external_backpack} AS beb
+            LEFT JOIN {badge_backpack} AS bb ON bb.externalbackpackid = beb.id
+            WHERE bb.id IS NULL";
+    $all = $DB->get_records_sql($sql);
 
     foreach ($all as $key => $bp) {
         if ($bp->id == $CFG->badges_site_backpack) {
