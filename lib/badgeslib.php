@@ -777,6 +777,7 @@ function badges_create_site_backpack($data) {
     $backpack->apiversion = $data->apiversion;
     $backpack->backpackapiurl = $data->backpackapiurl;
     $backpack->backpackweburl = $data->backpackweburl;
+    $backpack->backpackemail = $data->backpackemail;
     $backpack->sortorder = $count;
     return $DB->insert_record('badge_external_backpack', $backpack);
 }
@@ -799,6 +800,7 @@ function badges_update_site_backpack($id, $data) {
         $backpack->apiversion = $data->apiversion;
         $backpack->backpackweburl = $data->backpackweburl;
         $backpack->backpackapiurl = $data->backpackapiurl;
+        $backpack->backpackemail = $data->backpackemail;
         $backpack->password = $data->password;
         $DB->update_record('badge_external_backpack', $backpack);
         return true;
