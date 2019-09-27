@@ -761,25 +761,23 @@ function badges_local_backpack_js($checksite = false) {
 }
 
 /**
- * Create the backpack with this data.
+ * Create the site backpack with this data.
  *
  * @param stdClass $data The new backpack data.
+ * @param bool $ispersonal Indicates whether this is a user / site backpack
  * @return boolean
  */
-function badges_create_site_backpack($data) {
+function badges_create_site_backpack($data, $ispersonal = false) {
     global $DB;
-    $context = context_system::instance();
-    require_capability('moodle/badges:manageglobalsettings', $context);
+
+    if (!$ispersonal) {
+        $context = context_system::instance();
+        require_capability('moodle/badges:manageglobalsettings', $context);
+    }
 
     $count = $DB->count_records('badge_external_backpack');
-
-    $backpack = new stdClass();
-    $backpack->apiversion = $data->apiversion;
-    $backpack->backpackapiurl = $data->backpackapiurl;
-    $backpack->backpackweburl = $data->backpackweburl;
-    $backpack->backpackemail = $data->backpackemail;
-    $backpack->sortorder = $count;
-    return $DB->insert_record('badge_external_backpack', $backpack);
+    $data->sortorder = $count;
+    return badges_create_external_backpack($data);
 }
 
 /**
@@ -795,17 +793,38 @@ function badges_update_site_backpack($id, $data) {
     require_capability('moodle/badges:manageglobalsettings', $context);
 
     if ($backpack = badges_get_site_backpack($id)) {
-        $backpack = new stdClass();
-        $backpack->id = $id;
-        $backpack->apiversion = $data->apiversion;
-        $backpack->backpackweburl = $data->backpackweburl;
-        $backpack->backpackapiurl = $data->backpackapiurl;
-        $backpack->backpackemail = $data->backpackemail;
-        $backpack->password = $data->password;
-        $DB->update_record('badge_external_backpack', $backpack);
-        return true;
+        return badges_create_external_backpack($data, $id);
     }
     return false;
+}
+
+/**
+ * Perform the actual create/update of external bakpacks. Any checks on the validity of the id will need to be
+ * performed before it reaches this function.
+ *
+ * @param object $data The backpack data we are updating/inserting
+ * @param int $id The id of the record we are updating
+ * @return mixed bool|id Returns boolean true if updating a record else returns the id of the new record
+ */
+function badges_create_external_backpack($data, $id = 0) {
+    global $DB;
+    $backpack = new stdClass();
+
+    $backpack->apiversion = $data->apiversion;
+    $backpack->backpackweburl = $data->backpackweburl;
+    $backpack->backpackapiurl = $data->backpackapiurl;
+    $backpack->backpackemail = $data->backpackemail;
+    $backpack->password = $data->password;
+    if (isset($data->sortorder)) {
+        $backpack->sortorder = $data->sortorder;
+    }
+
+    $method = $id ? 'update_record' : 'insert_record';
+    if ($id) {
+        $backpack->id = $id;
+    }
+
+    return $DB->$method('badge_external_backpack', $backpack);
 }
 
 /**
@@ -843,9 +862,9 @@ function badges_get_site_backpack($id) {
 function badges_get_site_backpacks() {
     global $DB, $CFG;
 
-    $sql = "SELECT beb.* 
-            FROM {badge_external_backpack} AS beb
-            LEFT JOIN {badge_backpack} AS bb ON bb.externalbackpackid = beb.id
+    $sql = "SELECT beb.*
+            FROM {badge_external_backpack} beb
+            LEFT JOIN {badge_backpack} bb ON bb.externalbackpackid = beb.id
             WHERE bb.id IS NULL";
     $all = $DB->get_records_sql($sql);
 

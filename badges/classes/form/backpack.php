@@ -69,9 +69,17 @@ class backpack extends external_backpack {
         $mform->addElement('static', 'status', get_string('status'), $status);
 
         parent::definition();
+
+        $mform->setDefault('backpackemail', $USER->email);
         $mform->setDisableShortforms(false);
     }
 
+    /**
+     * Override add_action_buttons
+     *
+     * @param bool $cancel
+     * @param null|text $submitlabel
+     */
     public function add_action_buttons($cancel = true, $submitlabel = null) {
         if ($this->_customdata['email']) {
             $mform = $this->_form;
@@ -102,11 +110,11 @@ class backpack extends external_backpack {
             $bp = new \core_badges\backpack_api((object) $data, $check);
             $result = $bp->authenticate();
             if ($result === false || !empty($result->error)) {
-                $errors['email'] = get_string('backpackconnectionunexpectedresult', 'badges');
+                $errors['backpackemail'] = get_string('backpackconnectionunexpectedresult', 'badges');
                 $msg = $bp->get_authentication_error();
                 if (!empty($msg)) {
-                    $errors['email'] .= '<br/><br/>';
-                    $errors['email'] .= get_string('backpackconnectionunexpectedmessage', 'badges', $msg);
+                    $errors['backpackemail'] .= '<br/><br/>';
+                    $errors['backpackemail'] .= get_string('backpackconnectionunexpectedmessage', 'badges', $msg);
                 }
             }
         }
