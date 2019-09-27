@@ -44,7 +44,6 @@ class external_backpack extends \moodleform {
         global $CFG;
 
         $mform = $this->_form;
-        //$backpack = false;
 
         $mform->addElement('text', 'backpackapiurl', get_string('backpackapiurl', 'core_badges'));
         $mform->setType('backpackapiurl', PARAM_URL);
@@ -71,8 +70,6 @@ class external_backpack extends \moodleform {
         $mform->setType('password', PARAM_RAW);
         $mform->addHelpButton('password', 'defaultissuerpassword', 'badges');
         $mform->hideIf('password', 'apiversion', 'eq', 1);
-
-        //$this->set_data($backpack);
 
         // Disable short forms.
         $mform->setDisableShortforms();
