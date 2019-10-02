@@ -67,6 +67,10 @@ class assertion_exporter extends exporter {
         if (isset($data->badgeclass)) {
             $mapped->badgeclass = $data->badgeclass;
         }
+        if (isset($data->openBadgeId)) {
+            $mapped->openBadgeId = $data->openBadgeId;
+        }
+
         $propname = '@context';
         $mapped->$propname = 'https://w3id.org/openbadges/v2';
         return $mapped;
@@ -146,6 +150,11 @@ class assertion_exporter extends exporter {
             'expires' => [
                 'type' => PARAM_RAW,
                 'description' => 'Date this badge will expire',
+                'optional' => true,
+            ],
+            'openBadgeId' => [
+                'type' => PARAM_URL,
+                'description' => 'The public open badge URL',
                 'optional' => true,
             ],
             '@context' => [
