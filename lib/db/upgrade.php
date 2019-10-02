@@ -2545,9 +2545,16 @@ function xmldb_main_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
+
         $table->deleteKey('backpackapiurlkey');
         $table->deleteKey('backpackweburlkey');
         $table->add_key('backpackapiurlkey', XMLDB_KEY_UNIQUE, ['backpackapiurl', 'backpackemail']);
+
+        $table = new xmldb_table('badge_external_identifier');
+        $field = new xmldb_field('openbadgeid', XMLDB_TYPE_CHAR, '255');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
 
         upgrade_main_savepoint(true, 2020080700.01);
     }
