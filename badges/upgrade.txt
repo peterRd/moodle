@@ -1,6 +1,12 @@
 This files describes API changes in /badges/*,
 information provided here is intended especially for developers.
 
+=== 3.11 ===
+* Users can now specify a backpack that differs from the site backpack. In order to do this, connection details need to
+be set in 'Manage backpacks' with OR without auth details.
+* Badges can now be imported cross domain within the Badgr ecosystem.
+** Introduced a new function 'import_badge_assertion' which allows for this.
+
 === 3.9 ===
 * BADGE_BACKPACKAPIURL and BADGE_BACKPACKWEBURL are deprecated and should not be used.
 * OBv2 has been set to the default value when the obversion is not defined.
