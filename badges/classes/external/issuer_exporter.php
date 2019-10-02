@@ -63,6 +63,7 @@ class issuer_exporter extends exporter {
         $mapped->name = $data->name;
         $mapped->email = $data->email;
         $mapped->url = $data->url;
+        $mapped->openBadgeId = $data->openBadgeId;
         return $mapped;
     }
 
@@ -92,6 +93,11 @@ class issuer_exporter extends exporter {
             'url' => [
                 'type' => PARAM_URL,
                 'description' => 'URL for this issuer',
+            ],
+            'openBadgeId' => [
+                'type' => PARAM_URL,
+                'description' => 'Open badge Id of the issuer (which is a URL to OpenBadge Compliant JSON)',
+                'optional' => true
             ],
         ];
     }
