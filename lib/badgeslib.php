@@ -897,6 +897,17 @@ function badges_get_site_backpack($id) {
 }
 
 /**
+ * Get the primary backpack for the site
+ *
+ * @return array(stdClass)
+ */
+function badges_get_site_primary_backpack() {
+    global $CFG;
+
+    return badges_get_site_backpack($CFG->badges_site_backpack);
+}
+
+/**
  * List the backpacks at site level.
  *
  * @return array(stdClass)
@@ -986,9 +997,10 @@ function badges_disconnect_user_backpack($userid) {
  * @param integer $sitebackpackid The site backpack to connect to.
  * @param string $type The type of this remote object.
  * @param string $internalid The id for this object on the Moodle site.
+ * @param string $param The param we need to return. Defaults to the externalid.
  * @return mixed The id or false if it doesn't exist.
  */
-function badges_external_get_mapping($sitebackpackid, $type, $internalid) {
+function badges_external_get_mapping($sitebackpackid, $type, $internalid, $param = 'externalid') {
     global $DB;
     // Return externalid if it exists.
     $params = [
@@ -997,9 +1009,9 @@ function badges_external_get_mapping($sitebackpackid, $type, $internalid) {
         'internalid' => $internalid
     ];
 
-    $record = $DB->get_record('badge_external_identifier', $params, 'externalid', IGNORE_MISSING);
+    $record = $DB->get_record('badge_external_identifier', $params, $param, IGNORE_MISSING);
     if ($record) {
-        return $record->externalid;
+        return $record->$param;
     }
     return false;
 }
@@ -1011,16 +1023,18 @@ function badges_external_get_mapping($sitebackpackid, $type, $internalid) {
  * @param string $type The type of this remote object.
  * @param string $internalid The id for this object on the Moodle site.
  * @param string $externalid The id of this object on the remote site.
+ * @param string $externalid The open badge id of this object on the remote site.
  * @return boolean
  */
-function badges_external_create_mapping($sitebackpackid, $type, $internalid, $externalid) {
+function badges_external_create_mapping($sitebackpackid, $type, $internalid, $externalid, $openbadgeid) {
     global $DB;
 
     $params = [
         'sitebackpackid' => $sitebackpackid,
         'type' => $type,
         'internalid' => $internalid,
-        'externalid' => $externalid
+        'externalid' => $externalid,
+        'openbadgeid' => $openbadgeid
     ];
 
     return $DB->insert_record('badge_external_identifier', $params);
