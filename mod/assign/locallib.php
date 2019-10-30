@@ -9422,23 +9422,37 @@ class assign_portfolio_caller extends portfolio_module_caller_base {
                 throw new portfolio_caller_exception('invalidfileandsubmissionid', 'mod_assign');
             }
 
-            $submission = $DB->get_record('assign_submission', array('id' => $this->sid));
+            $submission = $DB->get_record('assign_submission', array('id' => $this->sid, 'assignment' => $this->cm->instance));
         } else {
             $submissionid = $DB->get_field('files', 'itemid', array('id' => $this->fileid, 'contextid' => $context->id));
             if ($submissionid) {
-                $submission = $DB->get_record('assign_submission', array('id' => $submissionid));
+                $submission = $DB->get_record('assign_submission', array(
+                    'id' => $submissionid,
+                    'assignment' => $this->cm->instance
+                ));
             }
         }
 
         if (empty($submission)) {
-            throw new portfolio_caller_exception('filenotfound');
+            // If a submission is not found then check whether there is a corresponding grade with the user. This is because sid can
+            // be assign_grade as well.
+            $grade = $DB->get_record('assign_grades', array('id' => $this->sid, 'assignment' => $this->cm->instance));
+            if (empty($grade)
+                || ($grade->userid != $this->user->id
+                && !has_any_capability(array('mod/assign:viewgrades', 'mod/assign:grade'), $context))) {
+                throw new portfolio_caller_exception('filenotfound');
+            }
+
         } else if ($submission->userid == 0) {
             // This must be a group submission.
             if (!groups_is_member($submission->groupid, $this->user->id)) {
                 throw new portfolio_caller_exception('filenotfound');
             }
         } else if ($this->user->id != $submission->userid) {
-            throw new portfolio_caller_exception('filenotfound');
+            // If the user doesn't match up then check whether the user has permission to view / assign grades.
+            if (!has_any_capability(array('mod/assign:viewgrades', 'mod/assign:grade'), $context)) {
+                throw new portfolio_caller_exception('filenotfound');
+            }
         }
 
         // Export either an area of files or a single file (see function for more detail).
