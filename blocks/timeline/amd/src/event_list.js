@@ -266,8 +266,9 @@ function(
             }
 
             var calendarEvents = result.events.filter(function(event) {
+                var dayTimestamp = UserDate.getUserMidnightForTimestamp(event.timesort, midnight);
                 // Do not include events that does not have a due date.
-                return event.eventtype != "open" && event.eventtype != "opensubmission";
+                return (event.eventtype != "open" || event.eventtype != "opensubmission") && dayTimestamp > midnight;
             });
             // We expect to receive limit + 1 events back from the server.
             // Any less means there are no more events to load.
