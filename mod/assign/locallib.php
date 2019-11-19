@@ -5885,6 +5885,7 @@ class assign {
      * @param int $userid
      * @param bool $updatetime
      * @param bool $teamsubmission
+     * @param bool $updategrade If it's a new attempt we don't need to update grades
      * @return bool
      */
     protected function update_submission(stdClass $submission, $userid, $updatetime, $teamsubmission) {
@@ -5898,7 +5899,7 @@ class assign {
             $submission->timemodified = time();
         }
         $result= $DB->update_record('assign_submission', $submission);
-        if ($result) {
+        if ($result && $this->can_grade($userid)) {
             $this->gradebook_item_update($submission);
         }
         return $result;

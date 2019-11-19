@@ -1868,7 +1868,7 @@ class mod_assign_locallib_testcase extends advanced_testcase {
         $gradinginfo = grade_get_grades($course->id, 'mod', 'assign', $assign->get_instance()->id, $student->id);
 
         $this->assertTrue(isset($gradinginfo->items[0]->grades[$student->id]));
-        $this->assertEquals($student->id, $gradinginfo->items[0]->grades[$student->id]->usermodified);
+        $this->assertNull($gradinginfo->items[0]->grades[$student->id]->usermodified);
     }
 
     public function test_update_submission_blind() {
