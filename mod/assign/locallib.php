@@ -5772,10 +5772,11 @@ class assign {
      * @return array
      */
     protected function convert_submission_for_gradebook(stdClass $submission) {
+        global $USER;
         $gradebookgrade = array();
 
         $gradebookgrade['userid'] = $submission->userid;
-        $gradebookgrade['usermodified'] = $submission->userid;
+        $gradebookgrade['usermodified'] = $USER->id;
         $gradebookgrade['datesubmitted'] = $submission->timemodified;
 
         return $gradebookgrade;
@@ -5928,7 +5929,7 @@ class assign {
             $submission->timemodified = time();
         }
         $result= $DB->update_record('assign_submission', $submission);
-        if ($result) {
+        if ($result && $this->can_grade()) {
             $this->gradebook_item_update($submission);
         }
         return $result;
