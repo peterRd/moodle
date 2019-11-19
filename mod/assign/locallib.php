@@ -5652,9 +5652,10 @@ class assign {
      * @param int $userid
      * @param bool $updatetime
      * @param bool $teamsubmission
+     * @param bool $updategrade If it's a new attempt we don't need to update grades
      * @return bool
      */
-    protected function update_submission(stdClass $submission, $userid, $updatetime, $teamsubmission) {
+    protected function update_submission(stdClass $submission, $userid, $updatetime, $teamsubmission, $updategrade = true) {
         global $DB;
 
         if ($teamsubmission) {
@@ -5665,7 +5666,7 @@ class assign {
             $submission->timemodified = time();
         }
         $result= $DB->update_record('assign_submission', $submission);
-        if ($result) {
+        if ($result && $updategrade) {
             $this->gradebook_item_update($submission);
         }
         return $result;
@@ -8440,7 +8441,7 @@ class assign {
             }
         }
 
-        $this->update_submission($newsubmission, $userid, false, $this->get_instance()->teamsubmission);
+        $this->update_submission($newsubmission, $userid, false, $this->get_instance()->teamsubmission, false);
         $flags = $this->get_user_flags($userid, false);
         if (isset($flags->locked) && $flags->locked) { // May not exist.
             $this->process_unlock_submission($userid);
