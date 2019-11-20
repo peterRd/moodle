@@ -300,6 +300,8 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
                                 // then save the form state again for comparison.
                                 checker.saveFormState('[data-region="grade-panel"] .gradeform');
                             });
+                            // Delete any fragments of atto's record construct to prep for the new form
+                            $('.atto_recordrtc.container-fluid').remove();
                             $('[data-region="attempt-chooser"]').on('click', this._chooseAttempt.bind(this));
                             this._addPopoutButtons('[data-region="grade-panel"] .gradeform');
                             $(document).trigger('finish-loading-user');
