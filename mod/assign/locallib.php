@@ -7680,6 +7680,8 @@ class assign {
         $this->add_plugin_grade_elements($grade, $mform, $data, $userid);
 
         // Hidden params.
+        $mform->addElement('hidden', 'timemodified', $grade->timemodified);
+        $mform->setType('timemodified', PARAM_INT);
         $mform->addElement('hidden', 'id', $this->get_course_module()->id);
         $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'rownum', $rownum);

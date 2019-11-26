@@ -49,6 +49,8 @@ Feature: Rubrics can be created and edited
       | Criterion 1 | 50 | Very good |
     And I press "Save changes"
     # Checking that it complains if you don't select a level for each criterion.
+    And I should see "Could not save grade."
+    And I press "Ok"
     And I should see "Please choose something for each criterion"
     And I grade by filling the rubric with:
       | Criterion 1 | 50 | Very good |
