@@ -146,6 +146,7 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
             // There was an error saving the grade. Re-render the form using the submitted data so we can show
             // validation errors.
             $(document).trigger('reset', [this._lastUserId, formdata]);
+            notification.alert(response[0].message, response[0].item);
         } else {
             str.get_strings([
                 {key: 'changessaved', component: 'core'},
