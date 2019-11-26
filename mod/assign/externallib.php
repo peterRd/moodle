@@ -1576,18 +1576,28 @@ class mod_assign_external extends external_api {
         $customdata = (object) $data;
         $formparams = array($assignment, $customdata, $options);
 
-        // Data is injected into the form by the last param for the constructor.
-        $mform = new mod_assign_grade_form(null, $formparams, 'post', '', null, true, $data);
-        $validateddata = $mform->get_data();
-
-        if ($validateddata) {
-            $assignment->save_grade($params['userid'], $validateddata);
+        // Confirm that the grade and related data hasn't been updated since the UI has been opened.
+        $grade = $assignment->get_user_grade($options['userid'], false, $data['attemptnumber']);
+        $message = '';
+        if (isset($data['timemodified']) && $data['timemodified'] != $grade->timemodified) {
+            $message = get_string('gradealreadymodified', 'assign');
         } else {
-            $warnings[] = self::generate_warning($params['assignmentid'],
-                                                 'couldnotsavegrade',
-                                                 'Form validation failed.');
+            // Data is injected into the form by the last param for the constructor.
+            $mform = new mod_assign_grade_form(null, $formparams, 'post', '', null, true, $data);
+            $validateddata = $mform->get_data();
+
+            if ($validateddata) {
+                $assignment->save_grade($params['userid'], $validateddata);
+            } else {
+                $message = get_string('formvalidationfailed', 'assign');
+            }
         }
 
+        if ($message) {
+            $warnings[] = self::generate_warning($params['assignmentid'],
+                'couldnotsavegrade',
+                $message);
+        }
 
         return $warnings;
     }
