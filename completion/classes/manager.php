@@ -175,7 +175,8 @@ class manager {
                 $activeruledescriptions[] = get_string('completionview_desc', 'completion');
             }
             if ($moduledata instanceof cm_info && !is_null($moduledata->completiongradeitemnumber) ||
-                ($moduledata instanceof stdClass && !empty($moduledata->completionusegrade))) {
+                ($moduledata instanceof stdClass && !empty($moduledata->completionusegrade))||
+                ($moduledata instanceof stdClass && !empty($moduledata->completionpassgrade))) {
                 $activeruledescriptions[] = get_string('completionusegrade_desc', 'completion');
             }
 

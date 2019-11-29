@@ -2212,5 +2212,21 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2020013000.01);
     }
 
+    if ($oldversion < 2020032000.01) {
+
+        $table = new xmldb_table('course_completion_defaults');
+
+        // Adding fields to table course_completion_defaults.
+        $field = new xmldb_field('completionpassgrade', XMLDB_TYPE_INTEGER, '1', null,
+            XMLDB_NOTNULL, null, '0', 'completionusegrade');
+
+        // Conditionally launch add field for course_completion_defaults.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_main_savepoint(true, 2020032000.01);
+    }
+
     return true;
 }
