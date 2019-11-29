@@ -1917,6 +1917,21 @@ function xmldb_main_upgrade($oldversion) {
     }
 
     if ($oldversion < 2021052500.01) {
+
+        // Define field timecreated to be added to task_adhoc.
+        $table = new xmldb_table('task_adhoc');
+        $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'blocking');
+
+        // Conditionally launch add field timecreated.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2021052500.01);
+    }
+
+    if ($oldversion < 2021052500.02) {
         // Delete all user evidence files from users that have been deleted.
         $sql = "SELECT DISTINCT f.*
                   FROM {files} f
@@ -1931,21 +1946,6 @@ function xmldb_main_upgrade($oldversion) {
             $fs->get_file_instance($stalefile)->delete();
         }
 
-        upgrade_main_savepoint(true, 2021052500.01);
-    }
-
-    if ($oldversion < 2021052500.02) {
-
-        // Define field timecreated to be added to task_adhoc.
-        $table = new xmldb_table('task_adhoc');
-        $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'blocking');
-
-        // Conditionally launch add field timecreated.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Main savepoint reached.
         upgrade_main_savepoint(true, 2021052500.02);
     }
 
@@ -2489,6 +2489,21 @@ function xmldb_main_upgrade($oldversion) {
         unset_config('badges_site_backpack');
 
         upgrade_main_savepoint(true, 2021052500.67);
+    }
+
+    if ($oldversion < 2021052500.69) {
+        $table = new xmldb_table('course_completion_defaults');
+
+        // Adding fields to table course_completion_defaults.
+        $field = new xmldb_field('completionpassgrade', XMLDB_TYPE_INTEGER, '1', null,
+            XMLDB_NOTNULL, null, '0', 'completionusegrade');
+
+        // Conditionally launch add field for course_completion_defaults.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_main_savepoint(true, 2021052500.69);
     }
 
     return true;
