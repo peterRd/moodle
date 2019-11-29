@@ -203,6 +203,11 @@ abstract class core_completion_edit_base_form extends moodleform {
                 get_string('completionusegrade_desc', 'completion'));
             $mform->disabledIf('completionusegrade', 'completion', 'ne', COMPLETION_TRACKING_AUTOMATIC);
             $mform->addHelpButton('completionusegrade', 'completionusegrade', 'completion');
+
+            $mform->addElement('advcheckbox', 'completionpassgrade', get_string('completionpassgrade', 'completion'),
+                get_string('completionpassgrade_desc', 'completion'));
+            $mform->disabledIf('completionpassgrade', 'completion', 'ne', COMPLETION_TRACKING_AUTOMATIC);
+            $mform->addHelpButton('completionpassgrade', 'completionpassgrade', 'completion');
             $autocompletionpossible = true;
         }
 
@@ -247,7 +252,7 @@ abstract class core_completion_edit_base_form extends moodleform {
         // on some conditions.
         if (array_key_exists('completion', $data) &&
             $data['completion'] == COMPLETION_TRACKING_AUTOMATIC) {
-            if (empty($data['completionview']) && empty($data['completionusegrade']) &&
+            if (empty($data['completionview']) && empty($data['completionusegrade']) && empty($data['completionpassgrade']) &&
                 !$this->completion_rule_enabled($data)) {
                 $errors['completion'] = get_string('badautocompletion', 'completion');
             }
