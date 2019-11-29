@@ -429,7 +429,7 @@ class availability_completion_condition_testcase extends advanced_testcase {
         // on its grade item.
         $assignrow = $this->getDataGenerator()->create_module('assign', [
             'course' => $course->id, 'name' => 'Assign!',
-            'completion' => COMPLETION_TRACKING_AUTOMATIC
+            'completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionusegrade' => 1
         ]);
         $DB->set_field('course_modules', 'completiongradeitemnumber', 0,
                 ['id' => $assignrow->cmid]);
