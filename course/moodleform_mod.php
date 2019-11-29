@@ -370,6 +370,9 @@ abstract class moodleform_mod extends moodleform {
                 if ($mform->elementExists('completionusegrade')) {
                     $mform->freeze('completionusegrade');
                 }
+                if ($mform->elementExists('completionpassgrade')) {
+                    $mform->freeze('completionpassgrade');
+                }
                 if ($mform->elementExists('completiongradeitemnumber')) {
                     $mform->freeze('completiongradeitemnumber');
                 }
@@ -480,7 +483,7 @@ abstract class moodleform_mod extends moodleform {
             $rulesenabled = !empty($data['completionview']);
 
             // Use grade to complete (only one grade item).
-            $rulesenabled = $rulesenabled || !empty($data['completionusegrade']);
+            $rulesenabled = $rulesenabled || !empty($data['completionusegrade']) || !empty($data['completionpassgrade']);
 
             // Use grade to complete (specific grade item).
             if (!$rulesenabled && isset($data['completiongradeitemnumber'])) {
@@ -709,16 +712,27 @@ abstract class moodleform_mod extends moodleform {
                     $mform->hideIf('completionusegrade', 'completion', 'ne', COMPLETION_TRACKING_AUTOMATIC);
                     $mform->addHelpButton('completionusegrade', 'completionusegrade', 'completion');
 
+                    // Complete if the user has reached the pass grade.
+                    $mform->addElement(
+                        'checkbox',
+                        'completionpassgrade', null,
+                        get_string('completionpassgrade_desc', 'completion')
+                    );
+                    $mform->hideIf('completionpassgrade', 'completion', 'ne', COMPLETION_TRACKING_AUTOMATIC);
+                    $mform->addHelpButton('completionpassgrade', 'completionpassgrade', 'completion');
+
                     // The disabledIf logic differs between ratings and other grade items due to different field types.
                     if ($this->_features->rating) {
                         // If using the rating system, there is no grade unless ratings are enabled.
                         $mform->disabledIf('completionusegrade', 'assessed', 'eq', 0);
+                        $mform->disabledIf('completionpassgrade', 'assessed', 'eq', 0);
                     } else {
                         // All other field types use the '$gradefieldname' field's modgrade_type.
                         $itemnumbers = array_keys($itemnames);
                         $itemnumber = array_shift($itemnumbers);
                         $gradefieldname = component_gradeitems::get_field_name_for_itemnumber($component, $itemnumber, 'grade');
                         $mform->disabledIf('completionusegrade', "{$gradefieldname}[modgrade_type]", 'eq', 'none');
+                        $mform->disabledIf('completionpassgrade', "{$gradefieldname}[modgrade_type]", 'eq', 'none');
                     }
                 } else if (count($itemnames) > 1) {
                     // There are multiple grade items in this activity.
