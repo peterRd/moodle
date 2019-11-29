@@ -429,7 +429,8 @@ function set_moduleinfo_defaults($moduleinfo) {
     }
 
     // Convert the 'use grade' checkbox into a grade-item number: 0 if checked, null if not.
-    if (isset($moduleinfo->completionusegrade) && $moduleinfo->completionusegrade) {
+    if ((isset($moduleinfo->completionusegrade) && $moduleinfo->completionusegrade) ||
+        (isset($moduleinfo->completionpassgrade) && $moduleinfo->completionpassgrade)) {
         $moduleinfo->completiongradeitemnumber = 0;
     } else if (!isset($moduleinfo->completiongradeitemnumber)) {
         $moduleinfo->completiongradeitemnumber = null;
