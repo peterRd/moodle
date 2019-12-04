@@ -184,6 +184,8 @@ class availability_completion_condition_testcase extends advanced_testcase {
                 'completion' => COMPLETION_TRACKING_AUTOMATIC));
         $DB->set_field('course_modules', 'completiongradeitemnumber', 0,
                 array('id' => $assignrow->cmid));
+        $DB->set_field('course_modules', 'completionusegrade', 1,
+                array('id' => $assignrow->cmid));
         $assign = new assign(context_module::instance($assignrow->cmid), false, false);
 
         // Get basic details.

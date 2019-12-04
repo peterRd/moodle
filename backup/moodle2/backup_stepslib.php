@@ -2725,7 +2725,8 @@ class backup_completion_defaults_structure_step extends backup_structure_step {
         $cc = new backup_nested_element('course_completion_defaults');
 
         $defaults = new backup_nested_element('course_completion_default', array('id'), array(
-            'modulename', 'completion', 'completionview', 'completionusegrade', 'completionpassgrade', 'completionexpected', 'customrules'
+            'modulename', 'completion', 'completionview', 'completionusegrade', 'completionpassgrade',
+            'completionexpected', 'customrules'
         ));
 
         // Use module name instead of module id so we can insert into another site later.

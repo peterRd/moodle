@@ -656,7 +656,7 @@ class completion_info {
         $newstate = COMPLETION_COMPLETE;
 
         // Check grade
-        if (!is_null($cm->completiongradeitemnumber)) {
+        if (!is_null($cm->completiongradeitemnumber) && ($cm->completionusegrade || $cm->completionpassgrade)) {
             require_once($CFG->libdir.'/gradelib.php');
             $item = grade_item::fetch(array('courseid'=>$cm->course, 'itemtype'=>'mod',
                 'itemmodule'=>$cm->modname, 'iteminstance'=>$cm->instance,
@@ -673,7 +673,9 @@ class completion_info {
                         item '{$item->id}', user '{$userid}'");
                 }
                 $newstate = self::internal_get_grade_state($item, reset($grades));
-                if ($newstate == COMPLETION_INCOMPLETE) {
+                if ($cm->completionpassgrade && $newstate != COMPLETION_COMPLETE_PASS) {
+                    return COMPLETION_INCOMPLETE;
+                } else if ($newstate == COMPLETION_INCOMPLETE) {
                     return COMPLETION_INCOMPLETE;
                 }
 
