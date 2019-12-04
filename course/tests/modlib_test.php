@@ -138,6 +138,7 @@ class core_course_modlib_testcase extends advanced_testcase {
             }
         }
         $expecteddata->gradepass = '0.00';
+        $expecteddata->completionpassgrade = $assigncm->completionpassgrade;
 
         // Unset untestable.
         unset($expecteddata->cmid);
