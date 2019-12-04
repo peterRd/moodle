@@ -73,8 +73,12 @@ function add_moduleinfo($moduleinfo, $course, $mform = null) {
     if ($completion->is_enabled()) {
         $newcm->completion                = $moduleinfo->completion;
         if ($moduleinfo->completiongradeitemnumber === '') {
+            $newcm->completionpassgrade       = 0;
+            $newcm->completionusegrade        = 0;
             $newcm->completiongradeitemnumber = null;
         } else {
+            $newcm->completionpassgrade       = $moduleinfo->completionpassgrade ?? 0;
+            $newcm->completionusegrade        = $moduleinfo->completionusegrade ?? 0;
             $newcm->completiongradeitemnumber = $moduleinfo->completiongradeitemnumber;
         }
         $newcm->completionview            = $moduleinfo->completionview;
@@ -546,8 +550,12 @@ function update_moduleinfo($cm, $moduleinfo, $course, $mform = null) {
         if (!empty($moduleinfo->completionunlocked)) {
             $cm->completion = $moduleinfo->completion;
             if ($moduleinfo->completiongradeitemnumber === '') {
+                $cm->completionpassgrade       = 0;
+                $cm->completionusegrade        = 0;
                 $cm->completiongradeitemnumber = null;
             } else {
+                $cm->completionpassgrade       = $moduleinfo->completionpassgrade ?? 0;
+                $cm->completionusegrade        = $moduleinfo->completionusegrade ?? 0;
                 $cm->completiongradeitemnumber = $moduleinfo->completiongradeitemnumber;
             }
             $cm->completionview = $moduleinfo->completionview;
@@ -708,7 +716,8 @@ function get_moduleinfo_data($cm, $course) {
     $data->completion         = $cm->completion;
     $data->completionview     = $cm->completionview;
     $data->completionexpected = $cm->completionexpected;
-    $data->completionusegrade = is_null($cm->completiongradeitemnumber) ? 0 : 1;
+    $data->completionusegrade = $cm->completionusegrade;
+    $data->completionpassgrade = $cm->completionpassgrade;
     $data->completiongradeitemnumber = $cm->completiongradeitemnumber;
     $data->showdescription    = $cm->showdescription;
     $data->tags               = core_tag_tag::get_item_tags_array('core', 'course_modules', $cm->id);
