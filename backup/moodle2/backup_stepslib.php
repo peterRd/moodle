@@ -276,7 +276,8 @@ class backup_module_structure_step extends backup_structure_step {
             'modulename', 'sectionid', 'sectionnumber', 'idnumber',
             'added', 'score', 'indent', 'visible', 'visibleoncoursepage',
             'visibleold', 'groupmode', 'groupingid',
-            'completion', 'completiongradeitemnumber', 'completionview', 'completionexpected',
+            'completion', 'completiongradeitemnumber', 'completionusegrade',
+            'completionpassgrade', 'completionview', 'completionexpected',
             'availability', 'showdescription'));
 
         $tags = new backup_nested_element('tags');
@@ -2725,7 +2726,8 @@ class backup_completion_defaults_structure_step extends backup_structure_step {
         $cc = new backup_nested_element('course_completion_defaults');
 
         $defaults = new backup_nested_element('course_completion_default', array('id'), array(
-            'modulename', 'completion', 'completionview', 'completionusegrade', 'completionpassgrade', 'completionexpected', 'customrules'
+            'modulename', 'completion', 'completionview', 'completionusegrade', 'completionpassgrade',
+            'completionexpected', 'customrules'
         ));
 
         // Use module name instead of module id so we can insert into another site later.
