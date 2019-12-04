@@ -111,7 +111,7 @@ class core_course_modlib_testcase extends advanced_testcase {
         $expecteddata->completion         = $assigncm->completion;
         $expecteddata->completionview     = $assigncm->completionview;
         $expecteddata->completionexpected = $assigncm->completionexpected;
-        $expecteddata->completionusegrade = is_null($assigncm->completiongradeitemnumber) ? 0 : 1;
+        $expecteddata->completionusegrade = $assigncm->completionusegrade;
         $expecteddata->completiongradeitemnumber = null;
         $expecteddata->showdescription    = $assigncm->showdescription;
         $expecteddata->tags               = core_tag_tag::get_item_tags_array('core', 'course_modules', $assigncm->id);
@@ -138,6 +138,7 @@ class core_course_modlib_testcase extends advanced_testcase {
             }
         }
         $expecteddata->gradepass = '0.00';
+        $expecteddata->completionpassgrade = $assigncm->completionpassgrade;
 
         // Unset untestable.
         unset($expecteddata->cmid);

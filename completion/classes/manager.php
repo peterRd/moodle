@@ -370,10 +370,10 @@ class manager {
             return false;
         }
 
-        if (array_key_exists('completionusegrade', $data)) {
+        if (array_key_exists('completionusegrade', $data) || array_key_exists('completionpassgrade', $data)) {
             // Convert the 'use grade' checkbox into a grade-item number: 0 if checked, null if not.
-            $data['completiongradeitemnumber'] = !empty($data['completionusegrade']) ? 0 : null;
-            unset($data['completionusegrade']);
+            $data['completiongradeitemnumber'] =
+                (!empty($data['completionusegrade']) || !empty($data['completionpassgrade'])) ? 0 : null;
         } else {
             $data['completiongradeitemnumber'] = $cm->completiongradeitemnumber;
         }
@@ -414,7 +414,8 @@ class manager {
             'completion' => COMPLETION_DISABLED,
             'completionview' => COMPLETION_VIEW_NOT_REQUIRED,
             'completionexpected' => 0,
-            'completionusegrade' => 0
+            'completionusegrade' => 0,
+            'completionpassgrade' => 0
         ];
 
         $data = (array)$data;
@@ -471,7 +472,7 @@ class manager {
     public static function get_default_completion($course, $module, $flatten = true) {
         global $DB, $CFG;
         if ($data = $DB->get_record('course_completion_defaults', ['course' => $course->id, 'module' => $module->id],
-            'completion, completionview, completionexpected, completionusegrade, customrules')) {
+            'completion, completionview, completionexpected, completionusegrade, completionpassgrade, customrules')) {
             if ($data->customrules && ($customrules = @json_decode($data->customrules, true))) {
                 if ($flatten) {
                     foreach ($customrules as $key => $value) {
