@@ -682,7 +682,18 @@ class completion_info {
                         item '{$item->id}', user '{$userid}'");
                 }
                 $newstate = self::internal_get_grade_state($item, reset($grades));
-                if ($newstate == COMPLETION_INCOMPLETE) {
+
+                if ($cm->completionpassgrade) {
+                    // If we are asking to use pass grade completion but haven't set it,
+                    // then default to COMPLETION_COMPLETE_PASS.
+                    if ($newstate == COMPLETION_COMPLETE) {
+                        return COMPLETION_COMPLETE_PASS;
+                    } else if ($newstate != COMPLETION_COMPLETE_PASS &&
+                        (empty($grades[$userid]) || !$grades[$userid]->is_passed($item))) {
+                        // Mark as incomplete if there is no grade provided or the grade has failed.
+                        $newstate = COMPLETION_INCOMPLETE;
+                    }
+                } else if ($newstate == COMPLETION_INCOMPLETE) {
                     return COMPLETION_INCOMPLETE;
                 }
 
