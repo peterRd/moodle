@@ -2514,5 +2514,30 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2020071100.01);
     }
 
+    if ($oldversion < 2020071100.02) {
+
+        $table = new xmldb_table('course_modules');
+
+        // Adding new fields to table course_module table.
+        $field = new xmldb_field('completionpassgrade', XMLDB_TYPE_INTEGER, '1', null,
+            XMLDB_NOTNULL, null, '0', 'deletioninprogress');
+        // Conditionally launch create table for course_completion_defaults.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('completionusegrade', XMLDB_TYPE_INTEGER, '1', null,
+            XMLDB_NOTNULL, null, '0', 'completionpassgrade');
+        // Conditionally launch create table for course_completion_defaults.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Update the new fields based on existing data.
+        $DB->execute("UPDATE {course_modules} SET completionusegrade = ? WHERE completiongradeitemnumber = ?", [1, 0]);
+
+        upgrade_main_savepoint(true, 2020071100.02);
+    }
+
     return true;
 }
