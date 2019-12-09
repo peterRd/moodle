@@ -117,6 +117,25 @@ class behat_completion extends behat_base {
     /**
      * Checks if the activity with specified name is maked as complete.
      *
+     * @Given /^the "(?P<activityname_string>(?:[^"]|\\")*)" "(?P<activitytype_string>(?:[^"]|\\")*)" activity should be marked as "(pass|fail)"$/
+     */
+    public function activity_marked_as_pass($activityname, $activitytype, $pass = null) {
+        if ($pass == "pass") {
+            $imgalttext = get_string("completion-alt-auto-pass", 'core_completion', $activityname);
+        } else {
+            $imgalttext = get_string("completion-alt-auto-fail", 'core_completion', $activityname);
+        }
+        $activityxpath = "//li[contains(concat(' ', @class, ' '), ' modtype_" . strtolower($activitytype) . " ')]";
+        $activityxpath .= "[descendant::*[contains(text(), '" . $activityname . "')]]";
+
+        $this->execute("behat_general::should_exist_in_the",
+            array($imgalttext, "icon", $activityxpath, "xpath_element")
+        );
+    }
+
+    /**
+     * Checks if the activity with specified name is maked as complete.
+     *
      * @Given /^the "(?P<activityname_string>(?:[^"]|\\")*)" "(?P<activitytype_string>(?:[^"]|\\")*)" activity with "(manual|auto)" completion should be marked as complete$/
      */
     public function activity_marked_as_complete($activityname, $activitytype, $completiontype) {
