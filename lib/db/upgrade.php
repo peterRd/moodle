@@ -3787,5 +3787,28 @@ function xmldb_main_upgrade($oldversion) {
     // Automatically generated Moodle v3.8.0 release upgrade line.
     // Put any upgrade step following this.
 
+    if ($oldversion < 2019120500.01) {
+
+        // Define field coremajor to be added to h5p_libraries.
+        $table = new xmldb_table('grade_grades');
+        $field = new xmldb_field('grader', XMLDB_TYPE_INTEGER, '10', null, false, null, null, 'usermodified');
+
+        // Conditionally launch add field coremajor.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field coremajor to be added to h5p_libraries.
+        $table = new xmldb_table('grade_grades_history');
+
+        // Conditionally launch add field coremajor.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2019120500.01);
+    }
+
     return true;
 }
