@@ -56,7 +56,8 @@ class grade_grade extends grade_object {
      * Array of optional fields with default values (these should match db defaults)
      * @var array $optional_fields
      */
-    public $optional_fields = array('feedback'=>null, 'feedbackformat'=>0, 'information'=>null, 'informationformat'=>0, 'grader' => null);
+    public $optional_fields = array('feedback'=>null, 'feedbackformat'=>0, 'information'=>null, 'informationformat'=>0,
+                                'grader' => null);
 
     /**
      * The id of the grade_item this grade belongs to.
