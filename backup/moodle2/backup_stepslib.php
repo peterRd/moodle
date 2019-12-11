@@ -1004,7 +1004,7 @@ class backup_gradebook_structure_step extends backup_structure_step {
         $grade_grades = new backup_nested_element('grade_grades');
         $grade_grade = new backup_nested_element('grade_grade', array('id'), array(
             'userid', 'rawgrade', 'rawgrademax', 'rawgrademin',
-            'rawscaleid', 'usermodified', 'finalgrade', 'hidden',
+            'rawscaleid', 'usermodified', 'grader', 'finalgrade', 'hidden',
             'locked', 'locktime', 'exported', 'overridden',
             'excluded', 'feedback', 'feedbackformat', 'information',
             'informationformat', 'timecreated', 'timemodified',
@@ -1134,7 +1134,7 @@ class backup_grade_history_structure_step extends backup_structure_step {
         $grade = new backup_nested_element('grade_grade', array('id'), array(
             'action', 'oldid', 'source', 'loggeduser', 'itemid', 'userid',
             'rawgrade', 'rawgrademax', 'rawgrademin', 'rawscaleid',
-            'usermodified', 'finalgrade', 'hidden', 'locked', 'locktime', 'exported', 'overridden',
+            'usermodified', 'grader', 'finalgrade', 'hidden', 'locked', 'locktime', 'exported', 'overridden',
             'excluded', 'feedback', 'feedbackformat', 'information',
             'informationformat', 'timemodified'));
 
@@ -2583,7 +2583,7 @@ class backup_activity_grade_history_structure_step extends backup_structure_step
         $grade = new backup_nested_element('grade_grade', array('id'), array(
             'action', 'oldid', 'source', 'loggeduser', 'itemid', 'userid',
             'rawgrade', 'rawgrademax', 'rawgrademin', 'rawscaleid',
-            'usermodified', 'finalgrade', 'hidden', 'locked', 'locktime', 'exported', 'overridden',
+            'usermodified', 'grader', 'finalgrade', 'hidden', 'locked', 'locktime', 'exported', 'overridden',
             'excluded', 'feedback', 'feedbackformat', 'information',
             'informationformat', 'timemodified'));
 
