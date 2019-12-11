@@ -104,11 +104,13 @@ class provider implements
 
         $collection->add_database_table('grade_grades', array_merge($gradescommonfields, [
             'timemodified' => 'privacy:metadata:grades:timemodified',
+            'grader' => 'privacy:metadata:grades:grader'
         ]), 'privacy:metadata:grades');
 
         $collection->add_database_table('grade_grades_history', array_merge($gradescommonfields, [
             'timemodified' => 'privacy:metadata:history:timemodified',
             'loggeduser' => 'privacy:metadata:history:loggeduser',
+            'grader' => 'privacy:metadata:history:grader'
         ]), 'privacy:metadata:gradeshistory');
 
         // The following tables are reported but not exported/deleted because their data is temporary and only
