@@ -256,6 +256,7 @@ function grade_update($source, $courseid, $itemtype, $itemmodule, $iteminstance,
         $feedbackformat = FORMAT_MOODLE;
         $feedbackfiles = [];
         $usermodified   = $USER->id;
+        $grader = null;
         $datesubmitted  = null;
         $dategraded     = null;
 
@@ -278,6 +279,9 @@ function grade_update($source, $courseid, $itemtype, $itemmodule, $iteminstance,
         if (array_key_exists('usermodified', $grade)) {
             $usermodified = $grade['usermodified'];
         }
+        if (array_key_exists('grader', $grade)) {
+            $grader = $grade['grader'];
+        }
 
         if (array_key_exists('datesubmitted', $grade)) {
             $datesubmitted = $grade['datesubmitted'];
@@ -289,7 +293,7 @@ function grade_update($source, $courseid, $itemtype, $itemmodule, $iteminstance,
 
         // update or insert the grade
         if (!$grade_item->update_raw_grade($userid, $rawgrade, $source, $feedback, $feedbackformat, $usermodified,
-                $dategraded, $datesubmitted, $grade_grade, $feedbackfiles)) {
+                $dategraded, $datesubmitted, $grade_grade, $feedbackfiles, $grader)) {
             $failed = true;
         }
     }
@@ -511,6 +515,7 @@ function grade_get_grades($courseid, $itemtype, $itemmodule, $iteminstance, $use
                         $grade->feedback       = $grade_grades[$userid]->feedback;
                         $grade->feedbackformat = $grade_grades[$userid]->feedbackformat;
                         $grade->usermodified   = $grade_grades[$userid]->usermodified;
+                        $grade->grader         = $grade_grades[$userid]->grader;
                         $grade->datesubmitted  = $grade_grades[$userid]->get_datesubmitted();
                         $grade->dategraded     = $grade_grades[$userid]->get_dategraded();
 
@@ -601,6 +606,7 @@ function grade_get_grades($courseid, $itemtype, $itemmodule, $iteminstance, $use
                         $grade->feedback       = $grade_grades[$userid]->feedback;
                         $grade->feedbackformat = $grade_grades[$userid]->feedbackformat;
                         $grade->usermodified   = $grade_grades[$userid]->usermodified;
+                        $grade->grader   = $grade_grades[$userid]->grader;
                         $grade->datesubmitted  = $grade_grades[$userid]->get_datesubmitted();
                         $grade->dategraded     = $grade_grades[$userid]->get_dategraded();
 

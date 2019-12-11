@@ -1892,7 +1892,7 @@ class grade_item extends grade_object {
      */
     public function update_raw_grade($userid, $rawgrade = false, $source = null, $feedback = false,
             $feedbackformat = FORMAT_MOODLE, $usermodified = null, $dategraded = null, $datesubmitted=null,
-            $grade = null, array $feedbackfiles = []) {
+            $grade = null, array $feedbackfiles = [], $grader = null) {
         global $USER;
 
         $result = true;
@@ -1912,6 +1912,10 @@ class grade_item extends grade_object {
             $grade->usermodified = $USER->id;
         } else {
             $grade->usermodified = $usermodified;
+        }
+
+        if (!empty($grader)) {
+            $grade->grader = $grader;
         }
 
         if ($grade->is_locked()) {
@@ -1934,6 +1938,7 @@ class grade_item extends grade_object {
         $oldgrade->rawscaleid     = $grade->rawscaleid;
         $oldgrade->feedback       = $grade->feedback;
         $oldgrade->feedbackformat = $grade->feedbackformat;
+        $oldgrade->grader = $grade->grader;
 
         // use new min and max
         $grade->rawgrade    = $grade->rawgrade;

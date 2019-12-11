@@ -5339,8 +5339,8 @@ class assign {
                 $gradeddate = $gradebookgrade->dategraded;
                 if (isset($grade->grader) && $grade->grader > 0) {
                     $grader = $DB->get_record('user', array('id' => $grade->grader));
-                } else if (isset($gradebookgrade->usermodified) && $gradebookgrade->usermodified > 0) {
-                    $grader = $DB->get_record('user', array('id' => $gradebookgrade->usermodified));
+                } else if (isset($gradebookgrade->grader) && $gradebookgrade->grader > 0) {
+                    $grader = $DB->get_record('user', array('id' => $gradebookgrade->grader));
                 }
             }
 
@@ -5740,6 +5740,7 @@ class assign {
      * @return array
      */
     protected function convert_grade_for_gradebook(stdClass $grade) {
+        global $USER;
         $gradebookgrade = array();
         if ($grade->grade >= 0) {
             $gradebookgrade['rawgrade'] = $grade->grade;
@@ -5749,7 +5750,8 @@ class assign {
             $gradebookgrade['rawgrade'] = NULL;
         }
         $gradebookgrade['userid'] = $grade->userid;
-        $gradebookgrade['usermodified'] = $grade->grader;
+        $gradebookgrade['usermodified'] = $USER->id;
+        $gradebookgrade['grader'] = $grade->grader;
         $gradebookgrade['datesubmitted'] = null;
         $gradebookgrade['dategraded'] = $grade->timemodified;
         if (isset($grade->feedbackformat)) {
@@ -5776,8 +5778,13 @@ class assign {
         $gradebookgrade = array();
 
         $gradebookgrade['userid'] = $submission->userid;
-        $gradebookgrade['usermodified'] = $USER->id;
         $gradebookgrade['datesubmitted'] = $submission->timemodified;
+        $gradebookgrade['usermodified'] = $USER->id;
+
+        // Only update usermodified if the person can grade.
+        if ($this->can_grade()) {
+            $gradebookgrade['grader'] = $USER->id;
+        }
 
         return $gradebookgrade;
     }
