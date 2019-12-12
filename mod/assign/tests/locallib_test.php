@@ -1805,6 +1805,18 @@ class mod_assign_locallib_testcase extends advanced_testcase {
 
         $this->assertTrue(isset($gradinginfo->items[0]->grades[$student->id]));
         $this->assertEquals($student->id, $gradinginfo->items[0]->grades[$student->id]->usermodified);
+        $this->assertNull($gradinginfo->items[0]->grades[$student->id]->grader);
+
+        // Simulate adding a grade.
+        $this->submit_for_grading($student, $assign);
+        $this->mark_submission($teacher, $assign, $student);
+
+        // Verify the gradebook update.
+        $gradinginfo = grade_get_grades($course->id, 'mod', 'assign', $assign->get_instance()->id, $student->id);
+
+        $this->assertTrue(isset($gradinginfo->items[0]->grades[$student->id]));
+        $this->assertEquals($teacher->id, $gradinginfo->items[0]->grades[$student->id]->usermodified);
+        $this->assertEquals($teacher->id, $gradinginfo->items[0]->grades[$student->id]->grader);
     }
 
     public function test_update_submission_team() {
