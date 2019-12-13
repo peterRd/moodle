@@ -515,7 +515,7 @@ function grade_get_grades($courseid, $itemtype, $itemmodule, $iteminstance, $use
                         $grade->feedback       = $grade_grades[$userid]->feedback;
                         $grade->feedbackformat = $grade_grades[$userid]->feedbackformat;
                         $grade->usermodified   = $grade_grades[$userid]->usermodified;
-                        $grade->grader         = $grade_grades[$userid]->grader;
+                        $grade->grader         = $grade_grades[$userid]->grader ?? $grade_grades[$userid]->usermodified;
                         $grade->datesubmitted  = $grade_grades[$userid]->get_datesubmitted();
                         $grade->dategraded     = $grade_grades[$userid]->get_dategraded();
 
@@ -606,7 +606,7 @@ function grade_get_grades($courseid, $itemtype, $itemmodule, $iteminstance, $use
                         $grade->feedback       = $grade_grades[$userid]->feedback;
                         $grade->feedbackformat = $grade_grades[$userid]->feedbackformat;
                         $grade->usermodified   = $grade_grades[$userid]->usermodified;
-                        $grade->grader   = $grade_grades[$userid]->grader;
+                        $grade->grader         = $grade_grades[$userid]->grader ?? $grade_grades[$userid]->usermodified;
                         $grade->datesubmitted  = $grade_grades[$userid]->get_datesubmitted();
                         $grade->dategraded     = $grade_grades[$userid]->get_dategraded();
 
