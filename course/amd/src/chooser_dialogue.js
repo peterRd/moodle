@@ -92,6 +92,7 @@ define(
             var optionSummaryElement = $(e.target).closest(SELECTORS.CHOOSER_OPTION_SUMMARY_CONTAINER);
             optionSummaryElement.removeClass('open');
             $(SELECTORS.CHOOSER_CONTAINER).removeClass('noscroll');
+            $(e.target).closest(SELECTORS.CHOOSER_OPTION_CONTAINER).focus();
         });
 
         // Register event listeners related to the keyboard navigation controls.
