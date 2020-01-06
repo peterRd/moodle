@@ -132,8 +132,13 @@ class course_module_chooser_exporter extends exporter {
 
             $icon = new \pix_icon('icon', '', $modulename);
 
+            $title = $module->title;
+            if (is_object($module->title) && $title instanceof \lang_string) {
+                $title = $module->title->out();
+            }
+
             $modulesdata[] = [
-                'label' => $module->title->out(),
+                'label' => $title,
                 'description' => $description,
                 'urls' => [
                     'addoption' => $module->link->out(false),
