@@ -51,8 +51,8 @@ const moduleInfoFormatter = (e, moduleInfo, section) => {
     } else if (siteMenu !== null) {
         // The block site menu has a sectionid of 0.
         sectionid = 0;
-    } else if (e.target.id) {
-        const caller = section.querySelector(`#${e.target.id}`);
+    } else if (e.currentTarget.id) {
+        const caller = section.querySelector(`#${e.currentTarget.id}`);
         sectionid = caller.dataset.sectionid;
     }
 
