@@ -74,7 +74,7 @@ class external_backpacks_page implements \renderable {
             }
             $backpack->cantest = ($backpack->apiversion == OPEN_BADGES_V2);
             $backpack->iscurrent = ($backpack->id == $CFG->badges_site_backpack);
-
+            // $backpack->canedit = true; // All external backpacks can now be edited.
             $data->backpacks[] = $backpack;
         }
 
