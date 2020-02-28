@@ -2216,14 +2216,37 @@ function xmldb_main_upgrade($oldversion) {
     }
 
     if ($oldversion < 2020021400.01) {
-        $table = new xmldb_table('badge_external_backpack');
-        $field = new xmldb_field('backpackemail', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
+        global $DB, $CFG;
+        // Get the currently used backpacks.
+        $records = $DB->get_records_select('badge_external_backpack', "password IS NOT NULL AND password != ''");
+        $backpack = [
+            'userid' => '0',
+            'email' => $CFG->badges_defaultissuecontact,
+        ];
+
+        // Create records corresponding to the site backpacks
+        foreach ($records as $record) {
+            $backpack['password'] = $record->password;
+            $backpack['externalbackpackid'] = $record->id;
+
+            $DB->insert_record('badge_backpack', (object) $backpack);
         }
+
+        $table = new xmldb_table('badge_external_backpack');
+        $field = new xmldb_field('password');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
         $table->deleteKey('backpackapiurlkey');
         $table->deleteKey('backpackweburlkey');
-        $table->add_key('backpackapiurlkey', XMLDB_KEY_UNIQUE, ['backpackapiurl', 'backpackemail']);
+        $table->add_key('backpackapiurlkey', XMLDB_KEY_UNIQUE, ['backpackapiurl', 'backpackweburl']);
+
+        $table = new xmldb_table('badge_external_backpack');
+        $field = new xmldb_field('backpackemail', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
 
         $table = new xmldb_table('badge_external_identifier');
         $field = new xmldb_field('openbadgeid', XMLDB_TYPE_CHAR, '255');
