@@ -57,24 +57,39 @@ class external_backpack extends \moodleform {
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INTEGER);
+        $mform->addElement('hidden', 'badgebackpack', 0);
+        $mform->setType('badgebackpack', PARAM_INTEGER);
+        $mform->addElement('hidden', 'userid', 0);
+        $mform->setType('userid', PARAM_INTEGER);
+        $mform->addElement('hidden', 'backpackuid', 0);
+        $mform->setType('backpackuid', PARAM_INTEGER);
 
         $mform->addElement('hidden', 'action', 'edit');
         $mform->setType('action', PARAM_ALPHA);
 
-        $issuercontact = $CFG->badges_defaultissuercontact;
-        $mform->addElement('text', 'backpackemail', get_string('defaultissuercontact', 'core_badges'));
-        $mform->setType('backpackemail', PARAM_EMAIL);
-        $mform->setDefault('backpackemail', $issuercontact);
+        $mform->addElement('checkbox', 'includeauthdetails', null, get_string('includeauthdetails', 'core_badges'));
 
-        $mform->addElement('passwordunmask', 'password', get_string('defaultissuerpassword', 'core_badges'));
-        $mform->setType('password', PARAM_RAW);
-        $mform->addHelpButton('password', 'defaultissuerpassword', 'badges');
+        $issuercontact = $CFG->badges_defaultissuercontact;
+        $this->add_auth_fields($issuercontact);
+        $mform->hideIf('backpackemail', 'includeauthdetails');
+        $mform->hideIf('password', 'includeauthdetails');
         $mform->hideIf('password', 'apiversion', 'eq', 1);
 
         // Disable short forms.
         $mform->setDisableShortforms();
 
         $this->add_action_buttons();
+    }
+
+    protected function add_auth_fields($email) {
+        $mform = $this->_form;
+        $mform->addElement('text', 'backpackemail', get_string('defaultissuercontact', 'core_badges'));
+        $mform->setType('backpackemail', PARAM_EMAIL);
+        $mform->setDefault('backpackemail', $email);
+
+        $mform->addElement('passwordunmask', 'password', get_string('defaultissuerpassword', 'core_badges'));
+        $mform->setType('password', PARAM_RAW);
+        $mform->addHelpButton('password', 'defaultissuerpassword', 'badges');
     }
 
 }

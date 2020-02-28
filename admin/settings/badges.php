@@ -104,7 +104,7 @@ if (($hassiteconfig || has_any_capability(array(
     $backpacksettings->add(new admin_setting_configselect('badges_site_backpack',
             new lang_string('sitebackpack', 'badges'),
             new lang_string('sitebackpack_help', 'badges'),
-            $bp->id, $choices));
+            $bp->id ?? 0, $choices));
 
     $warning = badges_verify_site_backpack();
     if (!empty($warning)) {

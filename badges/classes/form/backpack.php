@@ -53,7 +53,12 @@ class backpack extends external_backpack {
         $mform->addHelpButton('backpackheader', 'backpackconnection', 'badges');
         $mform->addElement('hidden', 'userid', $USER->id);
         $mform->setType('userid', PARAM_INT);
-        $mform->addElement('hidden', 'externalbackpackid');
+        $sitebackpacks = badges_get_site_backpacks();
+        $choices = array();
+        foreach ($sitebackpacks as $backpack) {
+            $choices[$backpack->id] = $backpack->backpackweburl;
+        }
+        $mform->addElement('select', 'externalbackpackid', get_string('backpackprovider', 'badges'), $choices);
         $mform->setType('externalbackpackid', PARAM_INT);
         if (isset($this->_customdata['email'])) {
             // Email will be passed in when we're in the process of verifying the user's email address,
@@ -68,10 +73,11 @@ class backpack extends external_backpack {
         }
         $mform->addElement('static', 'status', get_string('status'), $status);
 
-        parent::definition();
+        $this->add_auth_fields($USER->email);
 
-        $mform->setDefault('backpackemail', $USER->email);
         $mform->setDisableShortforms(false);
+
+        $this->add_action_buttons();
     }
 
     /**
@@ -105,9 +111,9 @@ class backpack extends external_backpack {
             $check = new stdClass();
             $check->email = $data['backpackemail'];
             $check->password = $data['password'];
-            $check->externalbackpackid = $data['externalbackpackid'];
+            $sitebackpack = badges_get_site_backpack($data['externalbackpackid']);
+            $bp = new \core_badges\backpack_api($sitebackpack, $check);
 
-            $bp = new \core_badges\backpack_api((object) $data, $check);
             $result = $bp->authenticate();
             if ($result === false || !empty($result->error)) {
                 $errors['backpackemail'] = get_string('backpackconnectionunexpectedresult', 'badges');

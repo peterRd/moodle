@@ -63,11 +63,7 @@ class external_backpacks_page implements \renderable {
         foreach ($this->backpacks as $backpack) {
             $exporter = new backpack_exporter($backpack);
             $backpack = $exporter->export($output);
-            if ($backpack->apiversion == OPEN_BADGES_V2) {
-                $backpack->canedit = true;
-            } else {
-                $backpack->canedit = false;
-            }
+            $backpack->canedit = true; // All external backpacks can now be edited.
             $data->backpacks[] = $backpack;
         }
         $data->warning = badges_verify_site_backpack();

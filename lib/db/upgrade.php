@@ -2306,15 +2306,56 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2020041700.01);
     }
 
-    if ($oldversion < 2020042400.01) {
-        $table = new xmldb_table('badge_external_backpack');
-        $field = new xmldb_field('backpackemail', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
+    if ($oldversion < 2020042400.03) {
+        global $DB, $CFG;
+
+        $table = new xmldb_table('badge_backpack');
+        $uniquekey = 'backpackcreditionals';
+        // All external backpack providers/hosts are now exclusively stored in badge_external_backpack.
+        // All credentials are stored in badge_backpack and are unique per user, backpack.
+        if (!$dbman->find_key_name($table, $uniquekey)) {
+            $table->add_key($uniquekey, XMLDB_KEY_UNIQUE, ['userid', 'externalbackpackid']);
         }
+
+        // If there is a current backpack set then copy it across to the new structure.
+        if ($CFG->badges_defaultissuercontact) {
+            // Get the currently used site backpacks.
+            $records = $DB->get_records_select('badge_external_backpack', "password IS NOT NULL AND password != ''");
+            $backpack = [
+                'userid' => '0',
+                'email' => $CFG->badges_defaultissuercontact,
+            ];
+
+            // Create records corresponding to the site backpacks.
+            foreach ($records as $record) {
+                $backpack['password'] = $record->password;
+                $backpack['externalbackpackid'] = $record->id;
+
+                try {
+                    $DB->insert_record('badge_backpack', (object) $backpack);
+                } catch (Exception $e) {
+                    // Error inserting record. Already exists?
+                }
+            }
+        }
+
+        // Drop the password and email fields as this is moved to badge_backpack.
+        $table = new xmldb_table('badge_external_backpack');
+        $field = new xmldb_field('password', XMLDB_TYPE_CHAR, '50');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Unique identifer are changed to be provider specific. e.g. only a single entry for eu.badgr.io should exist.
         $table->deleteKey('backpackapiurlkey');
         $table->deleteKey('backpackweburlkey');
-        $table->add_key('backpackapiurlkey', XMLDB_KEY_UNIQUE, ['backpackapiurl', 'backpackemail']);
+        $table->add_key('backpackapiurlkey', XMLDB_KEY_UNIQUE, ['backpackapiurl', 'backpackweburl']);
+
+        $table = new xmldb_table('badge_external_backpack');
+        $field = new xmldb_field('backpackemail', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
 
 
         $table = new xmldb_table('badge_external_identifier');
@@ -2323,7 +2364,7 @@ function xmldb_main_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_main_savepoint(true, 2020042400.01);
+        upgrade_main_savepoint(true, 2020042400.03);
     }
 
     return true;

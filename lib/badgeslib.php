@@ -813,8 +813,6 @@ function badges_create_external_backpack($data, $id = 0) {
     $backpack->apiversion = $data->apiversion;
     $backpack->backpackweburl = $data->backpackweburl;
     $backpack->backpackapiurl = $data->backpackapiurl;
-    $backpack->backpackemail = $data->backpackemail;
-    $backpack->password = $data->password;
     if (isset($data->sortorder)) {
         $backpack->sortorder = $data->sortorder;
     }
@@ -823,8 +821,36 @@ function badges_create_external_backpack($data, $id = 0) {
     if ($id) {
         $backpack->id = $id;
     }
+    $record = $DB->$method('badge_external_backpack', $backpack, true);
+    $data->externalbackpackid = $id ?? $record->id;
+    badges_create_backpack_creditionals($data);
 
-    return $DB->$method('badge_external_backpack', $backpack);
+    return $data->externalbackpackid;
+}
+
+function badges_create_backpack_creditionals($data, $id = 0) {
+    global $DB;
+
+    if (isset($data->backpackemail) && isset($data->password)) {
+        $backpack = new stdClass();
+
+        $backpack->email = $data->backpackemail;
+        $backpack->password = $data->password;
+        $backpack->externalbackpackid = $data->externalbackpackid;
+        $backpack->userid = $data->userid ?? 0;
+        $backpack->backpackuid = $data->backpackuid ?? 0;
+
+        $id = $data->badgebackpack ?? $id;
+        $method = $id ? 'update_record' : 'insert_record';
+        if ($id) {
+            $backpack->id = $id;
+        }
+
+        $DB->$method('badge_backpack', $backpack);
+        return $backpack->externalbackpackid;
+    }
+
+    return $data->externalbackpackid ?? 0;
 }
 
 /**
@@ -851,7 +877,12 @@ function badges_open_badges_backpack_api() {
 function badges_get_site_backpack($id) {
     global $DB;
 
-    return $DB->get_record('badge_external_backpack', ['id' => $id]);
+    $sql = "SELECT beb.*, bb.id as badgebackpack, bb.password, bb.email as backpackemail
+            FROM {badge_external_backpack} beb
+            LEFT JOIN {badge_backpack} bb ON bb.externalbackpackid = beb.id AND bb.userid=:userid
+            WHERE beb.id=:id";
+
+    return $DB->get_record_sql($sql, ['id' => $id, 'userid' => 0]);
 }
 
 /**
@@ -873,11 +904,11 @@ function badges_get_site_primary_backpack() {
 function badges_get_site_backpacks() {
     global $DB, $CFG;
 
-    $sql = "SELECT beb.*
+    $sql = "SELECT beb.*, bb.id as badgebackpack, bb.password, bb.email as backpackemail
             FROM {badge_external_backpack} beb
             LEFT JOIN {badge_backpack} bb ON bb.externalbackpackid = beb.id
-            WHERE bb.id IS NULL";
-    $all = $DB->get_records_sql($sql);
+            WHERE bb.id IS NULL OR bb.userid=:userid";
+    $all = $DB->get_records_sql($sql, ['userid' => 0]);
 
     foreach ($all as $key => $bp) {
         if ($bp->id == $CFG->badges_site_backpack) {
