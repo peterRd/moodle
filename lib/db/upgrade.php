@@ -2215,25 +2215,29 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2020013000.01);
     }
 
-    if ($oldversion < 2020021400.01) {
+    if ($oldversion < 2020021400.02) {
         global $DB, $CFG;
-        // Get the currently used backpacks.
-        $records = $DB->get_records_select('badge_external_backpack', "password IS NOT NULL AND password != ''");
-        $backpack = [
-            'userid' => '0',
-            'email' => $CFG->badges_defaultissuecontact,
-        ];
 
-        // Create records corresponding to the site backpacks
-        foreach ($records as $record) {
-            $backpack['password'] = $record->password;
-            $backpack['externalbackpackid'] = $record->id;
+        // If there is a current backpack set then copy it across to the new structure.
+        if ($CFG->badges_defaultissuercontact) {
+            // Get the currently used backpacks.
+            $records = $DB->get_records_select('badge_external_backpack', "password IS NOT NULL AND password != ''");
+            $backpack = [
+                'userid' => '0',
+                'email' => $CFG->badges_defaultissuercontact,
+            ];
 
-            $DB->insert_record('badge_backpack', (object) $backpack);
+            // Create records corresponding to the site backpacks.
+            foreach ($records as $record) {
+                $backpack['password'] = $record->password;
+                $backpack['externalbackpackid'] = $record->id;
+
+                $DB->insert_record('badge_backpack', (object) $backpack);
+            }
         }
 
         $table = new xmldb_table('badge_external_backpack');
-        $field = new xmldb_field('password');
+        $field = new xmldb_field('password', XMLDB_TYPE_CHAR, '50');
         if ($dbman->field_exists($table, $field)) {
             $dbman->drop_field($table, $field);
         }
@@ -2254,7 +2258,7 @@ function xmldb_main_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_main_savepoint(true, 2020021400.01);
+        upgrade_main_savepoint(true, 2020021400.02);
     }
 
     return true;
