@@ -153,12 +153,32 @@ class core_course_renderer extends plugin_renderer_base {
      * @return string
      */
     public function course_activitychooser($courseid) {
+        global $USER;
 
         if (!$this->page->requires->should_create_one_time_item_now('core_course_modchooser')) {
             return '';
         }
 
-        $this->page->requires->js_call_amd('core_course/activitychooser', 'init', [$courseid]);
+        $enabled = get_config('core', 'enablemoodlenet');
+        $installed = class_exists('tool_moodlenet\profile_manager', true);
+        $advanced = false;
+        if ($installed) {
+            $mnetprofile = \tool_moodlenet\profile_manager::get_moodlenet_user_profile($USER->id);
+            if ($mnetprofile !== null) {
+                $profilelink = \tool_moodlenet\profile_manager::get_moodlenet_profile_link($mnetprofile);
+                $advanced = $profilelink['domain'];
+            }
+        }
+
+        $footerdata = (object) [
+            'enabled' => (bool) $enabled, // Mocks the adv feat setting.
+            'installed' => $installed, // Mocks some CB we will do to see if the plugin is installed.
+            'generic' => 'https://hq.moodle.net', // Mock of the default HQ run mnet instance.
+            'advanced' => $advanced, // Can be false if user has not entered text into the fake form.
+            'img' => $this->image_url('MoodleNet', 'tool_moodlenet')->out(false), // mnet logo for use in templates etc.
+        ];
+        print_object($footerdata);
+        $this->page->requires->js_call_amd('core_course/activitychooser', 'init', [$courseid, $footerdata]);
 
         return '';
     }
