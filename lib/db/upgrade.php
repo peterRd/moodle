@@ -2215,7 +2215,7 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2020013000.01);
     }
 
-    if ($oldversion < 2020021400.02) {
+    if ($oldversion < 2020021400.03) {
         global $DB, $CFG;
 
         // If there is a current backpack set then copy it across to the new structure.
@@ -2232,7 +2232,11 @@ function xmldb_main_upgrade($oldversion) {
                 $backpack['password'] = $record->password;
                 $backpack['externalbackpackid'] = $record->id;
 
-                $DB->insert_record('badge_backpack', (object) $backpack);
+                try {
+                    $DB->insert_record('badge_backpack', (object) $backpack);
+                } catch (Exception $e) {
+                    // Error inserting record. Already exists?
+                }
             }
         }
 
@@ -2258,7 +2262,7 @@ function xmldb_main_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_main_savepoint(true, 2020021400.02);
+        upgrade_main_savepoint(true, 2020021400.03);
     }
 
     return true;

@@ -61,15 +61,19 @@ class external_backpack extends \moodleform {
         $mform->addElement('hidden', 'action', 'edit');
         $mform->setType('action', PARAM_ALPHA);
 
+        $mform->addElement('checkbox', 'includeauthdetails', null, get_string('includeauthdetails', 'core_badges'));
+
         $issuercontact = $CFG->badges_defaultissuercontact;
         $mform->addElement('text', 'backpackemail', get_string('defaultissuercontact', 'core_badges'));
         $mform->setType('backpackemail', PARAM_EMAIL);
         $mform->setDefault('backpackemail', $issuercontact);
+        $mform->hideIf('backpackemail', 'includeauthdetails');
 
         $mform->addElement('passwordunmask', 'password', get_string('defaultissuerpassword', 'core_badges'));
         $mform->setType('password', PARAM_RAW);
         $mform->addHelpButton('password', 'defaultissuerpassword', 'badges');
         $mform->hideIf('password', 'apiversion', 'eq', 1);
+        $mform->hideIf('password', 'includeauthdetails');
 
         // Disable short forms.
         $mform->setDisableShortforms();
