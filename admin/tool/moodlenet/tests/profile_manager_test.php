@@ -44,7 +44,7 @@ class tool_moodlenet_profile_manager_testcase extends advanced_testcase {
      */
     public function test_get_moodlenet_user_profile() {
         $this->resetAfterTest();
-        $user = $this->getDataGenerator()->create_user(['moodlenetprofile' => 'Anything here will do']);
+        $user = $this->getDataGenerator()->create_user(['moodlenetprofile' => '@matt@hq.mnet']);
 
         $result = \tool_moodlenet\profile_manager::get_moodlenet_user_profile($user->id);
         $this->assertEquals($user->moodlenetprofile, $result->get_profile_name());
@@ -107,7 +107,7 @@ class tool_moodlenet_profile_manager_testcase extends advanced_testcase {
         $this->resetAfterTest();
 
         $user = $this->getDataGenerator()->create_user();
-        $profilename = 'Anything will do';
+        $profilename = '@matt@hq.mnet';
 
         $moodlenetprofile = new \tool_moodlenet\moodlenet_user_profile($profilename, $user->id);
 
