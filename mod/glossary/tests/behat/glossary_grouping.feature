@@ -107,6 +107,16 @@ Feature: Glossary entries allow for grouping
     Then I should see "Separate groups: Group A"
     Then I should see "Dummy first entry"
     And  I should see "Dummy second entry"
+    And  I should not see "Dummy third entry"
+    And I should see "Dummy fourth entry"
+    And I log out
+    When I log in as "student4"
+    And I am on "Course 1" course homepage
+    And I follow "Test glossary"
+    Then I should see "Separate groups: Group B"
+    Then I should see "Dummy first entry"
+    And  I should not see "Dummy second entry"
+    And  I should see "Dummy third entry"
     And I should see "Dummy fourth entry"
 
   Scenario: Glossary 'Separate groups' viewability as a student who belongs to multiple groups

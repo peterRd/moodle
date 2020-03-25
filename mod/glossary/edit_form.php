@@ -81,12 +81,16 @@ class mod_glossary_entry_form extends moodleform {
                     $mform->addElement('select', 'groupid', get_string('group'), $groupinfo);
                     $mform->setType('groupid', PARAM_INT);
                 } else {
-                    if (empty($currententry->groupid) || $currententry->groupid < 0) {
-                        $groupname = get_string('allparticipants');
+                    if (empty($currententry->groupid)) {
+                        reset($groupinfo);
+                        $groupid = key($groupinfo);
                     } else {
-                        $groupname = format_string($groupdata[$currententry->groupid]->name);
+                        $groupid = $currententry->groupid;
                     }
+                    $groupname = format_string($groupdata[$groupid]->name);
                     $mform->addElement('static', 'groupinfo', get_string('group'), $groupname);
+                    $mform->addElement('hidden', 'groupid',   $groupid);
+                    $mform->setType('groupid', PARAM_INT);
                 }
             }
         }
