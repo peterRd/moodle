@@ -31,6 +31,7 @@ $string['enablemoodlenet'] = 'Enable the MoodleNet integration';
 $string['enablemoodlenetinfo'] = 'Enabling the integration allows users with the \'xx\' capability to browse MoodleNet from the
 activity chooser and import MoodleNet resources into their course. It also allows users to push backups from MoodleNet into Moodle.
 ';
+$string['invalidmoodlenetprofile'] = '$userprofile is not correctly formatted';
 $string['forminfo'] = "It will be automatically saved on your Moodle profile.";
 $string['instancedescription'] = "Description of what you can find on MoodleNet and that you will be directed out of the Moodle site.<br />
         Description of what you can find on MoodleNet and that you will be directed out of the Moodle site.<br />
