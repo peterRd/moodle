@@ -110,7 +110,7 @@ if (!$result->correctanswer && !$result->noanswer && !$result->isessayquestion &
     echo $OUTPUT->single_button($url, get_string('reviewquestionback', 'lesson'));
 }
 
-$url = new moodle_url('/mod/lesson/view.php', array('id'=>$cm->id, 'pageid'=>$result->newpageid, 'review' => $review));
+$url = new moodle_url('/mod/lesson/view.php', ['id' => $cm->id, 'pageid' => $result->newpageid, 'review' => $review]);
 
 if ($lesson->review && !$result->correctanswer && !$result->noanswer && !$result->isessayquestion && !$result->maxattemptsreached) {
     // If both the "Yes, I'd like to try again" and "No, I just want to go on  to the next question" point to the same

@@ -102,8 +102,8 @@ class lesson_page_type_matching extends lesson_page {
         }
 
         $action = $CFG->wwwroot.'/mod/lesson/continue.php';
-        $params = array('answers'=>$answers, 'useranswers'=>$useranswers, 'responseoptions'=>$responseoptions,
-            'lessonid'=>$this->lesson->id, 'contents'=>$this->get_contents(), 'review' => $reviewmode);
+        $params = ['answers' => $answers, 'useranswers' => $useranswers, 'responseoptions' => $responseoptions,
+            'lessonid' => $this->lesson->id, 'contents' => $this->get_contents(), 'review' => $reviewmode];
         $mform = new lesson_display_answer_form_matching($action, $params);
         return $mform;
     }
