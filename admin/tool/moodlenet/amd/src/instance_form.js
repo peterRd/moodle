@@ -131,7 +131,7 @@ define(['tool_moodlenet/validator',
         registerListenerEvents(showMoodleNet, footerData.generic);
 
         // Move to the next slide, and resolve the transition promise when it's done.
-        carousel.one('slid.bs.carousel', () => {
+        carousel.one('slid.bs.carousel', function() {
             transitionPromiseResolver();
         });
         // Trigger the transition between 'pages'.
@@ -169,20 +169,8 @@ define(['tool_moodlenet/validator',
         if (data.enabled === true) {
             data.courseID = courseId;
             data.sectionID = caller;
-            if (data.installed === true) {
-                // Assumption multiple mnet instances or is the URL meant to be appended to something?
-                // They have added a account to their profile show then a direct link.
-                if (data.advanced !== false) {
-                    /*var userInput = data.advanced.split("@");
-                    data.test = userInput[2];
-                    data.user = userInput[1];*/
-                }
-                // On click show the carousel item / render it then show.
-            }
-            // Plugin has been removed or disabled but promo is still shown.
         }
         return data;
-        // Final catch where the Admin want no references.
     };
 
     return {

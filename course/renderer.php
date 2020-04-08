@@ -177,7 +177,7 @@ class core_course_renderer extends plugin_renderer_base {
             'advanced' => $advanced, // Can be false if user has not entered text into the fake form.
             'img' => $this->image_url('MoodleNet', 'tool_moodlenet')->out(false), // mnet logo for use in templates etc.
         ];
-        print_object($footerdata);
+
         $this->page->requires->js_call_amd('core_course/activitychooser', 'init', [$courseid, $footerdata]);
 
         return '';
