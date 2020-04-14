@@ -1578,6 +1578,17 @@ class page_requirements_manager {
             }
             $output .= html_writer::script($js);
         }
+        $options = [
+            'showclose' => false,
+            'customjs' => ['core_course/moodlenetimport', 'init', ['customimportclass']],
+            'customclass' => ['customimportclass']
+        ];
+        $link = html_writer::link('#', 'cancel');
+        \core\notification::add(
+            get_string('importfrommoodlenet', 'course', ['filename' => 'test.png', 'link' => $link]),
+            \core\output\notification::NOTIFY_INFO,
+            $options
+        );
 
         // Mark head sending done, it is not possible to anything there.
         $this->headdone = true;

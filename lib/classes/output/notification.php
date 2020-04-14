@@ -80,6 +80,8 @@ class notification implements \renderable, \templatable {
      */
     protected $extraclasses = array();
 
+    protected $customjs = array();
+
     /**
      * Notification constructor.
      *
@@ -133,6 +135,19 @@ class notification implements \renderable, \templatable {
     }
 
     /**
+     * Set any custom js scripts that is required to manimpualte the notification content.
+     *
+     * @param array $customjs the params would have to be in the same order as passed to js_call_amd i.e.
+     *              [modulename, func, params]
+     * @return $this
+     */
+    public function set_customjs(array $customjs = []) {
+        $this->customjs = $customjs;
+
+        return $this;
+    }
+
+    /**
      * Get the message for this notification.
      *
      * @return string message
@@ -157,6 +172,12 @@ class notification implements \renderable, \templatable {
      * @return stdClass data context for a mustache template
      */
     public function export_for_template(\renderer_base $output) {
+        // If this notification requires some custom js, then include it.
+        if ($this->customjs) {
+            global $PAGE;
+            $PAGE->requires->js_call_amd(...$this->customjs);
+        }
+
         return array(
             'message'       => clean_text($this->message),
             'extraclasses'  => implode(' ', $this->extraclasses),
