@@ -54,16 +54,25 @@ class notification {
      *
      * @param string $message The message to add to the stack
      * @param string $level   The type of message to add to the stack
+     * @param bool $showclose Should the close button be shown?
+     * @param array $customclass Additional classes to be used in the notification.
+     * @param array $customjs Additional js required for the notification.
+     * @throws \coding_exception
      */
-    public static function add($message, $level = null) {
+    public static function add($message, $level = null, bool $showclose = true,
+                array $customclass = [], array $customjs = []) {
         global $PAGE, $SESSION;
 
         if ($PAGE && $PAGE->state === \moodle_page::STATE_IN_BODY) {
             // Currently in the page body - just render and exit immediately.
             // We insert some code to immediately insert this into the user-notifications created by the header.
             $id = uniqid();
+            $notification = new \core\output\notification($message, $level);
+            $notification->set_show_closebutton($showclose);
+            $notification->set_customjs($customjs);
+            $notification->set_extra_classes($customclass);
             echo \html_writer::span(
-                $PAGE->get_renderer('core')->render(new \core\output\notification($message, $level)),
+                $PAGE->get_renderer('core')->render($notification),
                 '', array('id' => $id));
 
             // Insert this JS here using a script directly rather than waiting for the page footer to load to avoid
@@ -93,6 +102,9 @@ class notification {
         $SESSION->notifications[] = (object) array(
             'message'   => $message,
             'type'      => $level,
+            'showclose' => $showclose,
+            'customclass' => $customclass,
+            'customjs' => $customjs,
         );
     }
 
@@ -114,6 +126,9 @@ class notification {
         $renderables = [];
         foreach ($notifications as $notification) {
             $renderable = new \core\output\notification($notification->message, $notification->type);
+            $renderable->set_show_closebutton($notification->showclose);
+            $renderable->set_customjs($notification->customjs);
+            $renderable->set_extra_classes($notification->customclass);
             $renderables[] = $renderable;
         }
 

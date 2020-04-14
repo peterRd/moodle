@@ -119,4 +119,31 @@ class core_notification_testcase extends advanced_testcase {
         \core\session\manager::init_empty_session();
         $this->assertCount(1, $SESSION->notifications);
     }
+
+    /**
+     * Test notification creation with additional configuration options.
+     */
+    public function test_notification_additional_configurations() {
+        global $SESSION;
+
+        \core\notification::add('Example before header', \core\notification::INFO, false);
+        $this->assertCount(1, $SESSION->notifications);
+        $this->assertCount(5, (array) $SESSION->notifications[0]);
+        $this->assertFalse($SESSION->notifications[0]->showclose);
+        $this->assertEmpty($SESSION->notifications[0]->customclass);
+        $this->assertEmpty($SESSION->notifications[0]->customjs);
+
+        // Create notification with additional setting config.
+        unset($SESSION->notifications);
+        $additionaljs = ['test', 'test2', ['test3']];
+        \core\notification::add('Example before header', \core\notification::INFO, false,
+            ['test'], $additionaljs);
+        $this->assertCount(1, $SESSION->notifications);
+        $this->assertCount(5, (array) $SESSION->notifications[0]);
+        $this->assertFalse($SESSION->notifications[0]->showclose);
+        $this->assertNotEmpty($SESSION->notifications[0]->customclass);
+        $this->assertEquals(['test'], $SESSION->notifications[0]->customclass);
+        $this->assertNotEmpty($SESSION->notifications[0]->customjs);
+        $this->assertEquals($additionaljs, $SESSION->notifications[0]->customjs);
+    }
 }
