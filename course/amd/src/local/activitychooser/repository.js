@@ -78,3 +78,13 @@ export const unfavouriteModule = (modName, modID) => {
     };
     return ajax.call([request])[0];
 };
+
+export const stopImportProcess = () => {
+    const request = {
+        methodname: 'core_course_stop_import_process',
+        args: {
+            status: true
+        }
+    };
+    return ajax.call([request])[0];
+};

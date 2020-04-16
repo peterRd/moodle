@@ -2762,6 +2762,14 @@ $functions = array(
         'capabilities'  => '',
         'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
+    'core_course_stop_import_process' => array(
+        'classname' => 'core_course_external',
+        'methodname' => 'stop_import_process',
+        'classpath' => 'course/externallib.php',
+        'description' => 'Stops and removes the moodlenet import process.',
+        'type' => 'read',
+        'ajax' => true,
+    ),
 );
 
 $services = array(

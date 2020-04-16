@@ -4336,4 +4336,44 @@ class core_course_external extends external_api {
             ]
         );
     }
+
+    /**
+     * Returns description of method parameters.
+     *
+     * @return external_function_parameters
+     */
+    public static function stop_import_process_parameters() {
+        return new external_function_parameters(array(
+            'status' => new external_value(PARAM_TEXT, 'If created or deleted'),
+        ));
+    }
+
+    /**
+     * Stop the import process
+     *
+     * @return array some warnings or something.
+     */
+    public static function stop_import_process(): array {
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        // TODO: Change this to a more appropriate capability
+//        require_capability('moodle/site:import', $context);
+
+        unset($_SESSION['moodlenet']);
+        return ['success' => true];
+    }
+
+    /**
+     * Returns warnings.
+     *
+     * @return external_description
+     */
+    public static function stop_import_process_returns() {
+        return new external_single_structure(
+            [
+                'success' => new external_value(PARAM_BOOL, 'Successfully stopped.'),
+            ]
+        );
+    }
 }
