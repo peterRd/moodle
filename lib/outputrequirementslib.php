@@ -1583,12 +1583,20 @@ class page_requirements_manager {
             'customjs' => ['core_course/moodlenetimport', 'init', ['customimportclass']],
             'customclass' => ['customimportclass']
         ];
-        $link = html_writer::link('#', 'cancel');
-        \core\notification::add(
-            get_string('importfrommoodlenet', 'course', ['filename' => 'test.png', 'link' => $link]),
-            \core\output\notification::NOTIFY_INFO,
-            $options
-        );
+
+        // If we are doing an import from MoodleNet then display a notification across the site.
+        global $SESSION;
+        if (isset($SESSION->moodlenetimport)) {
+            $resourceurl = urldecode($SESSION->moodlenetimport['resource']);
+            $filename = basename($resourceurl);
+            $resource = $filename ? $filename : $resourceurl;
+            $link = html_writer::link('#', 'cancel');
+            \core\notification::add(
+                get_string('importfrommoodlenet', 'course', ['filename' => $resource, 'link' => $link]),
+                \core\output\notification::NOTIFY_INFO,
+                $options
+            );
+        }
 
         // Mark head sending done, it is not possible to anything there.
         $this->headdone = true;

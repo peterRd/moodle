@@ -18,6 +18,14 @@ if (!empty($_POST)) {
         $resourceurl = validate_param($_POST['resourceurl'], PARAM_URL);
         $resourceurl = urlencode($resourceurl);
 
+        $sessionparams = [
+            'resource' => $resourceurl,
+            'course' => $course,
+            'section' => $section
+        ];
+        global $SESSION;
+        $SESSION->moodlenetimport = $sessionparams;
+
         // Build the URL to fetch.
         $url = new moodle_url('/admin/tool/moodlenet/index.php', ['resourceurl' => $resourceurl]);
 

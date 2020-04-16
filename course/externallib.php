@@ -4356,11 +4356,10 @@ class core_course_external extends external_api {
     public static function stop_import_process(): array {
         $context = context_system::instance();
         self::validate_context($context);
+        require_capability('moodle/course:update', $context);
 
-        // TODO: Change this to a more appropriate capability
-//        require_capability('moodle/site:import', $context);
-
-        unset($_SESSION['moodlenet']);
+        global $SESSION;
+        unset($SESSION->moodlenetimport);
         return ['success' => true];
     }
 

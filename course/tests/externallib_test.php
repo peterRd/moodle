@@ -3198,4 +3198,22 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
         $this->assertFalse($favouritefactory->favourite_exists($component, $areaname, $areaid, $context));
         $this->assertFalse($result['status']);
     }
+
+    public function test_stop_import_process() {
+        global $SESSION;
+        $this->resetAfterTest();
+
+        $this->setAdminUser();
+        $SESSION->moodlenetimport = [];
+        core_course_external::stop_import_process();
+        $this->assertFalse(isset($SESSION->moodlenetimport));
+
+        $course  = self::getDataGenerator()->create_course();
+        $user = self::getDataGenerator()->create_and_enrol($course, 'student');
+
+        // Try and stop import, who won't have the permission to manage activities.
+        $this->setUser($user);
+        $this->expectException('required_capability_exception');
+        core_course_external::stop_import_process();
+    }
 }
