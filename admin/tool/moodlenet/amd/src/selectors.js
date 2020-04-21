@@ -26,11 +26,15 @@ define([], function() {
         action: {
             browse: '[data-action="browse"]',
             submit: '[data-action="submit"]',
+            showMoodleNet: '[data-action="show-moodlenet"]',
+            closeOption: '[data-action="close-chooser-option-summary"]',
         },
         region: {
             instancePage: '[data-region="moodle-net"]',
             spinner: '[data-region="spinner"]',
             validationArea: '[data-region="validation-area"]',
+            carousel: '[data-region="carousel"]',
+            moodleNet: '[data-region="moodleNet"]',
         },
     };
 });

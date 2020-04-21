@@ -86,7 +86,8 @@ const registerListenerEvents = (courseId, footerData) => {
                 const sectionId = parseInt(caller.dataset.sectionid);
                 const favouriteFunction = partiallyAppliedFavouriteManager(data, sectionId);
                 const builtModuleData = sectionIdMapper(data, sectionId);
-                const builtFooterData = await footerDataBuilder(footerData, courseId, sectionId);
+                const footerplugin = await getPlugin(footerData.customfooterjs);
+                const builtFooterData = await footerplugin.footerDataBuilder(footerData, courseId, sectionId);
                 const sectionModal = await modalBuilder(builtModuleData, builtFooterData);
 
                 ChooserDialogue.displayChooser(caller, sectionModal, builtModuleData, favouriteFunction, builtFooterData);
@@ -152,24 +153,6 @@ const templateDataBuilder = (data) => {
         recommendedFirst: recommendedFirst,
         fallback: fallback,
     };
-};
-
-/**
- * A small helper function for anything that wishes to add information to the footer.
- *
- * @param {Object} data What we use to figure out if / what we need to render
- * @param {Number} courseId What course was this modal called from
- * @param {Number} caller Which section of this course is this modal for
- * @return {Object} Our data object with formatting done.
- */
-const footerDataBuilder = async(data, courseId, caller) => {
-    // Conditionally load this based on footerData.
-    if (data.installed === true) {
-        const mnetFunctions = await getPlugin('tool_moodlenet/instance_form');
-        return mnetFunctions.chooserFooterLogic(data, courseId, caller);
-    } else {
-        return data;
-    }
 };
 
 /**

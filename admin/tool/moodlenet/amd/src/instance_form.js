@@ -173,10 +173,52 @@ define(['tool_moodlenet/validator',
         return data;
     };
 
+    /**
+     * A small helper function for anything that wishes to add information to the footer.
+     *
+     * @param {Object} data What we use to figure out if / what we need to render
+     * @param {Number} courseId What course was this modal called from
+     * @param {Number} caller Which section of this course is this modal for
+     * @return {Object} Our data object with formatting done.
+     */
+    var footerDataBuilder = function(data, courseId, caller) {
+        // Conditionally load this based on footerData.
+        if (data.installed === true) {
+            return chooserFooterLogic(data, courseId, caller);
+        } else {
+            return data;
+        }
+    };
+
+        /**
+         * Create the custom listener that would handle anything in the footer.
+         *
+         * @param {Event} e The event being triggered.
+         * @param {Object} footerData The data generated from the exporter.
+         * @param {Object} modal The chooser modal.
+         */
+    var footerClickListener = function(e, footerData, modal) {
+        if (e.target.matches(Selectors.action.showMoodleNet) || e.target.closest(Selectors.action.showMoodleNet)) {
+            e.preventDefault();
+            const carousel = $(modal.getBody()[0].querySelector(Selectors.region.carousel));
+            const showMoodleNet = carousel.find(Selectors.region.moodleNet)[0];
+
+            chooserNavigateToMnet(showMoodleNet, footerData, carousel, modal);
+        }
+        // From the help screen go back to the module overview.
+        if (e.target.matches(Selectors.action.closeOption)) {
+            const carousel = $(modal.getBody()[0].querySelector(Selectors.region.carousel));
+
+            chooserNavigateFromMnet(carousel, modal, footerData);
+        }
+    };
+
     return {
         init: init,
         chooserNavigateToMnet: chooserNavigateToMnet,
         chooserNavigateFromMnet: chooserNavigateFromMnet,
         chooserFooterLogic: chooserFooterLogic,
+        footerDataBuilder: footerDataBuilder,
+        footerClickListener: footerClickListener
     };
 });

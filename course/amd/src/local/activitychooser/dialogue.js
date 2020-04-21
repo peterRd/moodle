@@ -168,20 +168,8 @@ const registerListenerEvents = (modal, mappedModules, partialFavourite, footerDa
     // need to manage. The below code handles a real footer going to a mnet carousel item.
     const footerClickListener = async(e) => {
         if (footerData.installed === true) {
-            const mnetFunctions = await getPlugin('tool_moodlenet/instance_form');
-            if (e.target.matches(selectors.actions.showMoodleNet) || e.target.closest(selectors.actions.showMoodleNet)) {
-                e.preventDefault();
-                const carousel = $(modal.getBody()[0].querySelector(selectors.regions.carousel));
-                const showMoodleNet = carousel.find(selectors.regions.moodleNet)[0];
-
-                mnetFunctions.chooserNavigateToMnet(showMoodleNet, footerData, carousel, modal);
-            }
-            // From the help screen go back to the module overview.
-            if (e.target.matches(selectors.actions.closeOption)) {
-                const carousel = $(modal.getBody()[0].querySelector(selectors.regions.carousel));
-
-                mnetFunctions.chooserNavigateFromMnet(carousel, modal, footerData);
-            }
+            const footerjs = await getPlugin(footerData.customfooterjs);
+            await footerjs.footerClickListener(e, footerData, modal);
         }
     };
 
