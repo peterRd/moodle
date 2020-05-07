@@ -874,7 +874,7 @@ function badges_open_badges_backpack_api() {
  * @param int $id The backpack id.
  * @return array(stdClass)
  */
-function badges_get_site_backpack($id) {
+function badges_get_site_backpack($id, $userid = 0) {
     global $DB;
 
     $sql = "SELECT beb.*, bb.id as badgebackpack, bb.password, bb.email as backpackemail
@@ -882,7 +882,7 @@ function badges_get_site_backpack($id) {
             LEFT JOIN {badge_backpack} bb ON bb.externalbackpackid = beb.id AND bb.userid=:userid
             WHERE beb.id=:id";
 
-    return $DB->get_record_sql($sql, ['id' => $id, 'userid' => 0]);
+    return $DB->get_record_sql($sql, ['id' => $id, 'userid' => $userid]);
 }
 
 /**
@@ -904,11 +904,7 @@ function badges_get_site_primary_backpack() {
 function badges_get_site_backpacks() {
     global $DB, $CFG;
 
-    $sql = "SELECT beb.*, bb.id as badgebackpack, bb.password, bb.email as backpackemail
-            FROM {badge_external_backpack} beb
-            LEFT JOIN {badge_backpack} bb ON bb.externalbackpackid = beb.id
-            WHERE bb.id IS NULL OR bb.userid=:userid";
-    $all = $DB->get_records_sql($sql, ['userid' => 0]);
+    $all = $DB->get_records('badge_external_backpack');
 
     foreach ($all as $key => $bp) {
         if ($bp->id == $CFG->badges_site_backpack) {
@@ -940,6 +936,7 @@ function badges_get_badge_api_versions() {
 function badges_get_default_issuer() {
     global $CFG, $SITE;
 
+    $sitebackpack = badges_get_site_primary_backpack();
     $issuer = array();
     $issuerurl = new moodle_url('/');
     $issuer['name'] = $CFG->badges_defaultissuername;
@@ -947,7 +944,7 @@ function badges_get_default_issuer() {
         $issuer['name'] = $SITE->fullname ? $SITE->fullname : $SITE->shortname;
     }
     $issuer['url'] = $issuerurl->out(false);
-    $issuer['email'] = $CFG->badges_defaultissuercontact;
+    $issuer['email'] = $sitebackpack->backpackemail ?? $CFG->badges_defaultissuercontact;
     $issuer['@context'] = OPEN_BADGES_V2_CONTEXT;
     $issuerid = new moodle_url('/badges/issuer_json.php');
     $issuer['id'] = $issuerid->out(false);
