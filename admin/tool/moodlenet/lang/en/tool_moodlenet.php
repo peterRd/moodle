@@ -32,7 +32,6 @@ $string['browsecontentmoodlenet'] = "Or browse for content on MoodleNet";
 $string['clearsearch'] = "Clear search";
 $string['connectandbrowse'] = "Connect to and browse:";
 $string['defaultmoodlenet'] = "Default MoodleNet URL";
-$string['defaultmoodlenet_desc'] = "The Moodle HQ run instance of MoodleNet";
 $string['defaultmoodlenet_desc'] = "The URL to either Moodle HQ's MoodleNet instance, or your preferred instance.";
 $string['defaultmoodlenetname'] = "MoodleNet instance name";
 $string['defaultmoodlenetname_desc'] = 'The name of either Moodle HQ\'s MoodleNet instance or your preferred MoodleNet instance to browse on.';
@@ -41,14 +40,14 @@ $string['enablemoodlenet_desc'] = 'Enabling the integration allows users with th
 activity chooser and import MoodleNet resources into their course. It also allows users to push backups from MoodleNet into Moodle.
 ';
 $string['errorduringdownload'] = 'An error occurred while downloading the file: {$a}';
-$string['forminfo'] = "It will be automatically saved on your Moodle profile.";
+$string['forminfo'] = "Your MoodleNet profile URL will be automatically saved in your profile.";
 $string['footermessage'] = "Or, browse for content on";
 $string['instancedescription'] = "MoodleNet is an open social media platform for educators, with a focus on the collaborative curation of collections of open resources. ";
 $string['instanceplaceholder'] = '@yourprofile@moodle.net';
 $string['inputhelp'] = 'Or if you have a MoodleNet account already, enter your MoodleNet profile:';
 $string['invalidmoodlenetprofile'] = '$userprofile is not correctly formatted';
-$string['importconfirm'] = 'You are about to add the resource "{$a->resourcename}" to the course "{$a->coursename}". Please confirm if this is what you intend to do.';
-$string['importconfirmnocourse'] = 'You are about to add the resource "{$a->resourcename}". Please confirm if this is what you intend to do.';
+$string['importconfirm'] = 'You are about to import the content "{$a->resourcename}" to the course "{$a->coursename}". Are you sure you want to continue?';
+$string['importconfirmnocourse'] = 'You are about to import the content "{$a->resourcename}" into your site. Are you sure you want to continue?';
 $string['importformatselectguidingtext'] = 'In which format would you like the resource "{$a->name}" to be added to your course?';
 $string['importformatselectheader'] = 'Choose the resource display format';
 $string['missinginvalidpostdata'] = 'The resource information from MoodleNet is either missing, or is in an incorrect format.
