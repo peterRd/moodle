@@ -58,15 +58,22 @@ class tool_moodlenet_lib_testcase extends advanced_testcase {
                 '@name@domain.name',
                 1,
                 2,
-                'domain.name/endpoint?site=' . urlencode($CFG->wwwroot)
-                    . '&path=' . urlencode('admin/tool/moodlenet/import.php?course=1&section=2')
+                'https://domain.name/' . MOODLENET_DEFAULT_ENDPOINT . '?site=' . urlencode($CFG->wwwroot)
+                    . '&course=1&section=2'
             ],
             [
                 '@profile@name@domain.name',
                 1,
                 2,
-                'domain.name/endpoint?site=' . urlencode($CFG->wwwroot)
-                    . '&path=' . urlencode('admin/tool/moodlenet/import.php?course=1&section=2')
+                'https://domain.name/' . MOODLENET_DEFAULT_ENDPOINT . '?site=' . urlencode($CFG->wwwroot)
+                    . '&course=1&section=2'
+            ],
+            [
+                'https://domain.name',
+                1,
+                2,
+                'https://domain.name/' . MOODLENET_DEFAULT_ENDPOINT . '?site=' . urlencode($CFG->wwwroot)
+                    . '&course=1&section=2'
             ]
         ];
     }
