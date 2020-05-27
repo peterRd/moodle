@@ -114,6 +114,7 @@ foreach ($handlerregistry->get_resource_handlers_for_strategy($importinfo->get_r
 // Template context.
 $context = [
     'resourcename' => $importinfo->get_resource()->get_name(),
+    'resourcetype' => $importinfo->get_config()->type,
     'resourceurl' => urlencode($importinfo->get_resource()->get_url()->get_value()),
     'course' => $course->id,
     'section' => $config->section,

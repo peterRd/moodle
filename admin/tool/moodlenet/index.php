@@ -119,6 +119,7 @@ $renderer = $PAGE->get_renderer('core');
 $context = $context = [
     'resourceurl' => $importinfo->get_resource()->get_url()->get_value(),
     'resourcename' => $importinfo->get_resource()->get_name(),
+    'resourcetype' => $importinfo->get_config()->type,
     'sesskey' => sesskey()
 ];
 if (!is_null($importinfo->get_config()->course) && !is_null($importinfo->get_config()->section)) {

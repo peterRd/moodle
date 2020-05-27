@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['addingaresource'] = 'Adding a resource from MoodleNet';
+$string['addingaresource'] = 'Adding content from MoodleNet';
 $string['aria:enterprofile'] = "Enter your MoodleNet profile URL";
 $string['aria:footermessage'] = "Browse for content on MoodleNet";
 $string['browsecontentmoodlenet'] = "Or browse for content on MoodleNet";
@@ -40,16 +40,16 @@ $string['enablemoodlenet_desc'] = 'Enabling the integration allows users with th
 activity chooser and import MoodleNet resources into their course. It also allows users to push backups from MoodleNet into Moodle.
 ';
 $string['errorduringdownload'] = 'An error occurred while downloading the file: {$a}';
-$string['forminfo'] = "Your MoodleNet profile URL will be automatically saved in your profile.";
-$string['footermessage'] = "Or, browse for content on";
+$string['forminfo'] = "It will be automatically saved on your moodle profile.";
+$string['footermessage'] = "Or browse for content on";
 $string['instancedescription'] = "MoodleNet is an open social media platform for educators, with a focus on the collaborative curation of collections of open resources. ";
 $string['instanceplaceholder'] = '@yourprofile@moodle.net';
 $string['inputhelp'] = 'Or if you have a MoodleNet account already, enter your MoodleNet profile:';
 $string['invalidmoodlenetprofile'] = '$userprofile is not correctly formatted';
-$string['importconfirm'] = 'You are about to import the content "{$a->resourcename}" to the course "{$a->coursename}". Are you sure you want to continue?';
-$string['importconfirmnocourse'] = 'You are about to import the content "{$a->resourcename}" into your site. Are you sure you want to continue?';
-$string['importformatselectguidingtext'] = 'In which format would you like the resource "{$a->name}" to be added to your course?';
-$string['importformatselectheader'] = 'Choose the resource display format';
+$string['importconfirm'] = 'You are about to import the content "{$a->resourcename} ({$a->resourcetype})" into the course "{$a->coursename}". Are you sure you want to continue?';
+$string['importconfirmnocourse'] = 'You are about to import the content "{$a->resourcename} ({$a->resourcetype})" into your site. Are you sure you want to continue?';
+$string['importformatselectguidingtext'] = 'In which format would you like this content "{$a->name} ({$a->type})" to be added to your course?';
+$string['importformatselectheader'] = 'Choose the content display format';
 $string['missinginvalidpostdata'] = 'The resource information from MoodleNet is either missing, or is in an incorrect format.
 If this happens repeatedly, please contact the site administrator.';
 $string['mnetprofile'] = 'MoodleNet profile';
@@ -57,15 +57,13 @@ $string['mnetprofiledesc'] = '<p>Enter in your MoodleNet profile details here to
 $string['moodlenetsettings'] = 'MoodleNet settings';
 $string['moodlenetnotenabled'] = 'The MoodleNet integration must be enabled before resource imports can be processed.
 To enable this feature, see the \'enablemoodlenet\' setting.';
-$string['notification'] = 'You are currently adding the resource "{$a->name}". Navigate to the course you want to add the content to, or <a href="{$a->cancellink}">Cancel</a>.';
+$string['notification'] = 'You are about to import the content "{$a->name} ({$a->type})" into your site. Select the course in which it should be added, or <a href="{$a->cancellink}">cancel</a>.';
 $string['searchcourses'] = "Search courses";
-$string['selectacourseinfo'] = 'Please select the course in which the resource "{$a}" will be added';
-$string['selecthelp'] = 'We have narrowed down the list of courses where you have the permission to create resources. If you can not find a course, please contact your Moodle administrator.';
 $string['selectpagetitle'] = 'Select page';
 $string['pluginname'] = 'MoodleNet';
 $string['privacy:metadata'] = "The MoodleNet tool only facilitates communication with MoodleNet. It stores no data.";
-$string['profilevalidationerror'] = 'There was a problem trying to validate your profile URL';
-$string['profilevalidationfail'] = 'Please enter a valid MoodleNet profile URL';
-$string['profilevalidationpass'] = 'Your profile has been saved, you will be redirected in a moment.';
+$string['profilevalidationerror'] = 'There was a problem trying to validate your profile';
+$string['profilevalidationfail'] = 'Please enter a valid MoodleNet profile';
+$string['profilevalidationpass'] = 'Looks good!';
 $string['saveandgo'] = "Save and go";
 $string['uploadlimitexceeded'] = 'The file size {$a->filesize} exceeds the user upload limit of {$a->uploadlimit} bytes.';

@@ -58,10 +58,10 @@
             </div>
             <div class="box py-3 modal-body">
                 {{#course}}
-                    {{#str}}importconfirm, tool_moodlenet, {"resourcename": {{#quote}}{{resourcename}}{{/quote}}, "coursename": {{#quote}}{{coursename}}{{/quote}} }{{/str}}
+                    {{#str}}importconfirm, tool_moodlenet, {"resourcename": {{#quote}}{{resourcename}}{{/quote}}, "resourcetype": {{#quote}}{{resourcetype}}{{/quote}}, "coursename": {{#quote}}{{coursename}}{{/quote}} }{{/str}}
                 {{/course}}
                 {{^course}}
-                    {{#str}}importconfirmnocourse, tool_moodlenet, {"resourcename": {{#quote}}{{resourcename}}{{/quote}} }{{/str}}
+                    {{#str}}importconfirmnocourse, tool_moodlenet, {"resourcename": {{#quote}}{{resourcename}}{{/quote}}, "resourcetype": {{#quote}}{{resourcetype}}{{/quote}} }{{/str}}
                 {{/course}}
 
             </div>
