@@ -18,12 +18,12 @@
     <div class="overlay-icon-container d-none" data-region="spinner"></div>
     <img class="w-25 mb-4" aria-hidden="true" src="{{{img}}}">
     <p>{{#str}} instancedescription, tool_moodlenet {{/str}}</p>
-    <button class="btn btn-secondary d-block w-50 mx-auto mt-5 mb-3"
+    <p class="w-50 mx-auto mt-5 mb-1">{{#str}} connectandbrowse, tool_moodlenet {{/str}}</p>
+    <button class="btn btn-secondary d-block w-50 mx-auto mb-4"
             data-action="browse"
     >
         {{#str}} browsemoodlenet, tool_moodlenet {{/str}}
     </button>
-    <p class="text-center text-uppercase h5">{{#str}} or, tool_moodlenet {{/str}}</p>
     <div id="mnet-instance-form-{{uniqid}}" data-region="mnet-form">
         <input type="hidden" name="sesskey" value="{{sesskey}}">
         <div class="w-50 mx-auto my-3">

@@ -27,10 +27,9 @@
 }}
 <div data-region="moodle-net-select">
     <div class="alert alert-primary" role="alert">
-        {{#str}} notification, tool_moodlenet, {"name": {{#quote}}{{name}}{{/quote}}, "cancellink": {{#quote}}{{cancellink}}{{/quote}} } {{/str}}
+        {{#str}} notification, tool_moodlenet, {"name": {{#quote}}{{name}}{{/quote}}, "cancellink": {{#quote}}{{cancellink}}{{/quote}}, "type": {{#quote}}{{type}}{{/quote}}  } {{/str}}
     </div>
     <h3>{{#str}} selectacourse {{/str}}</h3>
-    <p>{{#str}} selectacourseinfo, tool_moodlenet, {{name}} {{/str}}</p>
     <div class="searchbar input-group w-50" role="search">
         <label for="searchinput">
             <span class="sr-only">{{#str}} searchcourses, tool_moodlenet {{/str}}</span>
@@ -56,5 +55,4 @@
         </div>
     </div>
     <div class="my-4" data-region="mnet-courses" aria-live="polite"></div>
-    <p tabindex="0">{{#str}} selecthelp, tool_moodlenet{{/str}}</p>
 </div>
