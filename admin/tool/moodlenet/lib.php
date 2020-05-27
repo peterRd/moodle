@@ -86,7 +86,7 @@ function tool_moodlenet_custom_chooser_footer(int $courseid, int $sectionid): ac
         'advanced' => $advanced,
         'courseID' => $courseid,
         'sectionID' => $sectionid,
-        'img' => $OUTPUT->image_url('MoodleNet', 'core')->out(false),
+        'img' => $OUTPUT->image_url('MoodleNet', 'tool_moodlenet')->out(false),
     ]);
 
     $renderedcarousel = $OUTPUT->render_from_template('tool_moodlenet/chooser_moodlenet', (object)[
@@ -94,7 +94,7 @@ function tool_moodlenet_custom_chooser_footer(int $courseid, int $sectionid): ac
         'generic' => $defaultlink,
         'courseID' => $courseid,
         'sectionID' => $sectionid,
-        'img' => $OUTPUT->image_url('MoodleNet', 'core')->out(false),
+        'img' => $OUTPUT->image_url('MoodleNet', 'tool_moodlenet')->out(false),
     ]);
     return new activity_chooser_footer(
         'tool_moodlenet/instance_form',
