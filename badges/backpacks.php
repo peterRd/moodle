@@ -63,8 +63,7 @@ if ($action == 'edit') {
     if (!empty($id)) {
         $backpack = badges_get_site_backpack($id);
     }
-    $form = new \core_badges\form\external_backpack();
-    $form->set_data($backpack);
+    $form = new \core_badges\form\external_backpack(null, ['externalbackpack' => $backpack]);
     if ($form->is_cancelled()) {
         redirect($url);
     } else if ($data = $form->get_data()) {

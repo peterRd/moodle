@@ -132,7 +132,7 @@ function label_delete_instance($id) {
  */
 function label_get_coursemodule_info($coursemodule) {
     global $DB;
-
+//http://localhost/stable_master/pluginfile.php/514/mod_label/intro/Screenshot%20from%202020-05-22%2009-51-16.png
     if ($label = $DB->get_record('label', array('id'=>$coursemodule->instance), 'id, name, intro, introformat')) {
         if (empty($label->name)) {
             // label name missing, fix it

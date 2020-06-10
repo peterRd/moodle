@@ -848,13 +848,14 @@ function badges_delete_site_backpack($id) {
  * @param int $id The id of the record we are updating
  * @return mixed bool|id Returns boolean true if updating a record else returns the id of the new record
  */
-function badges_create_external_backpack($data, $id = 0) {
+function badges_create_external_backpack($data, ?int $id = null) {
     global $DB;
     $backpack = new stdClass();
 
     $backpack->apiversion = $data->apiversion;
     $backpack->backpackweburl = $data->backpackweburl;
     $backpack->backpackapiurl = $data->backpackapiurl;
+    $backpack->oauth2_issuerid = $data->oauth2_issuerid;
     if (isset($data->sortorder)) {
         $backpack->sortorder = $data->sortorder;
     }
@@ -864,7 +865,7 @@ function badges_create_external_backpack($data, $id = 0) {
         $backpack->id = $id;
     }
     $record = $DB->$method('badge_external_backpack', $backpack, true);
-    $data->externalbackpackid = $id ?? $record->id;
+    $data->externalbackpackid = $id ?? $record;
     badges_create_backpack_creditionals($data);
 
     return $data->externalbackpackid;

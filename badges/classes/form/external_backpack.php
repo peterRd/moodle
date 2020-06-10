@@ -44,7 +44,7 @@ class external_backpack extends \moodleform {
         global $CFG;
 
         $mform = $this->_form;
-
+        $backpack = null;
         if (isset($this->_customdata['externalbackpack'])) {
             $backpack = $this->_customdata['externalbackpack'];
         }
@@ -85,10 +85,9 @@ class external_backpack extends \moodleform {
         $mform->addElement('checkbox', 'includeauthdetails', null, get_string('includeauthdetails', 'core_badges'));
 
         $issuercontact = $CFG->badges_defaultissuercontact;
-        if ($backpack && $backpack->apiversion != OPEN_BADGES_V2P1) {
-            $this->add_auth_fields($issuercontact);
-        } else {
-            $this->add_auth_fields($issuercontact, false);
+        $this->add_auth_fields($issuercontact);
+
+        if ($backpack && $backpack->apiversion == OPEN_BADGES_V2P1) {
             $oauth2options = badges_get_oauth2_service_options();
             $mform->addElement('select', 'oauth2_issuerid', get_string('oauth2issuer', 'core_badges'), $oauth2options);
             $mform->setType('oauth2_issuerid', PARAM_INT);
@@ -99,7 +98,7 @@ class external_backpack extends \moodleform {
 
         $mform->hideIf('backpackemail', 'includeauthdetails');
         $mform->hideIf('password', 'includeauthdetails');
-        $mform->hideIf('password', 'apiversion', 'eq', 1);
+        $mform->hideIf('password', 'apiversion', 'in', [1, OPEN_BADGES_V2P1]);
 
         // Disable short forms.
         $mform->setDisableShortforms();
@@ -133,7 +132,7 @@ class external_backpack extends \moodleform {
      * @param boolean $includepassword
      * @throws \coding_exception
      */
-    protected function add_auth_fields(?string $email, boolean $includepassword = true) {
+    protected function add_auth_fields(?string $email, bool $includepassword = true) {
         $mform = $this->_form;
         $mform->addElement('text', 'backpackemail', get_string('defaultissuercontact', 'core_badges'));
         $mform->setType('backpackemail', PARAM_EMAIL);

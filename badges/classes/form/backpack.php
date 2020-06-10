@@ -54,9 +54,13 @@ class backpack extends external_backpack {
         $mform->addElement('hidden', 'userid', $USER->id);
         $mform->setType('userid', PARAM_INT);
         $sitebackpacks = badges_get_site_backpacks();
-        $choices = array();
+        $choices = [];
+        $restrictedoptions = [];
         foreach ($sitebackpacks as $backpack) {
             $choices[$backpack->id] = $backpack->backpackweburl;
+            if ($backpack->apiversion == OPEN_BADGES_V2P1) {
+                $restrictedoptions[] = $backpack->id;
+            }
         }
         $mform->addElement('select', 'externalbackpackid', get_string('backpackprovider', 'badges'), $choices);
         $mform->setType('externalbackpackid', PARAM_INT);
@@ -74,6 +78,8 @@ class backpack extends external_backpack {
         $mform->addElement('static', 'status', get_string('status'), $status);
 
         $this->add_auth_fields($USER->email);
+        $mform->hideIf('password', 'externalbackpackid', 'in', $restrictedoptions);
+        $mform->hideIf('backpackemail', 'externalbackpackid', 'in', $restrictedoptions);
 
         $mform->setDisableShortforms(false);
 
@@ -87,8 +93,8 @@ class backpack extends external_backpack {
      * @param null|text $submitlabel
      */
     public function add_action_buttons($cancel = true, $submitlabel = null) {
-        if ($this->_customdata['email']) {
-            $mform = $this->_form;
+        $mform = $this->_form;
+        if (isset($this->_customdata['email'])) {
             $buttonarray = [];
             $buttonarray[] = &$mform->createElement('submit', 'submitbutton',
                                                     get_string('backpackconnectionresendemail', 'badges'));
@@ -98,27 +104,6 @@ class backpack extends external_backpack {
             $mform->closeHeaderBefore('buttonar');
         } else {
             // Email isn't present, so provide an input element to get it and a button to start the verification process.
-
-            $mform->addElement('static', 'info', get_string('backpackweburl', 'badges'), $sitebackpack->backpackweburl);
-            $mform->addElement('hidden', 'backpackid', $sitebackpack->id);
-            $mform->setType('backpackid', PARAM_INT);
-
-            $status = html_writer::tag('span', get_string('notconnected', 'badges'),
-                array('class' => 'notconnected', 'id' => 'connection-status'));
-            $mform->addElement('static', 'status', get_string('status'), $status);
-            if (badges_open_badges_backpack_api() != OPEN_BADGES_V2P1) {
-                $mform->addElement('text', 'email', get_string('email'), 'maxlength="100" size="30"');
-                $mform->addHelpButton('email', 'backpackemail', 'badges');
-                $mform->addRule('email', get_string('required'), 'required', null, 'client');
-                $mform->setType('email', PARAM_EMAIL);
-                if (badges_open_badges_backpack_api() == OPEN_BADGES_V2) {
-                    $mform->addElement('passwordunmask', 'backpackpassword', get_string('password'));
-                    $mform->setType('backpackpassword', PARAM_RAW);
-                } else {
-                    $mform->addElement('hidden', 'backpackpassword', '');
-                    $mform->setType('backpackpassword', PARAM_RAW);
-                }
-            }
             parent::add_action_buttons(false, get_string('backpackconnectionconnect', 'badges'));
         }
     }

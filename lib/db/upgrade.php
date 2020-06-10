@@ -2445,7 +2445,8 @@ function xmldb_main_upgrade($oldversion) {
         global $DB, $CFG;
 
         $table = new xmldb_table('badge_backpack');
-        $uniquekey = 'backpackcreditionals';
+        $uniquekey = new xmldb_key('backpackcreditionals');;
+
         // All external backpack providers/hosts are now exclusively stored in badge_external_backpack.
         // All credentials are stored in badge_backpack and are unique per user, backpack.
         if (!$dbman->find_key_name($table, $uniquekey)) {
