@@ -45,7 +45,6 @@ function badges_install_default_backpacks() {
     } else {
         $bpid = $bp->id;
     }
-    set_config('badges_site_backpack', $bpid);
 
     // All existing backpacks default to V1.
     $DB->set_field('badge_backpack', 'externalbackpackid', $bpid);
@@ -57,9 +56,15 @@ function badges_install_default_backpacks() {
     $record->sortorder = 1;
     $record->password = '';
 
-    if (!$DB->record_exists('badge_external_backpack', array('backpackapiurl' => $record->backpackapiurl))) {
-        $DB->insert_record('badge_external_backpack', $record);
+    $bp = $DB->get_record('badge_external_backpack', ['backpackapiurl' => $record->backpackapiurl]);
+    if (!$bp) {
+        $bpid = $DB->insert_record('badge_external_backpack', $record);
+    } else {
+        $bpid = $bp->id;
     }
+
+    // As of 3.7, badgr.io is the default site backpack
+    set_config('badges_site_backpack', $bpid);
 
 }
 
