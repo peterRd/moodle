@@ -63,5 +63,31 @@ function xmldb_quiz_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020061501, 'quiz');
     }
 
+    if ($oldversion < 2020061502) {
+        $table = new xmldb_table('quiz');
+        $field = new xmldb_field('completionpass');
+
+        if ($dbman->field_exists($table, $field)) {
+            $sql = "SELECT q.id id " .
+                "FROM {quiz} q " .
+                "INNER JOIN {course_modules} cm ON cm.instance = q.id " .
+                "INNER JOIN {modules} m ON m.id = cm.module " .
+                "WHERE m.name = :param1 AND q.completionpass = :param2";
+
+            // Get all quiz records with active completion grade pass set.
+            $records = $DB->get_fieldset_sql($sql, ['param1' => 'quiz', 'param2' => 1]);
+            if ($records) {
+                list($insql, $params) = $DB->get_in_or_equal($records, SQL_PARAMS_NAMED);
+                $sql = "UPDATE {course_modules} cm " .
+                    "SET cm.completionpassgrade = 1 " .
+                    "WHERE cm.instance $insql";
+                $DB->execute($sql, $params);
+                $dbman->drop_field($table, $field);
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2020061502, 'quiz');
+    }
+
     return true;
 }
