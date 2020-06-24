@@ -25,7 +25,7 @@ Feature: Award badges based on activity completion
       | questioncategory | qtype     | name           | questiontext              |
       | Test questions   | truefalse | First question | Answer the first question |
     And the following "activities" exist:
-      | activity   | name           | course | idnumber | attempts | gradepass | completion | completionattemptsexhausted | completionpass | completionusegrade |
+      | activity   | name           | course | idnumber | attempts | gradepass | completion | completionattemptsexhausted | completionpassgrade | completionusegrade |
       | quiz       | Test quiz name | C1     | quiz1    | 2        | 5.00      | 2          | 1                           | 1              | 1                  |
     And quiz "Test quiz name" contains the following questions:
       | question       | page |

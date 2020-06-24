@@ -167,7 +167,9 @@ class mod_quiz_lib_testcase extends advanced_testcase {
                       'sumgrades' => 1,
                       'completion' => COMPLETION_TRACKING_AUTOMATIC,
                       'completionusegrade' => 1,
-                      'completionpass' => 1);
+                      'completionattemptsexhausted' => 1,
+                      'attempts' => 2,
+                      'completionpassgrade' => 1);
         $quiz = $quizgenerator->create_instance($data);
         $cm = get_coursemodule_from_id('quiz', $quiz->cmid);
 
@@ -178,51 +180,55 @@ class mod_quiz_lib_testcase extends advanced_testcase {
         $question = $questiongenerator->create_question('numerical', null, array('category' => $cat->id));
         quiz_add_quiz_question($question->id, $quiz);
 
-        $quizobj = quiz::create($quiz->id, $passstudent->id);
-
         // Set grade to pass.
         $item = grade_item::fetch(array('courseid' => $course->id, 'itemtype' => 'mod',
                                         'itemmodule' => 'quiz', 'iteminstance' => $quiz->id, 'outcomeid' => null));
         $item->gradepass = 80;
         $item->update();
 
-        // Start the passing attempt.
-        $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
-        $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
+        $attempts[$passstudent->id] = [
+            [
+                'attempt' => 1,
+                'answer' => ''
+            ],
+            [
+                'attempt' => 2,
+                'answer' => 3.14,
+            ],
+        ];
+        $attempts[$failstudent->id] = [
+            [
+                'attempt' => 1,
+                'answer' => 2,
+            ]
+        ];
 
-        $timenow = time();
-        $attempt = quiz_create_attempt($quizobj, 1, false, $timenow, false, $passstudent->id);
-        quiz_start_new_attempt($quizobj, $quba, $attempt, 1, $timenow);
-        quiz_attempt_save_started($quizobj, $quba, $attempt);
+        foreach ($attempts as $key => $attemptconfigs) {
+            $quizobj = quiz::create($quiz->id, $key);
 
-        // Process some responses from the student.
-        $attemptobj = quiz_attempt::create($attempt->id);
-        $tosubmit = array(1 => array('answer' => '3.14'));
-        $attemptobj->process_submitted_actions($timenow, false, $tosubmit);
+            foreach ($attemptconfigs as $config) {
+                // Start the passing attempt.
+                $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
+                $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
 
-        // Finish the attempt.
-        $attemptobj = quiz_attempt::create($attempt->id);
-        $this->assertTrue($attemptobj->has_response_to_at_least_one_graded_question());
-        $attemptobj->process_finish($timenow, false);
+                $timenow = time();
+                $attempt = quiz_create_attempt($quizobj, $config['attempt'], false, $timenow, false, $key);
+                quiz_start_new_attempt($quizobj, $quba, $attempt, $config['attempt'], $timenow);
+                quiz_attempt_save_started($quizobj, $quba, $attempt);
 
-        // Start the failing attempt.
-        $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
-        $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
+                // Process some responses from the student.
+                $attemptobj = quiz_attempt::create($attempt->id);
+                if ($config['answer']) {
+                    $tosubmit = array(1 => array('answer' => $config['answer']));
+                    $attemptobj->process_submitted_actions($timenow, false, $tosubmit);
+                }
 
-        $timenow = time();
-        $attempt = quiz_create_attempt($quizobj, 1, false, $timenow, false, $failstudent->id);
-        quiz_start_new_attempt($quizobj, $quba, $attempt, 1, $timenow);
-        quiz_attempt_save_started($quizobj, $quba, $attempt);
-
-        // Process some responses from the student.
-        $attemptobj = quiz_attempt::create($attempt->id);
-        $tosubmit = array(1 => array('answer' => '0'));
-        $attemptobj->process_submitted_actions($timenow, false, $tosubmit);
-
-        // Finish the attempt.
-        $attemptobj = quiz_attempt::create($attempt->id);
-        $this->assertTrue($attemptobj->has_response_to_at_least_one_graded_question());
-        $attemptobj->process_finish($timenow, false);
+                // Finish the attempt.
+                $attemptobj = quiz_attempt::create($attempt->id);
+                $attemptobj->process_finish($timenow, false);
+                $this->assertTrue($attemptobj->has_response_to_at_least_one_graded_question());
+            }
+        }
 
         // Check the results.
         $this->assertTrue(quiz_get_completion_state($course, $cm, $passstudent->id, 'return'));
@@ -947,8 +953,8 @@ class mod_quiz_lib_testcase extends advanced_testcase {
             'course' => $course->id,
             'completion' => 2,
             'completionusegrade' => 1,
+            'completionpassgrade' => 1,
             'completionattemptsexhausted' => 1,
-            'completionpass' => 1
         ]);
         $quiz2 = $this->getDataGenerator()->create_module('quiz', [
             'course' => $course->id,
@@ -964,13 +970,11 @@ class mod_quiz_lib_testcase extends advanced_testcase {
         $moddefaults = new stdClass();
         $moddefaults->customdata = ['customcompletionrules' => [
             'completionattemptsexhausted' => 1,
-            'completionpass' => 1
         ]];
         $moddefaults->completion = 2;
 
         $activeruledescriptions = [
-            get_string('completionattemptsexhausteddesc', 'quiz'),
-            get_string('completionpassdesc', 'quiz'),
+            get_string('completionattemptsexhausteddesc', 'quiz')
         ];
         $this->assertEquals(mod_quiz_get_completion_active_rule_descriptions($cm1), $activeruledescriptions);
         $this->assertEquals(mod_quiz_get_completion_active_rule_descriptions($cm2), []);
