@@ -63,5 +63,36 @@ function xmldb_quiz_upgrade($oldversion) {
     // Automatically generated Moodle v3.10.0 release upgrade line.
     // Put any upgrade step following this.
 
+    if ($oldversion < 2020121101) {
+        $table = new xmldb_table('quiz');
+        $field = new xmldb_field('completionpass');
+
+        if ($dbman->field_exists($table, $field)) {
+            $sql = "SELECT q.id " .
+                     "FROM {quiz} q " .
+               "INNER JOIN {course_modules} cm ON cm.instance = q.id " .
+               "INNER JOIN {modules} m ON m.id = cm.module " .
+                    "WHERE m.name = :name AND q.completionpass = :completionpass";
+
+            do {
+                // Get all quiz records with active completion grade pass set.
+                if ($records = $DB->get_records_sql($sql, ['name' => 'quiz', 'completionpass' => 1], 0, 1000)) {
+                    list($insql, $params) = $DB->get_in_or_equal(array_keys($records), SQL_PARAMS_NAMED);
+                    $DB->set_field_select('course_modules', 'completionpassgrade', 1, "instance $insql", $params);
+
+                    // Reset the value so it doesn't get picked on the next run. The field will be dropped later.
+                    $DB->set_field_select('quiz', 'completionpass', 0, "id $insql", $params);
+                }
+            } while ($records);
+
+            // We have completed our checks. Drop the field.
+            if ($dbman->field_exists($table, $field)) {
+                $dbman->drop_field($table, $field);
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2020121101, 'quiz');
+    }
+
     return true;
 }
