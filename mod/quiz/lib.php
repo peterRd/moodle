@@ -1123,9 +1123,9 @@ function quiz_process_options($quiz) {
 
     // Ensure that disabled checkboxes in completion settings are set to 0.
     if (empty($quiz->completionusegrade)) {
-        $quiz->completionpass = 0;
+        $quiz->completionpassgrade = 0;
     }
-    if (empty($quiz->completionpass)) {
+    if (empty($quiz->completionpassgrade)) {
         $quiz->completionattemptsexhausted = 0;
     }
 }
@@ -1910,7 +1910,7 @@ function quiz_get_completion_state($course, $cm, $userid, $type) {
     global $CFG;
 
     $quiz = $DB->get_record('quiz', array('id' => $cm->instance), '*', MUST_EXIST);
-    if (!$quiz->completionattemptsexhausted && !$quiz->completionpass) {
+    if (!$quiz->completionattemptsexhausted) {
         return $type;
     }
 
@@ -1929,18 +1929,6 @@ function quiz_get_completion_state($course, $cm, $userid, $type) {
         }
     }
 
-    // Check for passing grade.
-    if ($quiz->completionpass) {
-        require_once($CFG->libdir . '/gradelib.php');
-        $item = grade_item::fetch(array('courseid' => $course->id, 'itemtype' => 'mod',
-                'itemmodule' => 'quiz', 'iteminstance' => $cm->instance, 'outcomeid' => null));
-        if ($item) {
-            $grades = grade_grade::fetch_users_grades($item, array($userid), false);
-            if (!empty($grades[$userid])) {
-                return $grades[$userid]->is_passed($item);
-            }
-        }
-    }
     return false;
 }
 
@@ -2128,7 +2116,7 @@ function quiz_get_coursemodule_info($coursemodule) {
     global $DB;
 
     $dbparams = ['id' => $coursemodule->instance];
-    $fields = 'id, name, intro, introformat, completionattemptsexhausted, completionpass';
+    $fields = 'id, name, intro, introformat, completionattemptsexhausted';
     if (!$quiz = $DB->get_record('quiz', $dbparams, $fields)) {
         return false;
     }
@@ -2144,7 +2132,7 @@ function quiz_get_coursemodule_info($coursemodule) {
     // Populate the custom completion rules as key => value pairs, but only if the completion mode is 'automatic'.
     if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
         $result->customdata['customcompletionrules']['completionattemptsexhausted'] = $quiz->completionattemptsexhausted;
-        $result->customdata['customcompletionrules']['completionpass'] = $quiz->completionpass;
+        $result->customdata['customcompletionrules']['completionpassgrade'] = $coursemodule->completionpassgrade;
     }
 
     return $result;
@@ -2169,11 +2157,6 @@ function mod_quiz_get_completion_active_rule_descriptions($cm) {
             case 'completionattemptsexhausted':
                 if (!empty($val)) {
                     $descriptions[] = get_string('completionattemptsexhausteddesc', 'quiz');
-                }
-                break;
-            case 'completionpass':
-                if (!empty($val)) {
-                    $descriptions[] = get_string('completionpassdesc', 'quiz', format_time($val));
                 }
                 break;
             default:

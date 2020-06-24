@@ -131,7 +131,7 @@ class mod_quiz_external extends external_api {
                                                     'reviewspecificfeedback', 'reviewgeneralfeedback', 'reviewrightanswer',
                                                     'reviewoverallfeedback', 'questionsperpage', 'navmethod',
                                                     'browsersecurity', 'delay1', 'delay2', 'showuserpicture', 'showblocks',
-                                                    'completionattemptsexhausted', 'completionpass', 'overduehandling',
+                                                    'completionattemptsexhausted', 'overduehandling',
                                                     'graceperiod', 'canredoquestions', 'allowofflineattempts');
                         $viewablefields = array_merge($viewablefields, $additionalfields);
                     }
@@ -258,7 +258,6 @@ class mod_quiz_external extends external_api {
                             'completionattemptsexhausted' => new external_value(PARAM_INT, 'Mark quiz complete when the student has
                                                                                 exhausted the maximum number of attempts',
                                                                                 VALUE_OPTIONAL),
-                            'completionpass' => new external_value(PARAM_INT, 'Whether to require passing grade', VALUE_OPTIONAL),
                             'allowofflineattempts' => new external_value(PARAM_INT, 'Whether to allow the quiz to be attempted
                                                                             offline in the mobile app', VALUE_OPTIONAL),
                             'autosaveperiod' => new external_value(PARAM_INT, 'Auto-save delay', VALUE_OPTIONAL),

@@ -204,7 +204,7 @@ class mod_quiz_external_testcase extends externallib_advanced_testcase {
                                         'reviewspecificfeedback', 'reviewgeneralfeedback', 'reviewrightanswer',
                                         'reviewoverallfeedback', 'questionsperpage', 'navmethod',
                                         'browsersecurity', 'delay1', 'delay2', 'showuserpicture', 'showblocks',
-                                        'completionattemptsexhausted', 'completionpass', 'autosaveperiod', 'hasquestions',
+                                        'completionattemptsexhausted', 'autosaveperiod', 'hasquestions',
                                         'overduehandling', 'graceperiod', 'canredoquestions', 'allowofflineattempts');
         $managerfields = array('shuffleanswers', 'timecreated', 'timemodified', 'password', 'subnet');
 

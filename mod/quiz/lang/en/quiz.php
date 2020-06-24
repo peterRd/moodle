@@ -179,9 +179,6 @@ $string['comment'] = 'Comment';
 $string['commentorgrade'] = 'Make comment or override grade';
 $string['comments'] = 'Comments';
 $string['completedon'] = 'Completed on';
-$string['completionpass'] = 'Require passing grade';
-$string['completionpassdesc'] = 'Student must achieve a passing grade to complete this activity';
-$string['completionpass_help'] = 'If enabled, this activity is considered complete when the student receives a pass grade (as specified in the Grade section of the quiz settings) or higher.';
 $string['completionattemptsexhausted'] = 'Or all available attempts completed';
 $string['completionattemptsexhausteddesc'] = 'Complete if all available attempts are exhausted';
 $string['completionattemptsexhausted_help'] = 'Mark quiz complete when the student has exhausted the maximum number of attempts.';
@@ -1005,3 +1002,8 @@ $string['yourfinalgradeis'] = 'Your final grade for this quiz is {$a}.';
 $string['numattemptsmade'] = '{$a} attempts made on this quiz';
 $string['reviewofattempt'] = 'Review of attempt {$a}';
 $string['reviewofpreview'] = 'Review of preview';
+
+// Deprecated since Moodle 4.0.
+$string['completionpass'] = 'Require passing grade';
+$string['completionpassdesc'] = 'Student must achieve a passing grade to complete this activity';
+$string['completionpass_help'] = 'If enabled, this activity is considered complete when the student receives a pass grade (as specified in the Grade section of the quiz settings) or higher.';

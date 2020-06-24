@@ -25,7 +25,7 @@ Feature: Set a quiz to be marked complete when the student uses all attempts all
       | questioncategory | qtype     | name           | questiontext              |
       | Test questions   | truefalse | First question | Answer the first question |
     And the following "activities" exist:
-      | activity | name           | course | idnumber | attempts | gradepass | completion | completionusegrade | completionpass | completionattemptsexhausted |
+      | activity | name           | course | idnumber | attempts | gradepass | completion | completionusegrade | completionpassgrade | completionattemptsexhausted |
       | quiz     | Test quiz name | C1     | quiz1    | 2        | 5.00      | 2          | 1                  | 1              | 1                           |
     And quiz "Test quiz name" contains the following questions:
       | question       | page |
