@@ -226,7 +226,7 @@ class mod_quiz_lib_testcase extends advanced_testcase {
             'qtype' => 'numerical',
             'quizoptions' => [
                 'completionusegrade' => 1,
-                'completionpass' => 1
+                'completionpassgrade' => 1
             ]
         ]);
 
@@ -267,7 +267,7 @@ class mod_quiz_lib_testcase extends advanced_testcase {
             'quizoptions' => [
                 'attempts' => 2,
                 'completionusegrade' => 1,
-                'completionpass' => 1,
+                'completionpassgrade' => 1,
                 'completionattemptsexhausted' => 1
             ]
         ]);
@@ -362,7 +362,7 @@ class mod_quiz_lib_testcase extends advanced_testcase {
             'quizoptions' => [
                 'attempts' => 2,
                 'completionusegrade' => 1,
-                'completionpass' => 1,
+                'completionpassgrade' => 1,
                 'completionminattemptsenabled' => 1,
                 'completionminattempts' => 2
             ]
@@ -1112,8 +1112,8 @@ class mod_quiz_lib_testcase extends advanced_testcase {
             'course' => $course->id,
             'completion' => 2,
             'completionusegrade' => 1,
+            'completionpassgrade' => 1,
             'completionattemptsexhausted' => 1,
-            'completionpass' => 1
         ]);
         $quiz2 = $this->getDataGenerator()->create_module('quiz', [
             'course' => $course->id,
@@ -1129,13 +1129,11 @@ class mod_quiz_lib_testcase extends advanced_testcase {
         $moddefaults = new stdClass();
         $moddefaults->customdata = ['customcompletionrules' => [
             'completionattemptsexhausted' => 1,
-            'completionpass' => 1
         ]];
         $moddefaults->completion = 2;
 
         $activeruledescriptions = [
-            get_string('completionattemptsexhausteddesc', 'quiz'),
-            get_string('completionpassdesc', 'quiz'),
+            get_string('completionattemptsexhausteddesc', 'quiz')
         ];
         $this->assertEquals(mod_quiz_get_completion_active_rule_descriptions($cm1), $activeruledescriptions);
         $this->assertEquals(mod_quiz_get_completion_active_rule_descriptions($cm2), []);
