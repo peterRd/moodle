@@ -226,6 +226,7 @@ class mod_quiz_external_testcase extends externallib_advanced_testcase {
         $quiz1->groupingid = 0;
         $quiz1->hasquestions = 0;
         $quiz1->hasfeedback = 0;
+        $quiz1->completionpass = 0;
         $quiz1->autosaveperiod = get_config('quiz', 'autosaveperiod');
         $quiz1->introfiles = [];
 
@@ -237,6 +238,7 @@ class mod_quiz_external_testcase extends externallib_advanced_testcase {
         $quiz2->groupingid = 0;
         $quiz2->hasquestions = 0;
         $quiz2->hasfeedback = 0;
+        $quiz2->completionpass = 0;
         $quiz2->autosaveperiod = get_config('quiz', 'autosaveperiod');
         $quiz2->introfiles = [];
 
