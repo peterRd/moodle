@@ -1897,6 +1897,10 @@ function quiz_get_navigation_options() {
     );
 }
 
+function quiz_get_completion_aggregation_state() {
+    return COMPLETION_OR;
+}
+
 /**
  * Internal function used in quiz_get_completion_state. Check passing grade (or no attempts left) requirement for completion.
  * Considering the aggregation state is ORing with the core conditions we need to check passing grade again.
