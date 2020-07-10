@@ -1897,6 +1897,10 @@ function quiz_get_navigation_options() {
     );
 }
 
+function quiz_get_completion_aggregation_state() {
+    return COMPLETION_CUSTOM_MODULE_FLOW;
+}
+
 /**
  * Internal function used in quiz_get_completion_state. Check passing grade (or no attempts left) requirement for completion.
  * Considering the aggregation state is ORing with the core conditions we need to check passing grade again.
@@ -1905,10 +1909,11 @@ function quiz_get_navigation_options() {
  * @param object $cm
  * @param int $userid
  * @param object $quiz
+ * @param array $completionstate
  * @return bool True if the passing grade (or no attempts left) requirement is disabled or met.
  * @throws coding_exception
  */
-function quiz_completion_check_passing_grade_or_all_attempts($course, $cm, $userid, $quiz) {
+function quiz_completion_check_passing_grade_or_all_attempts($course, $cm, $userid, $quiz, $completionstate) {
     global $CFG;
 
     // If completion pass grade is not enabled then we don't need to check further.
@@ -1916,15 +1921,10 @@ function quiz_completion_check_passing_grade_or_all_attempts($course, $cm, $user
         return true;
     }
 
-    // Check for passing grade.
-    require_once($CFG->libdir . '/gradelib.php');
-    $item = grade_item::fetch(array('courseid' => $course->id, 'itemtype' => 'mod',
-        'itemmodule' => 'quiz', 'iteminstance' => $cm->instance, 'outcomeid' => null));
-    if ($item) {
-        $grades = grade_grade::fetch_users_grades($item, array($userid), false);
-        if (!empty($grades[$userid]) && $grades[$userid]->is_passed($item)) {
-            return true;
-        }
+    // Check for passing grade. Core has already checked this, return if it is passed.
+    if (isset($completionstate['passgrade'])
+        && in_array($completionstate['passgrade'], [COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS])) {
+        return true;
     }
 
     // If a passing grade is required and exhausting all available attempts is not accepted for completion,
@@ -1975,10 +1975,11 @@ function quiz_completion_check_min_attempts($userid, $quiz) {
  * @param object $cm Course-module
  * @param int $userid User ID
  * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
+ * @param array $completionstate The current state of completion from core
  * @return bool True if completed, false if not. (If no conditions, then return
  *   value depends on comparison type)
  */
-function quiz_get_completion_state($course, $cm, $userid, $type) {
+function quiz_get_completion_state($course, $cm, $userid, $type, $completionstate = []) {
     global $DB;
 
     $quiz = $DB->get_record('quiz', array('id' => $cm->instance), '*', MUST_EXIST);
@@ -1986,7 +1987,7 @@ function quiz_get_completion_state($course, $cm, $userid, $type) {
         return $type;
     }
 
-    if (!quiz_completion_check_passing_grade_or_all_attempts($course, $cm, $userid, $quiz)) {
+    if (!quiz_completion_check_passing_grade_or_all_attempts($course, $cm, $userid, $quiz, $completionstate)) {
         return false;
     }
 
