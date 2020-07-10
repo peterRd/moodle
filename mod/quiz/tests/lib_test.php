@@ -241,7 +241,8 @@ class mod_quiz_lib_testcase extends advanced_testcase {
         ]);
 
         // Check the results.
-        $this->assertTrue(quiz_get_completion_state($course, $cm, $passstudent->id, 'return'));
+        $completionstate = ['passgrade' => COMPLETION_COMPLETE];
+        $this->assertTrue(quiz_get_completion_state($course, $cm, $passstudent->id, 'return', $completionstate));
 
         // Do a failing attempt.
         $this->do_attempt_quiz([
@@ -252,6 +253,8 @@ class mod_quiz_lib_testcase extends advanced_testcase {
         ]);
 
         // Check the results.
+        $completionstate = ['passgrade' => COMPLETION_INCOMPLETE];
+        $this->assertFalse(quiz_get_completion_state($course, $cm, $failstudent->id, 'return', $completionstate));
         $this->assertFalse(quiz_get_completion_state($course, $cm, $failstudent->id, 'return'));
     }
 
@@ -283,7 +286,8 @@ class mod_quiz_lib_testcase extends advanced_testcase {
         ]);
 
         // Check the results. Quiz is completed by $passstudent because of passing grade.
-        $this->assertTrue(quiz_get_completion_state($course, $cm, $passstudent->id, 'return'));
+        $completionstate = ['passgrade' => COMPLETION_COMPLETE];
+        $this->assertTrue(quiz_get_completion_state($course, $cm, $passstudent->id, 'return', $completionstate));
 
         // Do a failing attempt.
         $this->do_attempt_quiz([
@@ -391,7 +395,8 @@ class mod_quiz_lib_testcase extends advanced_testcase {
         ]);
 
         // Check the results. Quiz is completed by $student because two attempts were done AND a passing grade was obtained.
-        $this->assertTrue(quiz_get_completion_state($course, $cm, $student->id, 'return'));
+        $completionstate = ['passgrade' => COMPLETION_COMPLETE];
+        $this->assertTrue(quiz_get_completion_state($course, $cm, $student->id, 'return', $completionstate));
     }
 
     public function test_quiz_get_user_attempts() {
