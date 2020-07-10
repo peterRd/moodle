@@ -133,6 +133,16 @@ define('COMPLETION_OR', false);
 define('COMPLETION_AND', true);
 
 /**
+ * When a module implements this, completion state is dependent to the
+ * module's _get_completion_state callback.
+ */
+define('COMPLETION_CUSTOM_MODULE_FLOW', true);
+/**
+ * Default completion logic to be followed.
+ */
+define('COMPLETION_STANDARD_FLOW', false);
+
+/**
  * Course completion criteria aggregation method.
  */
 define('COMPLETION_AGGREGATION_ALL', 1);
@@ -652,11 +662,13 @@ class completion_info {
             $userid = $USER->id;
         }
 
-        // Check viewed
-        if ($cm->completionview == COMPLETION_VIEW_REQUIRED &&
-            $current->viewed == COMPLETION_NOT_VIEWED) {
-
-            return COMPLETION_INCOMPLETE;
+        $newstate = COMPLETION_COMPLETE;
+        $completionstate = [];
+        if ($cm->completionview == COMPLETION_VIEW_REQUIRED) {
+            $newstate = ($current->viewed == COMPLETION_VIEWED ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE);
+            $completionstate = [
+                'viewed' => $newstate
+            ];
         }
 
         if ($cm instanceof stdClass) {
@@ -672,45 +684,71 @@ class completion_info {
         // Make sure we're using a cm_info object.
         $cminfo = cm_info::create($cm, $userid);
 
-        $newstate = COMPLETION_COMPLETE;
-
         // Check grade
         if (!is_null($cminfo->completiongradeitemnumber)) {
             $newstate = $this->get_grade_completion($cminfo, $userid);
+            $completionstate['usegrade'] = $newstate;
             if ($cm->completionpassgrade) {
-                // If we are asking to use pass grade completion but haven't set it,
+                // If we are asking to use pass grade completion but haven't set it properly,
                 // then default to COMPLETION_COMPLETE_PASS.
                 if ($newstate == COMPLETION_COMPLETE) {
-                    return COMPLETION_COMPLETE_PASS;
-                } else if ($newstate != COMPLETION_COMPLETE_PASS) {
-                    // Mark as incomplete if there is no grade provided or the grade has failed.
+                    $newstate = COMPLETION_COMPLETE_PASS;
+                }
+
+                // The criteria is to mark an activity as complete if a passing grade has been achieved.
+                // COMPLETION_COMPLETE_FAIL still marks the activity as completed which is incorrect.
+                // Rectify this.
+                if ($newstate == COMPLETION_COMPLETE_FAIL) {
                     $newstate = COMPLETION_INCOMPLETE;
                 }
-            } else if ($newstate == COMPLETION_INCOMPLETE) {
-                return COMPLETION_INCOMPLETE;
+
+                $completionstate['passgrade'] = $newstate;
             }
         }
 
         if (plugin_supports('mod', $cminfo->modname, FEATURE_COMPLETION_HAS_RULES)) {
+            $response = true;
             $cmcompletionclass = activity_custom_completion::get_cm_completion_class($cminfo->modname);
             if ($cmcompletionclass) {
                 /** @var activity_custom_completion $cmcompletion */
                 $cmcompletion = new $cmcompletionclass($cminfo, $userid);
-                if ($cmcompletion->get_overall_completion_state() == COMPLETION_INCOMPLETE) {
-                    return COMPLETION_INCOMPLETE;
-                }
+                $response = $cmcompletion->get_overall_completion_state() != COMPLETION_INCOMPLETE;
             } else {
-                // Fallback to the get_completion_state callback.
                 $function = $cminfo->modname . '_get_completion_state';
                 if (!function_exists($function)) {
                     $this->internal_systemerror("Module {$cminfo->modname} claims to support
                     FEATURE_COMPLETION_HAS_RULES but does not have required
                     {$cminfo->modname}_get_completion_state function");
                 }
-                if (!$function($this->course, $cminfo, $userid, COMPLETION_AND)) {
-                    return COMPLETION_INCOMPLETE;
-                }
+                $response = $function($this->course, $cm, $userid, COMPLETION_AND, $completionstate);
             }
+
+            // Get the relationship between the core_completion and plugin_completion criteria.
+            $aggregationtype = COMPLETION_STANDARD_FLOW;
+            if ($aggregationfn = component_callback_exists("mod_$cminfo->modname", 'get_completion_aggregation_state')) {
+                $aggregationtype = $aggregationfn();
+            }
+            // Within the if condition it handles the current behaviour for the completion criteria.
+            // Within the else, if the response is true and the aggregation type is COMPLETION_CUSTOM_MODULE_FLOW
+            // At this point, completion can be overridden by the plugin.
+            if (!$response && $aggregationtype == COMPLETION_STANDARD_FLOW) {
+                return COMPLETION_INCOMPLETE;
+            } else if ($aggregationtype != COMPLETION_STANDARD_FLOW) {
+                return ($response ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE);
+            }
+        }
+
+        if ($completionstate) {
+            // We have allowed the plugins to do it's thing and run their own checks.
+            // We have now reached a state where we need to AND all the calculated results.
+            $newstate = array_reduce($completionstate, function($carry, $value) {
+                if ($carry == COMPLETION_INCOMPLETE) {
+                    return $carry;
+                } else {
+                    return $value;
+                }
+
+            }, COMPLETION_COMPLETE);
         }
 
         return $newstate;
