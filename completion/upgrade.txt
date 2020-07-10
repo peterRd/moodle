@@ -1,6 +1,12 @@
 This files describes API changes in /completion/* - completion,
 information provided here is intended especially for developers.
 
+=== 4.0 ===
+ * Modified completion criteria to allow plugins to override core completion logic. This is useful when plugins require to override
+   the core completion criteria in cases where it may be dependent on them.
+ * Introduced a new plugin function that would indicate the aggregation type between the plugin and core
+   completion criteria.
+
 === 3.7 ===
  * External function core_completion_external::get_activities_completion_status new returns the following additional field:
    - valueused (indicates whether the completion state affects the availability of other content)

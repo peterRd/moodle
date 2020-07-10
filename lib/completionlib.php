@@ -704,14 +704,26 @@ class completion_info {
         }
 
         if (plugin_supports('mod', $cm->modname, FEATURE_COMPLETION_HAS_RULES)) {
+            // Get the relationship between the core_completion and plugin_completion criteria.
+            $aggregationfn = $cm->modname.'_get_completion_aggregation_state';
+            $aggregationtype = function_exists($aggregationfn) ? $aggregationfn() : COMPLETION_AND;
+
             $function = $cm->modname.'_get_completion_state';
             if (!function_exists($function)) {
                 $this->internal_systemerror("Module {$cm->modname} claims to support
                     FEATURE_COMPLETION_HAS_RULES but does not have required
                     {$cm->modname}_get_completion_state function");
             }
-            if (!$function($this->course, $cm, $userid, COMPLETION_AND)) {
+            $response = $function($this->course, $cm, $userid, COMPLETION_AND);
+            // Within the if condition it handles the current behaviour for the completion criteria.
+            // Within the else, we are assuming if we have reached this point, the completion state is incomplete.
+            // If the response is true and the aggregation type is COMPLETION_OR
+            // Then we set the state to complete as this would override the $newstate.
+            // At this point, completion can be overridden to true by the plugin.
+            if (!$response && $aggregationtype == COMPLETION_AND) {
                 return COMPLETION_INCOMPLETE;
+            } else if ($response && $aggregationtype != COMPLETION_AND){
+                return COMPLETION_COMPLETE;
             }
         }
 
