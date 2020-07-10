@@ -29,6 +29,8 @@ information provided here is intended especially for developers.
     - course_in_list (now: core_course_list_element)
     - coursecat (now: core_course_category)
 * The form element 'htmleditor', which was deprecated in 3.6, has been removed.
+* Require pass grade criteria is now part of core.
+  Refer to upgrade.php to see transitioning from similar plugin criteria to core
 
 === 3.9 ===
 * Following function has been deprecated, please use \core\task\manager::run_from_cli().

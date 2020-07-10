@@ -1894,6 +1894,10 @@ function quiz_get_navigation_options() {
     );
 }
 
+function quiz_get_completion_aggregation_state() {
+    return COMPLETION_OR;
+}
+
 /**
  * Obtains the automatic completion state for this quiz on any conditions
  * in quiz settings, such as if all attempts are used or a certain grade is achieved.
