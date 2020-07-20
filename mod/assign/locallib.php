@@ -5132,13 +5132,23 @@ class assign {
         $notifications = array();
         $submission = $this->get_user_submission($USER->id, false);
         $plugins = $this->get_submission_plugins();
+        $hassubmission = false;
         foreach ($plugins as $plugin) {
             if ($plugin->is_enabled() && $plugin->is_visible()) {
                 $check = $plugin->precheck_submission($submission);
                 if ($check !== true) {
                     $notifications[] = $check;
                 }
+
+                if (!$plugin->is_empty($submission)) {
+                    $hassubmission = true;
+                }
             }
+        }
+
+        // If there are no submissions and no existing notifications to be displayed the stop.
+        if (!$hassubmission && !$notifications) {
+            $notifications[] = get_string('addsubmission_help', 'assign');
         }
 
         $data = new stdClass();
