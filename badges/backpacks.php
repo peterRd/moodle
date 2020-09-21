@@ -70,6 +70,9 @@ if ($action == 'edit') {
         require_sesskey();
         if (!empty($data->id)) {
             badges_update_site_backpack($data->id, $data);
+            // Apart from the password, any change here would result in an error in other parts of the badge systems.
+            // In order to negate this, we restart any further mapping from scratch.
+            badges_external_delete_mappings($data->id);
         } else {
             badges_create_site_backpack($data);
         }
