@@ -3948,5 +3948,26 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2019111804.08);
     }
 
+    if ($oldversion < 2019111805.06) {
+        // Get all lessons that are set with a completion criteria of 'requires grade' but with no grade type set.
+        $sql = "SELECT cm.id
+                  FROM {course_modules} cm
+                  JOIN {lesson} l ON l.id = cm.instance
+                  JOIN {modules} m ON m.id = cm.module
+                 WHERE m.name = :name AND cm.completiongradeitemnumber IS NOT NULL AND l.grade = :grade";
+
+        do {
+            if ($invalidconfigrations = $DB->get_records_sql($sql, ['name' => 'lesson', 'grade' => 0], 0, 1000)) {
+                list($insql, $inparams) = $DB->get_in_or_equal(array_keys($invalidconfigrations), SQL_PARAMS_NAMED);
+                $updatesql = "UPDATE {course_modules}
+                                 SET completiongradeitemnumber = null
+                               WHERE id $insql";
+                $DB->execute($updatesql, $inparams);
+            }
+        } while ($invalidconfigrations);
+
+        upgrade_main_savepoint(true, 2019111805.06);
+    }
+
     return true;
 }
