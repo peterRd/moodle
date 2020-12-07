@@ -7,6 +7,7 @@ information provided here is intended especially for developers.
 * Final deprecation i_dock_block() in behat_deprecated.php
 * Final deprecation of get_courses_page. Function has been removed and core_course_category::get_courses() should be
   used instead.
+* Markdown lib has been upgraded to the latest version - 1.9.0
 
 === 3.10 ===
 * PHPUnit has been upgraded to 8.5. That comes with a few changes:
