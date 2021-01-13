@@ -61,10 +61,12 @@ class repository_dropbox extends repository {
         // Create the dropbox API instance.
         $key = get_config('dropbox', 'dropbox_key');
         $secret = get_config('dropbox', 'dropbox_secret');
+        $isscoped = get_config('dropbox', 'dropbox_scoped');
         $this->dropbox = new repository_dropbox\dropbox(
                 $key,
                 $secret,
-                $returnurl
+                $returnurl,
+                $isscoped
             );
     }
 
