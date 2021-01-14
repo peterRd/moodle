@@ -50,6 +50,9 @@ class repository_dropbox_generator extends testing_repository_generator {
         if (!isset($record['dropbox_cachelimit'])) {
             $record['dropbox_cachelimit'] = 0;
         }
+        if (!isset($record['dropbox_scoped'])) {
+            $record['dropbox_scoped'] = 0;
+        }
         return $record;
     }
 

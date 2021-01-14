@@ -105,6 +105,7 @@ class core_repository_generator_testcase extends advanced_testcase {
         $record->dropbox_key = '12345';
         $record->dropbox_secret = '67890';
         $record->dropbox_cachelimit = '123';
+        $record->dropbox_scoped = 0;
         $dropbox = $this->getDataGenerator()->create_repository_type('dropbox', $record);
 
         $config = get_config('dropbox');
