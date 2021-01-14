@@ -55,9 +55,10 @@ class dropbox extends \oauth2_client {
      * @param   string      $key        The API key
      * @param   string      $secret     The API secret
      * @param   string      $callback   The callback URL
+     * @param   bool        $isscoped   Whether the app we are connecting requires scopes to be provided
      */
-    public function __construct($key, $secret, $callback) {
-        parent::__construct($key, $secret, $callback, implode(' ', self::$requiredscopes));
+    public function __construct($key, $secret, $callback, bool $isscoped) {
+        parent::__construct($key, $secret, $callback, $isscoped ? implode(' ', self::$requiredscopes) : '');
     }
 
     /**
