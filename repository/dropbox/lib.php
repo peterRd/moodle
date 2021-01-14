@@ -535,6 +535,10 @@ class repository_dropbox extends repository {
         $mform->setType('dropbox_cachelimit', PARAM_INT);
         $mform->addElement('static', 'dropbox_cachelimit_info', '',  get_string('cachelimit_info', 'repository_dropbox'));
 
+        $mform->addElement('advcheckbox', 'dropbox_scoped', get_string('scoped', 'repository_dropbox'), ' ');
+        $mform->setType('dropbox_scoped', PARAM_BOOL);
+        $mform->addHelpButton('dropbox_scoped', 'dropbox_scoped', 'repository_dropbox');
+        $mform->addElement('static', 'dropbox_scoped_info', '',  get_string('scoped_info', 'repository_dropbox'));
     }
 
     /**
@@ -551,6 +555,10 @@ class repository_dropbox extends repository {
         if (!empty($options['dropbox_secret'])) {
             set_config('dropbox_secret', trim($options['dropbox_secret']), 'dropbox');
             unset($options['dropbox_secret']);
+        }
+        if (!empty($options['dropbox_scoped'])) {
+            set_config('dropbox_scoped', (bool) $options['dropbox_scoped'], 'dropbox');
+            unset($options['dropbox_scoped']);
         }
         if (!empty($options['dropbox_cachelimit'])) {
             $this->cachelimit = (int) trim($options['dropbox_cachelimit']);
@@ -571,6 +579,8 @@ class repository_dropbox extends repository {
             return trim(get_config('dropbox', 'dropbox_key'));
         } else if ($config === 'dropbox_secret') {
             return trim(get_config('dropbox', 'dropbox_secret'));
+        } else if ($config === 'dropbox_scoped') {
+            return (bool) get_config('dropbox', 'dropbox_scoped');
         } else if ($config === 'dropbox_cachelimit') {
             return $this->max_cache_bytes();
         } else {
@@ -605,6 +615,7 @@ class repository_dropbox extends repository {
                 'dropbox_secret',
                 'pluginname',
                 'dropbox_cachelimit',
+                'dropbox_scoped',
             ];
     }
 
