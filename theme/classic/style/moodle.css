@@ -19853,6 +19853,49 @@ div.editor_atto_content:hover .atto_control {
 div.editor_atto_toolbar button .icon {
   color: #495057; }
 
+#secondarynavnav {
+  opacity: 0;
+  height: 45px;
+  box-shadow: none; }
+  #secondarynavnav.observed {
+    opacity: 1; }
+  #secondarynavnav .nav-link {
+    height: calc(45px - 1px - 0.5rem); }
+
+@media (max-width: 767.98px) {
+  .secondary-mobile {
+    background-color: #e9ecef;
+    padding: 0.25rem; }
+  .secondarynavcontainer {
+    opacity: 1;
+    transition: top 0.5s ease, bottom 0.5s ease;
+    height: 100vh;
+    left: 0;
+    right: 0;
+    position: fixed;
+    bottom: calc(-100vh - 5px);
+    z-index: 1050;
+    background-color: #fff; }
+    .secondarynavcontainer.show {
+      bottom: 0; }
+    .secondarynavcontainer .menutitle {
+      padding-left: 1.25rem; }
+    .secondarynavcontainer #secondarynavnav {
+      height: 100%;
+      max-height: 100%;
+      flex-direction: column;
+      overflow: scroll; }
+      .secondarynavcontainer #secondarynavnav .navbar-nav {
+        flex-direction: column;
+        width: 100%;
+        margin: 0; }
+      .secondarynavcontainer #secondarynavnav .nav-link {
+        height: auto;
+        padding: 0.75rem 1.25rem;
+        border-top: 1px solid #dee2e6;
+        border-bottom: 1px solid #dee2e6;
+        margin-bottom: -1px; } }
+
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }

@@ -62,7 +62,25 @@
 
     <div id="page" class="container-fluid d-print-block">
         {{{ output.full_header }}}
+        {{#secondarynavigation}}
+        <div class="secondarynavcontainer">
+            <div class="d-flex d-md-none align-items-center">
+                <div class="small pl-3">Course menu</div>
+                <button class="btn ml-auto icon-size-5" data-action="close-secondary-menu">
+                    <i class="icon fa fa-times"></i>
+                </button>
+            </div>
 
+            <nav id="secondarynavnav" class="navbar navbar-light navbar-expand w-100 p-0">
+                {{{ secondarynavigation }}}
+            </nav>
+        </div>
+        <div class="d-md-none secondary-mobile">
+            <button class="d-md-none mobiletoggle btn btn-outline-secondary" data-action="view-secondary-menu">
+                Secondary
+            </button>
+        </div>
+        {{/secondarynavigation}}
         <div id="page-content" class="row pb-3 d-print-block">
             <div id="region-main-box" class="col-12">
                 {{#hasregionmainsettingsmenu}}
@@ -105,5 +123,9 @@ M.util.js_pending('theme_boost/drawer');
 require(['theme_boost/drawer'], function(drawer) {
     drawer.init();
     M.util.js_complete('theme_boost/drawer');
+});
+
+require(['theme_boost/secondarynav'], function(secondarynav) {
+    secondarynav.togglenavigation();
 });
 {{/js}}

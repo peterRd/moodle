@@ -3694,6 +3694,19 @@ EOD;
     }
 
     /**
+     * Transforms a normal navigation bar into the more menu navigation bar
+     *
+     * @param object $content
+     * @return string
+     */
+    public function more_menu($content) {
+        if (is_object($content)) {
+            $template = (object) ['nodecollection' => $content];
+        }
+        return $this->render_from_template('core/moremenu', $template);
+    }
+
+    /**
      * Renders a custom menu object (located in outputcomponents.php)
      *
      * The custom menu this method produces makes use of the YUI3 menunav widget
