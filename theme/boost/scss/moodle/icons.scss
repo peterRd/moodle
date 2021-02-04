@@ -43,7 +43,7 @@ $iconsizes: map-merge((
     }
 }
 
-.navbar-dark a .icon {
+.navbar-dark .nav-link .icon {
     color: $navbar-dark-color !important; /* stylelint-disable-line declaration-no-important */
 }
 

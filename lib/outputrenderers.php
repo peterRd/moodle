@@ -3311,7 +3311,7 @@ EOD;
             return html_writer::div(
                 html_writer::span(
                     $returnstr,
-                    'login'
+                    'login nav-link'
                 ),
                 $usermenuclasses
             );
@@ -3328,7 +3328,7 @@ EOD;
             return html_writer::div(
                 html_writer::span(
                     $returnstr,
-                    'login'
+                    'login nav-link'
                 ),
                 $usermenuclasses
             );
@@ -3400,7 +3400,8 @@ EOD;
 
         $am = new action_menu();
         $am->set_menu_trigger(
-            $returnstr
+            $returnstr,
+            'nav-link'
         );
         $am->set_action_label(get_string('usermenu'));
         $am->set_alignment(action_menu::TR, action_menu::BR);
@@ -3673,22 +3674,6 @@ EOD;
             $custommenuitems = $CFG->custommenuitems;
         }
         $custommenu = new custom_menu($custommenuitems, current_language());
-        $langs = get_string_manager()->get_list_of_translations();
-        $haslangmenu = $this->lang_menu() != '';
-
-        if ($haslangmenu) {
-            $strlang = get_string('language');
-            $currentlang = current_language();
-            if (isset($langs[$currentlang])) {
-                $currentlang = $langs[$currentlang];
-            } else {
-                $currentlang = $strlang;
-            }
-            $this->language = $custommenu->add($currentlang, new moodle_url('#'), $strlang, 10000);
-            foreach ($langs as $langtype => $langname) {
-                $this->language->add($langname, new moodle_url($this->page->url, array('lang' => $langtype)), $langname);
-            }
-        }
 
         return $custommenu->export_for_template($this);
     }
@@ -3696,12 +3681,14 @@ EOD;
     /**
      * Transforms a normal navigation bar into the more menu navigation bar
      *
-     * @param object $content
+     * @param string/object $content
      * @return string
      */
     public function more_menu($content) {
         if (is_object($content)) {
             $template = (object) ['nodecollection' => $content];
+        } else {
+            $template = (object) ['rawmenu' => $content];
         }
         return $this->render_from_template('core/moremenu', $template);
     }
@@ -3719,12 +3706,35 @@ EOD;
     protected function render_custom_menu(custom_menu $menu) {
         global $CFG;
 
+        if (!$menu->has_children()) {
+            return '';
+        }
+
+        $content = '';
+        foreach ($menu->get_children() as $item) {
+            $context = $item->export_for_template($this);
+            $content .= $this->render_from_template('core/custom_menu_item', $context);
+        }
+
+        return $content;
+    }
+
+    /**
+     * Renders the language menu.
+     *
+     * @return string
+     */
+    public function render_language_menu() {
+        global $CFG;
+
         $langs = get_string_manager()->get_list_of_translations();
         $haslangmenu = $this->lang_menu() != '';
 
-        if (!$menu->has_children() && !$haslangmenu) {
+        if (!$haslangmenu) {
             return '';
         }
+
+        $menu = new custom_menu('', current_language());
 
         if ($haslangmenu) {
             $strlang = get_string('language');

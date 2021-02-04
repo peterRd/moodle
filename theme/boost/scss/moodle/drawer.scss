@@ -93,17 +93,6 @@ body.drawer-ease {
     transition: margin-left 0.5s ease, margin-right 0.5s ease;
 }
 
-body.drawer-open-left {
-    @include media-breakpoint-up(md) {
-        margin-left: $drawer-width;
-    }
-}
-body.drawer-open-right {
-    @include media-breakpoint-up(md) {
-        margin-right: $drawer-width;
-    }
-}
-
 $right-drawer-width: 320px;
 
 [data-region=right-hand-drawer] {

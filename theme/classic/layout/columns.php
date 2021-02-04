@@ -38,7 +38,8 @@ $templatecontext = [
     'sidepostblocks' => $blockspost,
     'haspreblocks' => $hassidepre,
     'haspostblocks' => $hassidepost,
-    'bodyattributes' => $bodyattributes
+    'bodyattributes' => $bodyattributes,
+    'navbardark' => !empty($PAGE->theme->settings->navbardark),
 ];
 
 echo $OUTPUT->render_from_template('theme_classic/columns', $templatecontext);

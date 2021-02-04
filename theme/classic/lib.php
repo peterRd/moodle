@@ -100,14 +100,6 @@ function theme_classic_get_extra_scss($theme) {
         $content .= file_get_contents($CFG->dirroot .
             '/theme/classic/scss/classic/body-background.scss');
     }
-
-    if (!empty($theme->settings->navbardark)) {
-        $content .= file_get_contents($CFG->dirroot .
-            '/theme/classic/scss/classic/navbar-dark.scss');
-    } else {
-        $content .= file_get_contents($CFG->dirroot .
-            '/theme/classic/scss/classic/navbar-light.scss');
-    }
     if (!empty($theme->settings->scss)) {
         $content .= $theme->settings->scss;
     }
