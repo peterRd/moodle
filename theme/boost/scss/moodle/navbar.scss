@@ -1,67 +1,34 @@
-#secondarynavnav {
-    opacity: 0;
-    height: $secondarynav-height;
-    box-shadow: none;
-    &.observed {
-        opacity: 1;
-    }
-    .nav-link {
-        height: calc(#{$secondarynav-height} - 1px - 0.5rem);
-    }
-}
-
-@include media-breakpoint-down(sm) {
-    .secondary-mobile {
-        background-color: $gray-200;
-        padding: 0.25rem;
-    }
-    .secondarynavcontainer {
-        opacity: 1;
-        transition: top 0.5s ease, bottom 0.5s ease;
-        height: 100vh;
-        left: 0;
-        right: 0;
-        position: fixed;
-        bottom: calc(-100vh - 5px);
-        z-index: 1050;
-        background-color: $body-bg;
-        &.show {
-            bottom: 0;
-        }
-        .menutitle {
-            padding-left: 1.25rem;
-        }
-        #secondarynavnav {
-            height: 100%;
-            max-height: 100%;
-            flex-direction: column;
-            overflow: scroll;
-            .navbar-nav {
-                flex-direction: column;
-                width: 100%;
-                margin: 0;
-            }
-            .nav-link {
-                height: auto;
-                padding: 0.75rem 1.25rem;
-                border-top: $border-width solid $border-color;
-                border-bottom: $border-width solid $border-color;
-                margin-bottom: -$border-width;
-            }
-        }
-    }
-}
-
 #moodlenavbar {
     position: fixed;
     top: 0;
     right: 0;
     left: 0;
-    z-index: $zindex-fixed;
-    padding: 0.25rem 0.5rem;
+    z-index: 1050;
+    padding: $primary-nav-padding-y $primary-nav-padding-x;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
     align-items: stretch;
     height: $navbar-height;
+    .logo,
+    .languagemenu-container,
+    .usermenu,
+    .navbar-brand.nav-link,
+    .usertext,
+    .usermenu .dropdown-toggle::after {
+        display: none;
+    }
+
+    .navbar-toggler {
+        border: 0;
+    }
+
+    @include media-breakpoint-up(md) {
+        .logo,
+        .popover-region,
+        .usermenu,
+        .navbar-brand.nav-link {
+            display: block;
+        }
+    }
     .logo img {
         max-height: calc(#{$navbar-height} - 10px);
     }
@@ -70,90 +37,9 @@
         display: flex;
         align-items: center;
     }
-}
-
-#primarynav {
-    opacity: 0;
-    height: calc(#{$navbar-height} - 0.5rem);
-    flex: 1 1 auto;
-    &.observed {
-        opacity: 1;
+    .divider {
+        width: 1px;
+        height: 28px;
+        background-color: $gray-300;
     }
-    .nav-link {
-        height: calc(#{$navbar-height} - 1px - 0.5rem);
-    }
-    .primary-nav-close {
-        display: none;
-    }
-    .dropdownmoremenu > .dropdown-menu {
-        & > .dropdown-item {
-            padding: 0;
-        }
-        .dropdown-menu {
-            position: static;
-            display: block;
-            padding: 0;
-            border: 0;
-            .dropdown-item {
-                background-color: $gray-100;
-                @include hover-focus() {
-                    color: $dropdown-link-hover-color;
-                    @include gradient-bg($dropdown-link-active-bg);
-                }
-            }
-            .dropdown-divider {
-                display: none;
-            }
-        }
-    }
-}
-
-@include media-breakpoint-down(md) {
-    #primarynav {
-        opacity: 1;
-        transition: right 0.5s ease, left 0.5s ease;
-        position: fixed;
-        width: 285px;
-        top: $navbar-height;
-        z-index: $zindex-dropdown - 1;
-        background-color: $white;
-        left: -305px;
-        height: 100%;
-        overflow-y: auto;
-        .primary-nav-close {
-            position: absolute;
-            right: -42px;
-            top: 0;
-        }
-        &.show {
-            left: 0;
-            .primary-nav-close {
-                display: block;
-            }
-        }
-        .nav {
-            flex-wrap: nowrap;
-            margin: 0;
-            flex-direction: column;
-            border-left: $border-width solid $border-color;
-        }
-        .nav-link,
-        .dropdown-item {
-            padding: 0.75rem 1.25rem;
-            border: $border-width solid $border-color;
-            margin-bottom: -$border-width;
-        }
-        .dropdown-menu {
-            position: static;
-            padding: 0;
-            border: 0;
-            .dropdown-divider {
-                display: none;
-            }
-        }
-    }
-}
-
-.hiddenboost {
-    display: none;
 }

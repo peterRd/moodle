@@ -46,7 +46,7 @@ body:not(.editing)  .sitetopic ul.section {
 
 @include media-breakpoint-up(sm) {
     .course-content ul.section {
-        margin: $spacer;
+        margin: $spacer 0;
     }
 }
 .section {
@@ -341,7 +341,7 @@ body:not(.editing)  .sitetopic ul.section {
         @include media-breakpoint-up(sm) {
             .summary,
             .content > .availabilityinfo {
-                margin-left: 25px;
+                margin-left: 0;
             }
         }
 
@@ -354,7 +354,6 @@ body:not(.editing)  .sitetopic ul.section {
     }
 }
 
-@include media-breakpoint-down(sm) {
     body:not(.editing) {
         .course-content ul.topics,
         .course-content ul.weeks {
@@ -366,7 +365,7 @@ body:not(.editing)  .sitetopic ul.section {
             }
         }
     }
-}
+
 
 .course-content {
     margin-top: 0;

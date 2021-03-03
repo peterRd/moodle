@@ -25,37 +25,56 @@
 defined('MOODLE_INTERNAL') || die();
 
 user_preference_allow_ajax_update('drawer-open-nav', PARAM_ALPHA);
+user_preference_allow_ajax_update('drawer-open-block', PARAM_ALPHA);
+
 require_once($CFG->libdir . '/behat/lib.php');
+require_once($CFG->dirroot . '/blocks/course_modulenavigation/block_course_modulenavigation.php');
 
 if (isloggedin()) {
-    $navdraweropen = (get_user_preferences('drawer-open-nav', 'true') == 'true');
+    $showdrawerleft = (get_user_preferences('drawer-open-nav', 'true') == 'true');
+    $showdrawerright = (get_user_preferences('drawer-open-block', 'true') == 'true');
 } else {
-    $navdraweropen = false;
+    $showdrawerleft = false;
+    $showdrawerright = false;
 }
+
 $extraclasses = [];
-if ($navdraweropen) {
+if ($showdrawerleft) {
     $extraclasses[] = 'drawer-open-left';
 }
 $bodyattributes = $OUTPUT->body_attributes($extraclasses);
 $blockshtml = $OUTPUT->blocks('side-pre');
 $hasblocks = strpos($blockshtml, 'data-block=') !== false;
+if (!$hasblocks) {
+    $showdrawerright = false;
+}
 $buildregionmainsettings = !$PAGE->include_region_main_settings_in_header_actions();
 // If the settings menu will be included in the header then don't add it here.
 $regionmainsettingsmenu = $buildregionmainsettings ? $OUTPUT->region_main_settings_menu() : false;
 
 $primarymenu = $OUTPUT->custom_menu();
 $secondarymenu = $PAGE->secondarynav;
+
+$courseindex = new block_course_modulenavigation();
+$courseindex->instance = -1;
+$courseindexcontent = $courseindex->get_content()->text;
+
+if (empty($courseindexcontent)) {
+    $showdrawerleft = false;
+}
 $templatecontext = [
     'sitename' => format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), "escape" => false]),
     'output' => $OUTPUT,
     'sidepreblocks' => $blockshtml,
     'hasblocks' => $hasblocks,
     'bodyattributes' => $bodyattributes,
-    'navdraweropen' => $navdraweropen,
+    'showdrawerleft' => $showdrawerleft,
+    'showdrawerright' => $showdrawerright,
     'regionmainsettingsmenu' => $regionmainsettingsmenu,
     'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
     'primarynavigation' => $OUTPUT->more_menu($primarymenu),
     'secondarynavigation' => $OUTPUT->more_menu($secondarymenu),
+    'courseindex' => $courseindexcontent
 ];
 
 $nav = $PAGE->flatnav;

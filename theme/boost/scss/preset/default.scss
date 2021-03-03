@@ -33,21 +33,23 @@ $info-outline:    #1f7e9a;
 $warning-outline: #a6670e;
 
 // Options
-$enable-rounded: false !default;
+$enable-rounded: true !default;
 $enable-responsive-font-sizes: true !default;
 
 // Body
 $body-color:    $gray-900 !default;
 
 // Fonts
-$font-size-base: 0.9375rem !default;
+$font-size-base: 1rem !default;
 $rfs-base-font-size: 0.9rem !default;
 $headings-font-weight:   300 !default;
 
 // Navbar
 $navbar-dark-hover-color:           rgba($white, 1) !default;
-$navbar-light-color:                rgba($black, 0.6) !default;
-$navbar-light-hover-color:          rgba($black, .9) !default;
+
+$navbar-nav-link-padding-x: 1rem !default;
+$navbar-light-color: #212529 !default;
+$navbar-light-hover-color: #212529 !default;
 
 // Breadcrumbs
 $breadcrumb-padding-y:              .25rem !default;
@@ -75,6 +77,9 @@ $input-border-color: $gray-500 !default;
 
 $dropdown-link-hover-color: $white;
 $dropdown-link-hover-bg: $primary;
+
+$primary-nav-padding-y: 0rem;
+$primary-nav-padding-x: 0.5rem;
 
 // stylelint-disable
 $theme-colors: () !default;
@@ -119,7 +124,35 @@ body {
 .userpicture {
     border-radius: 50%;
 }
+.navbar-expand #usernavigation.navbar-nav .nav-link {
+    padding-right: 0.7rem;
+    padding-left: 0.7rem;
+    font-weight: normal;
+}
 
+#secondarynavnav .nav-link {
+    height: calc(#{$secondarynav-height} - 1px);
+}
+#secondarynavnav {
+    border-bottom: 1px solid $body-color;
+    border-top: 1px solid $body-color;
+    margin-bottom: 1rem;
+}
+
+.navbar-expand .navbar-nav .nav-link {
+    font-weight: bold;
+    border-top: 3px solid transparent;
+    border-bottom: 3px solid transparent;
+    @include hover-focus() {
+        border-bottom: 3px solid $body-color;
+    }
+    &.active {
+        border-bottom: 3px solid $body-color;
+    }
+}
+.breadcrumb-item a {
+    color: $body-color;
+}
 // Reset the default styling back to the bootstrap defaults for
 // the secondary outline button because gray-200 is much too light
 // for an outline button.

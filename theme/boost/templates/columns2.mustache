@@ -59,54 +59,48 @@
 
     {{> theme_boost/navbar }}
 
-    <div id="page" class="container-fluid d-print-block">
-        {{{ output.full_header }}}
-        {{#secondarynavigation}}
-        <div class="secondarynavcontainer">
-            <div class="d-flex d-md-none align-items-center">
-                <div class="small pl-3">Course menu</div>
-                <button class="btn ml-auto icon-size-5" data-action="close-secondary-menu">
-                    <i class="icon fa fa-times"></i>
+    {{#courseindex}}
+        <div data-region="courseindex" class="d-print-none courseindex drawer drawer-left {{#showdrawerleft}}show{{/showdrawerleft}}">
+            <div class="drawerheader">
+                <div class="drawertitle">Course index</div>
+                <button class="btn drawertoggle icon-no-margin icon-size-4" data-action="closedrawer">
+                    {{#pix}}e/cancel, core, {{#str}}closebuttontitle, core{{/str}}{{/pix}}
                 </button>
             </div>
-            <nav id="secondarynavnav" class="navbar navbar-light navbar-expand w-100 p-0">
-                {{{ secondarynavigation }}}
-            </nav>
+            {{{courseindex}}}
         </div>
-        <div class="d-md-none secondary-mobile">
-            <button class="d-md-none mobiletoggle btn btn-outline-secondary" data-action="view-secondary-menu">
-                Secondary
-            </button>
-        </div>
-        {{/secondarynavigation}}
-        <div id="page-content" class="row pb-3 d-print-block">
-            <div id="region-main-box" class="col-12">
-                {{#hasregionmainsettingsmenu}}
-                <div id="region-main-settings-menu" class="d-print-none {{#hasblocks}}has-blocks{{/hasblocks}}">
-                    <div> {{{ output.region_main_settings_menu }}} </div>
-                </div>
-                {{/hasregionmainsettingsmenu}}
-                <section id="region-main" {{#hasblocks}}class="has-blocks mb-3"{{/hasblocks}} aria-label="{{#str}}content{{/str}}">
+    {{/courseindex}}
 
-                    {{#hasregionmainsettingsmenu}}
-                        <div class="region_main_settings_menu_proxy"></div>
-                    {{/hasregionmainsettingsmenu}}
+    <div id="page" data-region="mainpage" class="drawers {{#showdrawerleft}}show-drawer-left{{/showdrawerleft}} {{#showdrawerright}}show-drawer-right{{/showdrawerright}}">
+        {{{ output.full_header }}}
+
+        {{> theme_boost/secondarynav }}
+
+        <div id="navwatch" class="sticky-top"></div>
+        <div id="page-content" class="pb-3 d-print-block">
+            <div id="region-main-box">
+                <section id="region-main" {{#hasblocks}}class="has-blocks mb-3"{{/hasblocks}} aria-label="{{#str}}content{{/str}}">
                     {{{ output.course_content_header }}}
                     {{{ output.main_content }}}
                     {{{ output.activity_navigation }}}
                     {{{ output.course_content_footer }}}
-
                 </section>
-                {{#hasblocks}}
-                <section data-region="blocks-column" class="d-print-none" aria-label="{{#str}}blocks{{/str}}">
-                    {{{ sidepreblocks }}}
-                </section>
-                {{/hasblocks}}
             </div>
         </div>
+        {{> theme_boost/footer }}
     </div>
+    {{#hasblocks}}
+        <section data-region="blocks-column" class="d-print-none blockdrawer drawer drawer-right {{#showdrawerright}}show{{/showdrawerright}}" aria-label="{{#str}}blocks{{/str}}">
+            <div class="drawerheader">
+                <div class="drawertitle">Blocks</div>
+                <button class="btn drawertoggle icon-no-margin icon-size-4" data-action="closedrawer">
+                    {{#pix}}e/cancel, core, {{#str}}closebuttontitle, core{{/str}}{{/pix}}
+                </button>
+            </div>
+            {{{ sidepreblocks }}}
+        </section>
+    {{/hasblocks}}
     {{{ output.standard_after_main_region_html }}}
-    {{> theme_boost/footer }}
 </div>
 
 </body>
@@ -117,11 +111,19 @@ require(['theme_boost/loader'], function() {
     M.util.js_complete('theme_boost/loader');
 });
 
-require(['theme_boost/primarynav'], function(primarynav) {
-    primarynav.togglenavigation();
+require(['theme_boost/secondary'], function(secondary) {
+    secondary.autohidenav();
 });
 
-require(['theme_boost/secondarynav'], function(secondarynav) {
-    secondarynav.togglenavigation();
+require(['theme_boost/drawer'], function(drawer) {
+    drawer.region('[data-region="courseindex"]', '[data-action="drawer-left-toggle"]' );
+    drawer.region('[data-region="blocks-column"]', '[data-action="drawer-right-toggle"]' );
 });
+
+require(['jquery'], function($) {
+    $('#editingswitch').on('change', function() {
+        $(this).closest('form').submit();
+    });
+});
+
 {{/js}}

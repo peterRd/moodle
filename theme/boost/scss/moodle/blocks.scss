@@ -27,11 +27,6 @@
 
 $blocks-column-width: 360px !default;
 
-[data-region="blocks-column"] {
-    width: $blocks-column-width;
-    float: right;
-}
-
 $blocks-plus-gutter: $blocks-column-width + ( $grid-gutter-width / 2 );
 
 /* We put an absolutely positioned div in a relatively positioned div so it takes up no space */
@@ -63,19 +58,6 @@ $blocks-plus-gutter: $blocks-column-width + ( $grid-gutter-width / 2 );
 @include media-breakpoint-down(sm) {
     #region-main-settings-menu .menubar {
         justify-content: flex-end;
-    }
-}
-
-// Required for IE11 to prevent blocks being pushed under the content.
-#region-main-settings-menu.has-blocks,
-#region-main.has-blocks {
-    display: inline-block;
-    width: calc(100% - #{$blocks-plus-gutter});
-    @include media-breakpoint-down(lg) {
-        width: 100%;
-        /* MDL-63102 - Remove extra space at bottom.
-        If modifying make sure block-region is horizontally stacked when in full screen */
-        display: block;
     }
 }
 
@@ -373,6 +355,13 @@ body.drawer-open-left #region-main.has-blocks {
     height: 2rem;
     border: 2px dashed $gray-800;
     margin: 4px 0;
+}
+
+.block-region {
+    padding: 0.25rem;
+}
+body.editing .block-region {
+    padding: 1rem;
 }
 
 .pagelayout-embedded {

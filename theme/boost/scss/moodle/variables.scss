@@ -20,4 +20,7 @@ $state-danger-bg: theme-color-level("danger", -10) !default;
 $state-danger-border: theme-color-level("danger", -9) !default;
 
 $navbar-height: 60px !default;
-$secondarynav-height: 45px !default;
+$secondarynav-height: 60px !default;
+
+$primary-nav-padding-y: 0.25rem !default;
+$primary-nav-padding-x: 0.5rem !default;

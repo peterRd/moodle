@@ -44,7 +44,7 @@
         }
     }
 }}
-<ul id="moremenu-{{ uniqid }}" class="nav navbar-nav">
+<ul id="moremenu-{{ uniqid }}" class="nav navbar-nav ml-0" role="tablist">
     {{#nodecollection}}
         {{#children}}
             {{> core/moremenu_children}}
@@ -55,7 +55,7 @@
         <a class="dropdown-toggle nav-link" href="#" id="moremenu-dropdown{{ uniqid }}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             {{#str}}more, core{{/str}}
         </a>
-        <ul class="dropdown-menu dropdown-menu-right" data-region="moredropdown" aria-labelledby="moremenu-dropdown{{ uniqid }}" role="menu">
+        <ul class="dropdown-menu" data-region="moredropdown" aria-labelledby="moremenu-dropdown{{ uniqid }}" role="menu">
         </ul>
     </li>
 </ul>

@@ -1,0 +1,92 @@
+#primarynav {
+    opacity: 0;
+    height: calc(#{$navbar-height} - #{$primary-nav-padding-y} * 2);
+    flex: 1 1 auto;
+    .drawerheader {
+        display: none;
+    }
+    &.observed {
+        opacity: 1;
+    }
+    .nav-link {
+        height: calc(#{$navbar-height} - 1px - #{$primary-nav-padding-y} * 2);
+    }
+    .primary-nav-close {
+        height: $navbar-height;
+        display: none;
+        .navlogo img {
+            max-height: calc(#{$navbar-height} - 10px);
+        }
+    }
+    .dropdownmoremenu > .dropdown-menu {
+        & > .dropdown-item {
+            padding: 0;
+        }
+        .dropdown-menu {
+            position: static;
+            display: block;
+            padding: 0;
+            border: 0;
+            .dropdown-item {
+                background-color: $gray-100;
+                @include hover-focus() {
+                    color: $dropdown-link-hover-color;
+                    @include gradient-bg($dropdown-link-active-bg);
+                }
+            }
+            .dropdown-divider {
+                display: none;
+            }
+        }
+    }
+}
+
+@include media-breakpoint-down(md) {
+    #primarynav {
+        opacity: 1;
+        transition: right 0.5s ease, left 0.5s ease;
+        position: fixed;
+        width: 340px;
+        max-width: 340px;
+        top: 0;
+        z-index: $zindex-dropdown - 1;
+        background-color: $white;
+        left: -350px;
+        height: 100%;
+        overflow-y: auto;
+        box-shadow: -4px 4px 14px rgba(0, 0, 0, 0.25);
+        .drawerheader {
+            display: flex;
+        }
+        &.show {
+            left: 0;
+            .primary-nav-close {
+                padding-top: 5px;
+                display: flex;
+                text-align: center;
+            }
+        }
+        .nav {
+            flex-wrap: nowrap;
+            margin: 0;
+            flex-direction: column;
+            border-left: $border-width solid $border-color;
+        }
+        .nav-link,
+        .dropdown-item {
+            height: auto;
+            padding: 0.75rem 1.25rem;
+            border-top: $border-width solid $border-color;
+            border-bottom: $border-width solid $border-color;
+            margin-bottom: -$border-width;
+        }
+        .dropdown-menu {
+            position: static;
+            padding: 0;
+            border: 0;
+            .dropdown-divider {
+                display: none;
+            }
+        }
+    }
+}

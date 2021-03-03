@@ -24,12 +24,14 @@
 }}
 <li class="nav-item">
 	{{#tab}}
-		<a class="nav-link {{#isactive}}active{{/isactive}} {{#classes}}{{.}} {{/classes}}" href="{{tab}}" role="tab" data-toggle="tab" aria-selected="false" tabindex="-1">{{{text}}}
+		<a class="nav-link {{#isactive}}active{{/isactive}} {{#classes}}{{.}} {{/classes}}" href="{{tab}}" role="tab" aria-selected="false" tabindex="-1">{{{text}}}
 		</a>
+
 	{{/tab}}
 	{{#action}}
-	    <a class="nav-link {{#isactive}}active{{/isactive}} {{#classes}}{{.}} {{/classes}}" href="{{{action}}}" role="menuitem"  {{#isactive}}aria-current="true"{{/isactive}}>
-            {{{text}}}
-        </a>
+	    	<a class="nav-link {{#isactive}}active{{/isactive}} {{#classes}}{{.}} {{/classes}}" href="{{{action}}}" role="menuitem"  {{#isactive}}aria-current="true"{{/isactive}}>
+        {{{text}}}
+    </a>
 	{{/action}}
+
 </li>

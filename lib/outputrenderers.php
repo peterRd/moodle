@@ -3686,6 +3686,9 @@ EOD;
      */
     public function more_menu($content) {
         if (is_object($content)) {
+            if (count($content->children) == 0) {
+                return false;
+            }
             $template = (object) ['nodecollection' => $content];
         } else {
             $template = (object) ['rawmenu' => $content];

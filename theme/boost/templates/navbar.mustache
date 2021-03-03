@@ -40,7 +40,7 @@
 <div id="moodlenavbar" class="navbar {{#navbardark}}navbar-dark bg-dark{{/navbardark}}{{^navbardark}}navbar-light bg-white{{/navbardark}} navbar-expand" aria-label="{{#str}}sitemenubar, admin{{/str}}">
     {{#primarynavigation}}
     <nav id="mobilenav" class="nav navbar-nav">
-        <button id="primarynavtoggle" class="navbar-toggler btn nav-link d-lg-none" data-action="toggle-drawer" aria-controls="primarynav" aria-expanded="false">
+        <button id="primarynavtoggle" class="navbar-toggler btn nav-link d-lg-none" data-action="view-primary-navigation" aria-controls="primarynav" aria-expanded="false">
             <span class="navbar-toggler-icon"></span>
             <span class="sr-only">{{#str}}sidepanel, core{{/str}}</span>
         </button>
@@ -57,19 +57,30 @@
         {{/ output.should_display_navbar_logo }}
     </a>
     {{#primarynavigation}}
-    <nav id="primarynav" class="" data-region="primarynavigation">
+    <nav id="primarynav" data-region="primarynavigation">
+        <div class="drawerheader">
+            {{# output.should_display_navbar_logo }}
+                <span class="drawerlogo">
+                    <img src="{{output.get_compact_logo_url}}" alt="{{sitename}}">
+                </span>
+            {{/ output.should_display_navbar_logo }}
+            {{^ output.should_display_navbar_logo }}
+                <span class="site-name">{{{ sitename }}}</span>
+            {{/ output.should_display_navbar_logo }}
+            <button class="btn drawertoggle icon-no-margin icon-size-4" data-action="closedrawer">
+                {{#pix}}e/cancel, core, {{#str}}closebuttontitle, core{{/str}}{{/pix}}
+            </button>
+        </div>
         {{{ primarynavigation }}}
-        <button id="primarynavclose" class="btn btn-dark primary-nav-close icon-no-margin">
-            {{#pix}}e/cancel, core, {{#str}}closebuttontitle, core{{/str}}{{/pix}}
-        </button>
     </nav>
     {{/primarynavigation}}
 
     <nav id="usernavigation" class="navbar-nav ml-auto">
-        <div class="d-flex align-items-stretch languagemenu-container" data-region="languagemenu">
+        <div class="navlink languagemenu-container" data-region="languagemenu">
             {{{ output.render_language_menu }}}
         </div>
         <div class="divider border-left h-50 align-self-center mx-1"></div>
+
         {{{ output.search_box }}}
 
         {{{ output.navbar_plugin_output }}}
@@ -78,5 +89,13 @@
         </div>
     </nav>
 
+    <div class="d-flex h-100 align-items-center">
+        <span class="divider align-self-center mr-3"></span>
+        {{{output.editing_button }}}
+    </div>
 </div>
-
+{{#js}}
+require(['theme_boost/drawer'], function(drawer) {
+    drawer.region('[data-region="primarynavigation"]', '[data-action="view-primary-navigation"]' );
+});
+{{/js}}

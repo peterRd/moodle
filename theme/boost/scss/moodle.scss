@@ -41,4 +41,7 @@ $breadcrumb-divider-rtl: "◀" !default;
 @import "moodle/layout";
 @import "moodle/prefixes";
 @import "moodle/atto";
-@import "moodle/navbar"
+@import "moodle/navbar";
+@import "moodle/primarynavigation";
+@import "moodle/secondarynavigation";
+@import "moodle/courseindex";
